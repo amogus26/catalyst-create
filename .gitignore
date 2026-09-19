@@ -1,0 +1,16 @@
+node_modules/
+.next/
+out/
+build/
+
+# Local dev store - uploaded files and rows when running without Supabase (see lib/store/local.ts)
+.localstore/
+
+# Secrets. .env.example is committed; anything real is not.
+.env
+.env.local
+.env*.local
+
+.DS_Store
+*.tsbuildinfo
+next-env.d.ts
