@@ -1,4 +1,5 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import type { DesignTypeId } from "../design-types";
 import type { Store, StoredImage, Submission, SubmissionStatus } from "./types";
 
 /**
@@ -24,10 +25,11 @@ interface Row {
   created_at: string;
   reviewed_at: string | null;
   featured: boolean;
+  design_type: DesignTypeId;
 }
 
 const COLUMNS =
-  "id, display_name, image_path, status, vote_count, created_at, reviewed_at, featured";
+  "id, display_name, image_path, status, vote_count, created_at, reviewed_at, featured, design_type";
 
 function toSubmission(row: Row): Submission {
   return {
@@ -38,6 +40,7 @@ function toSubmission(row: Row): Submission {
     createdAt: row.created_at,
     reviewedAt: row.reviewed_at,
     featured: row.featured,
+    designType: row.design_type,
   };
 }
 
@@ -56,7 +59,7 @@ export function createSupabaseStore(url: string, serviceRoleKey: string, bucket:
       return `Supabase (${new URL(url).host}, bucket "${bucket}")`;
     },
 
-    async createSubmission({ displayName, bytes, contentType }) {
+    async createSubmission({ displayName, designType, bytes, contentType }) {
       // The id is made here so the object can be named before the row exists: if the insert fails,
       // there is a known path to clean up rather than an orphan with a random name.
       const id = crypto.randomUUID();
@@ -71,7 +74,7 @@ export function createSupabaseStore(url: string, serviceRoleKey: string, bucket:
 
       const insert = await client
         .from("submissions")
-        .insert({ id, display_name: displayName, image_path: path })
+        .insert({ id, display_name: displayName, image_path: path, design_type: designType })
         .select(COLUMNS)
         .single();
 

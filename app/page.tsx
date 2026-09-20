@@ -5,7 +5,7 @@ import { Showcase } from "@/components/showcase";
 import { SubmitForm } from "@/components/submit-form";
 import { FEATURED_LIMIT } from "@/lib/config";
 import { getStore } from "@/lib/store";
-import { LIMIT_TEXT } from "@/lib/validation";
+import { DESIGN_TYPES } from "@/lib/design-types";
 import { currentVoterId } from "@/lib/voter";
 
 // Approvals and votes change under this page constantly; never serve it from the build.
@@ -33,14 +33,14 @@ export default async function HomePage() {
       <section className="hero">
         <p className="eyebrow">Catalyst Client</p>
         <h1>
-          Community <span className="gold">cape designs</span>
+          Community <span className="gold">cosmetic designs</span>
         </h1>
         <p className="lead">
-          Make a cape, put it up for review, and vote on the ones other people have made. The best of
-          each round gets worn in game.
+          Make a cape, a pair of wings or something else to wear, put it up for review, and vote on
+          the ones other people have made. The best of each round gets worn in game.
         </p>
         <div className="hero-meta">
-          <span className="chip">{LIMIT_TEXT}</span>
+          <span className="chip">{DESIGN_TYPES.map((type) => type.label).join(" \u00b7 ")}</span>
           <span className="chip">Every design reviewed by a person</span>
         </div>
       </section>
@@ -52,10 +52,11 @@ export default async function HomePage() {
             <header className="section-head">
               <div>
                 <p className="eyebrow">Your turn</p>
+                <div className="pixel-rule" aria-hidden="true" />
                 <h2>Submit a design</h2>
                 <p className="muted">
-                  Nothing you upload is shown to anyone until a reviewer has looked at it. Expect
-                  that to take a day or two.
+                  Upload a PNG, or draw a cape here in the browser. Nothing you submit is shown to
+                  anyone until a reviewer has looked at it - expect that to take a day or two.
                 </p>
               </div>
             </header>
@@ -77,6 +78,10 @@ export default async function HomePage() {
                   <li>
                     <strong>It joins the showcase.</strong> Approved designs can be voted on, and a
                     few get picked for each round.
+                  </li>
+                  <li>
+                    <strong>No art to hand?</strong> The <em>Draw a cape</em> tab is a 64x32 grid you
+                    can draw on directly - what comes out is a real cape texture.
                   </li>
                 </ol>
                 <p className="tiny muted" style={{ marginBottom: 0 }}>

@@ -10,6 +10,8 @@
  *    else; only the admin routes ask for `pending`.
  */
 
+import type { DesignTypeId } from "../design-types";
+
 export type SubmissionStatus = "pending" | "approved" | "rejected";
 
 export interface Submission {
@@ -21,6 +23,8 @@ export interface Submission {
   reviewedAt: string | null;
   /** Picked by a reviewer for the current voting round. Only meaningful while approved. */
   featured: boolean;
+  /** What kind of cosmetic this is. See lib/design-types.ts. */
+  designType: DesignTypeId;
 }
 
 export interface StoredImage {
@@ -38,6 +42,7 @@ export interface Store {
   /** Stores the image and a row for it. The row is always `pending`; nothing here can change that. */
   createSubmission(input: {
     displayName: string;
+    designType: DesignTypeId;
     bytes: Uint8Array;
     contentType: string;
   }): Promise<Submission>;

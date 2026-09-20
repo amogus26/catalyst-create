@@ -1,7 +1,8 @@
 # Catalyst Designs
 
-A small public site where players submit cape designs for Catalyst Client, and other players vote
-on them. Next.js + Supabase.
+A small public site where players submit cosmetic designs for Catalyst Client - capes, wings, hats,
+backpacks - and other players vote on them. Designs can be uploaded as a PNG or drawn in the
+browser. Next.js + Supabase.
 
 ## The rule this site is built around
 
@@ -31,6 +32,34 @@ Four independent places, so no single mistake opens it:
 Row-level security is on for both tables with **no policies at all**, so the anon key - the only
 key a browser could ever hold - can read and write nothing. Every query goes through this app's
 server.
+
+## Kinds of design, and the size rules
+
+The type names come from the launcher rather than being invented here: its `ShopKind` is
+{Wings, Cape} and its cosmetics page adds Hats and Backpacks. Pets and Emotes are left out on
+purpose - a pet is a model and an emote is an animation, neither of which is a PNG somebody draws.
+
+**Only the cape is size-checked, and that is a deliberate decision.** The cape has a real,
+documented texture size in this project (64x32 or an exact 2:1 HD multiple, because the 1.21.4 cape
+model computes its UVs against a 64x32 layout - the launcher's `ControlsValidation.kt` explains it
+properly). Nothing else has a settled size anywhere: the client mod implements capes
+(`ControlsCapeMixin`) and nothing else yet, and the launcher's wings are drawn artwork rather than
+a texture. Holding wings to the cape's 64x32 would be inventing a spec and rejecting good work for
+breaking a rule nobody has written, so every other type gets format and size checks only - a real
+PNG, under 1 MB, between 8x8 and 1024x1024.
+
+When wings do get implemented, add their sizes to `sizes` in `lib/design-types.ts`; the checks, the
+drop-zone wording and the submit form all follow from that one place.
+
+## Drawing in the browser
+
+The submit section has two tabs: upload a file, or draw a cape. The canvas is exactly 64x32 - a
+real cape texture - and is only *displayed* large (16px per texture pixel on a desktop screen), so
+anything drawn is already the right size and needs no dimension check at all. A drawing is turned
+into a PNG and posted to the same route as an upload, so it arrives pending and goes through the
+same review. Tools are deliberately four: a colour, a pencil, an eraser and a clear.
+
+Capes only, for now, because the cape is the only type whose dimensions are settled.
 
 ## Running it locally
 
@@ -171,13 +200,30 @@ components/
   submit-form.tsx                     the form, with the client half of the file checks
   featured-round.tsx, showcase.tsx    the two ways designs are shown
   design-card.tsx, vote-button.tsx    one card and one vote, shared by both
+  draw-canvas.tsx                     the 64x32 cape canvas and its four tools
+  type-icon.tsx                       a small pixel mark per kind of design
   feature-toggle.tsx                  the reviewer's round picker
 lib/
-  validation.ts                       PNG and cape-size rules, shared by browser and server
+  validation.ts                       PNG and size rules, shared by browser and server
+  design-types.ts                     the kinds of design, and which have fixed sizes
   admin-session.ts                    password check and signed session cookie
   voter.ts                            the voter cookie
   config.ts                           how many designs a round holds
   store/                              types.ts, index.ts (picks a driver), supabase.ts, local.ts
-supabase/migrations/                  0001 tables, RLS, cast_vote, private bucket; 0002 featured
+supabase/migrations/                  0001 tables, RLS, cast_vote, private bucket; 0002 featured;
+                                      0003 design_type
 scripts/check-supabase.mjs            read-only check of a real project
+scripts/remove-submissions.mjs        deletes submissions by display name, rows and images
 ```
+
+## Look and feel
+
+Light theme, Inter for text, and the launcher's own colours darkened until they hold up as ink on
+white - its #4FA8E8 is about 2:1 against a white background, which is unreadable, so the accent is
+a deeper shade of the same hue and the gold is used as a fill with dark text rather than as text.
+
+The page is drawn on graph paper: a single 8px grid at about 4% ink, behind everything. The site is
+about pixel art on a 64x32 grid, so the page sits on one too, and the drawing canvas uses the same
+grid at its own pixel size. The wordmark is set in a pixel face and nothing else is - the launcher
+draws its own mark in a pixel font, and one word in the same voice ties the two together without
+costing any readability.

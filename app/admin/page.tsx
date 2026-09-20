@@ -1,4 +1,6 @@
 import { FeatureToggle } from "@/components/feature-toggle";
+import { TypeIcon } from "@/components/type-icon";
+import { designType } from "@/lib/design-types";
 import { adminPasswordConfigured, isAdmin } from "@/lib/admin-session";
 import { FEATURED_LIMIT } from "@/lib/config";
 import { getStore, type Submission } from "@/lib/store";
@@ -127,7 +129,7 @@ function AdminCard({
         <img
           className="art"
           src={`/api/images/${submission.id}`}
-          alt={`Submission by ${submission.displayName}`}
+          alt={`${designType(submission.designType).label} submission by ${submission.displayName}`}
           loading="lazy"
         />
         {label && (
@@ -142,6 +144,11 @@ function AdminCard({
             {submission.displayName}
           </span>
           <span className="tiny muted">
+            <span className="type-tag">
+              <TypeIcon type={submission.designType} />
+              {designType(submission.designType).label}
+            </span>
+            {" - "}
             {new Date(submission.createdAt).toLocaleDateString()} - {submission.voteCount}{" "}
             {submission.voteCount === 1 ? "vote" : "votes"}
           </span>

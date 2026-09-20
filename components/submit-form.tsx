@@ -1,56 +1,97 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
+import { DrawCanvas } from "./draw-canvas";
+import { TypeIcon } from "./type-icon";
 import {
-  DISPLAY_NAME_MAX,
-  LIMIT_TEXT,
-  validateDisplayName,
-  validateImage,
-} from "@/lib/validation";
+  DESIGN_TYPES,
+  DEFAULT_DESIGN_TYPE,
+  designType,
+  type DesignTypeId,
+} from "@/lib/design-types";
+import { DISPLAY_NAME_MAX, limitText, validateDisplayName, validateImage } from "@/lib/validation";
 
 /**
- * The submission form: a display name, and a PNG dropped or browsed for.
+ * Two ways in, one pipeline: upload a PNG, or draw a cape on the canvas. Both end up posting the
+ * same `FormData` to the same route, so a drawing is pending, reviewed and stored exactly as a
+ * file is - it is a second input method, not a second system.
  *
- * The file is checked here first - the same rules the server applies, from the same module - so a
- * wrong file is refused the moment it is picked rather than after an upload. The message is always
- * on screen; nothing is only logged. The server checks again regardless, because this code runs on
- * the visitor's machine and anything here can be skipped.
+ * An uploaded file is checked here first, with the same rules the server applies, so a wrong file
+ * is refused the moment it is picked. The server checks again regardless. A drawing needs no
+ * dimension check at all: the canvas is the texture's size, so it cannot be the wrong one.
  */
 
+type Mode = "upload" | "draw";
 type Picked = { file: File; previewUrl: string; width: number; height: number };
 
 export function SubmitForm() {
+  const [mode, setMode] = useState<Mode>("upload");
   const [displayName, setDisplayName] = useState("");
+  const [type, setType] = useState<DesignTypeId>(DEFAULT_DESIGN_TYPE);
   const [picked, setPicked] = useState<Picked | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
   const [sending, setSending] = useState(false);
   const [done, setDone] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const take = useCallback(async (file: File | undefined) => {
-    if (!file) return;
-    setError(null);
-    const bytes = new Uint8Array(await file.arrayBuffer());
-    const result = validateImage(file.name, file.size, bytes);
-    if (!result.ok) {
+  const take = useCallback(
+    async (file: File | undefined, forType: DesignTypeId) => {
+      if (!file) return;
+      setError(null);
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      const result = validateImage(file.name, file.size, bytes, forType);
+      if (!result.ok) {
+        setPicked((current) => {
+          if (current) URL.revokeObjectURL(current.previewUrl);
+          return null;
+        });
+        setError(result.message);
+        return;
+      }
       setPicked((current) => {
         if (current) URL.revokeObjectURL(current.previewUrl);
-        return null;
+        return {
+          file,
+          previewUrl: URL.createObjectURL(file),
+          width: result.width,
+          height: result.height,
+        };
       });
-      setError(result.message);
-      return;
+    },
+    [],
+  );
+
+  /** The drawing, as a PNG file - or null if nothing has been drawn on it. */
+  async function drawingAsFile(): Promise<File | null> {
+    const canvas = canvasRef.current;
+    if (!canvas) return null;
+    const context = canvas.getContext("2d");
+    if (context) {
+      const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
+      let painted = false;
+      for (let i = 3; i < pixels.length; i += 4) {
+        if (pixels[i] !== 0) {
+          painted = true;
+          break;
+        }
+      }
+      if (!painted) return null;
     }
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/png"));
+    return blob ? new File([blob], "drawn-cape.png", { type: "image/png" }) : null;
+  }
+
+  function reset() {
+    setDone(false);
     setPicked((current) => {
       if (current) URL.revokeObjectURL(current.previewUrl);
-      return {
-        file,
-        previewUrl: URL.createObjectURL(file),
-        width: result.width,
-        height: result.height,
-      };
+      return null;
     });
-  }, []);
+    setDisplayName("");
+    setError(null);
+  }
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
@@ -61,16 +102,32 @@ export function SubmitForm() {
       setError(name.message);
       return;
     }
-    if (!picked) {
-      setError("Pick a PNG to submit.");
-      return;
+
+    // Drawing mode is capes only, which is also the only type with a fixed size - see
+    // lib/design-types.ts. If another type ever gets a canvas, this is where it widens.
+    const sentType: DesignTypeId = mode === "draw" ? "cape" : type;
+    let file: File | null = null;
+
+    if (mode === "draw") {
+      file = await drawingAsFile();
+      if (!file) {
+        setError("Draw something first - the canvas is empty.");
+        return;
+      }
+    } else {
+      if (!picked) {
+        setError("Pick a PNG to submit.");
+        return;
+      }
+      file = picked.file;
     }
 
     setSending(true);
     try {
       const body = new FormData();
       body.set("displayName", name.value);
-      body.set("image", picked.file);
+      body.set("designType", sentType);
+      body.set("image", file);
       const response = await fetch("/api/submissions", { method: "POST", body });
       const payload = (await response.json().catch(() => ({}))) as { error?: string };
       if (!response.ok) {
@@ -87,27 +144,17 @@ export function SubmitForm() {
 
   if (done) {
     return (
-      <div className="panel stack" role="status">
+      <div className="stack" role="status">
         <div>
-          <h2 style={{ color: "var(--success)" }}>Submitted for review</h2>
+          <h3 style={{ color: "var(--success-ink)" }}>Submitted for review</h3>
           <p style={{ margin: 0 }}>
-            Thanks. Your design is <strong>waiting for review and is not in the gallery yet</strong> -
-            nobody else can see it until one of us has looked at it. If it is approved it will show
-            up in the gallery; if it is not, it simply will not appear.
+            Thanks. Your design is <strong>waiting for review and is not in the showcase yet</strong>{" "}
+            - nobody else can see it until one of us has looked at it. If it is approved it will show
+            up in the showcase; if it is not, it simply will not appear.
           </p>
         </div>
         <div className="row">
-          <button
-            type="button"
-            onClick={() => {
-              setDone(false);
-              setPicked((current) => {
-                if (current) URL.revokeObjectURL(current.previewUrl);
-                return null;
-              });
-              setDisplayName("");
-            }}
-          >
+          <button type="button" onClick={reset}>
             Submit another
           </button>
           <a className="button" href="/#showcase">
@@ -118,13 +165,34 @@ export function SubmitForm() {
     );
   }
 
+  const active = designType(type);
+
   return (
-    <form className="stack" onSubmit={submit} style={{ marginTop: 24 }}>
+    <form className="stack" onSubmit={submit}>
       {error && (
         <div className="notice error" role="alert">
           {error}
         </div>
       )}
+
+      <div className="mode-switch" role="group" aria-label="How to submit">
+        <button
+          type="button"
+          className={mode === "upload" ? "mode on" : "mode"}
+          onClick={() => setMode("upload")}
+          aria-pressed={mode === "upload"}
+        >
+          Upload a file
+        </button>
+        <button
+          type="button"
+          className={mode === "draw" ? "mode on" : "mode"}
+          onClick={() => setMode("draw")}
+          aria-pressed={mode === "draw"}
+        >
+          Draw a cape
+        </button>
+      </div>
 
       <div>
         <label htmlFor="displayName">Display name</label>
@@ -136,72 +204,89 @@ export function SubmitForm() {
           placeholder="Shown next to your design"
           onChange={(event) => setDisplayName(event.target.value)}
         />
-        <p className="tiny muted" style={{ margin: "7px 0 0" }}>
-          A label, not an account - there are no accounts here yet, so anyone could type any name.
-          It is reviewed along with the image.
-        </p>
       </div>
 
-      <div>
-        <label htmlFor="pick">Cape design</label>
-        <div
-          className={dragging ? "dropzone over" : "dropzone"}
-          tabIndex={0}
-          role="button"
-          aria-label="Choose a PNG, or drop one here"
-          onClick={() => fileInput.current?.click()}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" || event.key === " ") {
-              event.preventDefault();
-              fileInput.current?.click();
-            }
-          }}
-          onDragOver={(event) => {
-            event.preventDefault();
-            setDragging(true);
-          }}
-          onDragLeave={() => setDragging(false)}
-          onDrop={(event) => {
-            event.preventDefault();
-            setDragging(false);
-            void take(event.dataTransfer.files?.[0]);
-          }}
-        >
-          {picked ? (
-            <>
-              <img className="preview" src={picked.previewUrl} alt="" />
-              <div className="small">
-                {picked.file.name} - {picked.width}x{picked.height}
-              </div>
-              <div className="tiny muted">Click, or drop another, to replace it</div>
-            </>
-          ) : (
-            <>
-              <div style={{ fontWeight: 600 }}>Drop a PNG here</div>
-              <div className="small muted">or click to browse</div>
-            </>
-          )}
-        </div>
-        <p className="tiny muted" style={{ margin: "7px 0 0" }}>
-          {LIMIT_TEXT}
-        </p>
-        <input
-          id="pick"
-          ref={fileInput}
-          type="file"
-          accept="image/png,.png"
-          hidden
-          onChange={(event) => {
-            void take(event.target.files?.[0]);
-            // Let the same file be picked again after a rejection.
-            event.target.value = "";
-          }}
-        />
-      </div>
+      {mode === "upload" ? (
+        <>
+          <div>
+            <label>Kind of design</label>
+            <div className="type-picker" role="group" aria-label="Kind of design">
+              {DESIGN_TYPES.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  className={option.id === type ? "type-chip on" : "type-chip"}
+                  aria-pressed={option.id === type}
+                  onClick={() => {
+                    setType(option.id);
+                    // The size rule changes with the type, so anything already picked is
+                    // re-checked against the new one rather than quietly kept.
+                    if (picked) void take(picked.file, option.id);
+                  }}
+                >
+                  <TypeIcon type={option.id} />
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="pick">Image</label>
+            <div
+              className={dragging ? "dropzone over" : "dropzone"}
+              tabIndex={0}
+              role="button"
+              aria-label="Drag and drop an image, or click to browse"
+              onClick={() => fileInput.current?.click()}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  fileInput.current?.click();
+                }
+              }}
+              onDragOver={(event) => {
+                event.preventDefault();
+                setDragging(true);
+              }}
+              onDragLeave={() => setDragging(false)}
+              onDrop={(event) => {
+                event.preventDefault();
+                setDragging(false);
+                void take(event.dataTransfer.files?.[0], type);
+              }}
+            >
+              {picked ? (
+                <img className="preview" src={picked.previewUrl} alt="" />
+              ) : (
+                <p className="dropzone-line">Drag and drop an image, or click to browse</p>
+              )}
+            </div>
+            <p className="tiny muted field-note">
+              {picked ? `${picked.file.name} - ${picked.width}x${picked.height}` : limitText(type)}
+            </p>
+            {!picked && active.note && <p className="tiny muted field-note">{active.note}</p>}
+            <input
+              id="pick"
+              ref={fileInput}
+              type="file"
+              accept="image/png,.png"
+              hidden
+              onChange={(event) => {
+                void take(event.target.files?.[0], type);
+                // Let the same file be picked again after a rejection.
+                event.target.value = "";
+              }}
+            />
+          </div>
+        </>
+      ) : (
+        <DrawCanvas canvasRef={canvasRef} />
+      )}
 
       <div className="row">
         <button className="primary" type="submit" disabled={sending}>
-          {sending ? "Sending..." : "Submit for review"}
+          {sending ? "Sending..." : mode === "draw" ? "Submit drawing" : "Submit for review"}
         </button>
         <span className="tiny muted">Nothing is published automatically.</span>
       </div>

@@ -23,6 +23,7 @@ export function FeaturedRound({
       <header className="section-head">
         <div>
           <p className="eyebrow">Current round</p>
+          <div className="pixel-rule" aria-hidden="true" />
           <h2>Vote for this round&apos;s winner</h2>
           <p className="muted">
             {items.length === 0

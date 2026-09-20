@@ -33,8 +33,8 @@ export default function TermsPage() {
 
       <h2>What this site is</h2>
       <p>
-        Catalyst Designs is a place to submit cape designs for Catalyst Client and vote on designs
-        other people have submitted. It is run by the small team that makes the client. It is not a
+        Catalyst Designs is a place to submit cosmetic designs for Catalyst Client - capes, wings and
+        other wearables - and to vote on designs other people have submitted. It is run by the small team that makes the client. It is not a
         shop, it takes no payments, and it has no user accounts.
       </p>
 
@@ -103,7 +103,7 @@ export default function TermsPage() {
       </p>
       <p>
         You keep the rights to what you make. By submitting, you give us permission to show it on
-        this site and, if it is chosen, to include it in Catalyst Client as a cape other players can
+        this site and, if it is chosen, to include it in Catalyst Client as a cosmetic other players can
         wear. You can ask us to remove a design - see below.
       </p>
 

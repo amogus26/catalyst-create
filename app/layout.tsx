@@ -1,7 +1,21 @@
 import type { Metadata } from "next";
+import { Inter, Silkscreen } from "next/font/google";
 import Link from "next/link";
 import { usingDevStore } from "@/lib/store";
 import "./globals.css";
+
+/**
+ * The launcher sets no font family at all - it takes the platform's sans and draws its own pixel
+ * face (`MinecraftText`) for headline moments. So there is no typeface to inherit, only that idea:
+ * Inter carries the text, and the pixel face appears on the wordmark and nowhere else.
+ */
+const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-sans" });
+const silkscreen = Silkscreen({
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+  variable: "--font-pixel",
+});
 
 export const metadata: Metadata = {
   title: "Catalyst Designs",
@@ -16,7 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const devStore = usingDevStore();
 
   return (
-    <html lang="en">
+    <html lang="en" className={`${inter.variable} ${silkscreen.variable}`}>
       <body>
         {devStore && (
           <div className="dev-banner">
@@ -42,7 +56,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <footer className="site-footer">
           <div className="inner">
             <p>
-              Community cape designs for Catalyst Client. Every submission is looked at by a person
+              Community cosmetic designs for Catalyst Client. Every submission is looked at by a person
               before it is shown here.
             </p>
             <p className="tiny">

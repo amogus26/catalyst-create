@@ -1,3 +1,9 @@
+import {
+  DEFAULT_DESIGN_TYPE,
+  designType,
+  type DesignTypeId,
+} from "./design-types";
+
 /**
  * What a submitted file has to be before this site keeps it, and the exact wording used to turn
  * one away.
@@ -7,12 +13,10 @@
  * are stated up front beside the drop zone, and every rejection is a plain sentence saying what
  * was wrong and what would be accepted. Nothing fails silently.
  *
- * **Capes must be 64x32, or an exact 2:1 HD multiple.** Minecraft's cape model (`PlayerCapeModel`
- * in 1.21.4) declares a 64x64 texture but gives the cape cuboid a `textureScaleY` of 0.5, so its
- * UVs are computed against 64x32 - the same layout as vanilla's own cape texture. UVs are
- * normalised, so exact multiples render identically at higher detail; any other size is stretched
- * or mis-sampled. A design that breaks this rule is no use to the launcher that would wear it, so
- * it is refused here rather than accepted and disappointing someone later.
+ * The size rule depends on the kind of design, and only the cape has one - see `design-types.ts`
+ * for why, at length. Everything else is checked for being a real PNG of a sane size and nothing
+ * more, because inventing a texture size for a cosmetic the client has not implemented yet would
+ * only reject good work.
  *
  * This module runs in the browser *and* on the server. The browser copy is a courtesy - it gives
  * an instant answer - and the server copy is the one that decides, because anything the browser
@@ -21,16 +25,9 @@
 
 export const MAX_IMAGE_BYTES = 1024 * 1024;
 
-export const CAPE_WIDTH = 64;
-export const CAPE_HEIGHT = 32;
-
-/** 64x32 and its HD multiples, as the launcher accepts them. */
-export const CAPE_SCALES = [1, 2, 4, 8] as const;
-
-export const CAPE_SIZE_TEXT = "64x32 pixels (or an HD multiple: 128x64, 256x128 or 512x256)";
-
-/** Shown beside the drop zone, so the limits are known before anyone picks a file. */
-export const LIMIT_TEXT = "PNG only | under 1 MB | 64x32 (or 128x64, 256x128, 512x256)";
+/** The widest and tallest anything may be when its type has no fixed size, and the smallest. */
+export const MAX_FREE_DIMENSION = 1024;
+export const MIN_FREE_DIMENSION = 8;
 
 export const DISPLAY_NAME_MIN = 2;
 export const DISPLAY_NAME_MAX = 24;
@@ -39,8 +36,17 @@ const PNG_MAGIC = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
 
 export type Validation = { ok: true; width: number; height: number } | { ok: false; message: string };
 
-export function isCapeSize(width: number, height: number): boolean {
-  return CAPE_SCALES.some((scale) => width === CAPE_WIDTH * scale && height === CAPE_HEIGHT * scale);
+/** How the accepted sizes read in a sentence: "64x32, 128x64, 256x128 or 512x256". */
+export function sizeListText(id: DesignTypeId): string | null {
+  const sizes = designType(id).sizes;
+  if (!sizes) return null;
+  const parts = sizes.map((size) => `${size.width}x${size.height}`);
+  return parts.length === 1 ? parts[0] : `${parts.slice(0, -1).join(", ")} or ${parts[parts.length - 1]}`;
+}
+
+/** The line shown beside the drop zone for [id], before anyone picks a file. */
+export function limitText(id: DesignTypeId): string {
+  return designType(id).requirement;
 }
 
 /**
@@ -62,10 +68,24 @@ export function readPngSize(bytes: Uint8Array): { width: number; height: number 
   return { width, height };
 }
 
+/** Whether [width]x[height] is one of the sizes [id] accepts. Always true where there are none. */
+export function isAcceptedSize(id: DesignTypeId, width: number, height: number): boolean {
+  const sizes = designType(id).sizes;
+  if (!sizes) return width <= MAX_FREE_DIMENSION && height <= MAX_FREE_DIMENSION && width >= MIN_FREE_DIMENSION && height >= MIN_FREE_DIMENSION;
+  return sizes.some((size) => size.width === width && size.height === height);
+}
+
 /** The whole rule set for an uploaded image, in the order the messages read best. */
-export function validateImage(fileName: string, size: number, bytes: Uint8Array): Validation {
+export function validateImage(
+  fileName: string,
+  size: number,
+  bytes: Uint8Array,
+  typeId: DesignTypeId = DEFAULT_DESIGN_TYPE,
+): Validation {
+  const type = designType(typeId);
+
   if (!fileName.toLowerCase().endsWith(".png")) {
-    return { ok: false, message: "Only .png files are supported for capes." };
+    return { ok: false, message: "Only .png files are supported." };
   }
   if (size > MAX_IMAGE_BYTES) {
     return { ok: false, message: "That file is too large. Images must be under 1 MB." };
@@ -73,6 +93,7 @@ export function validateImage(fileName: string, size: number, bytes: Uint8Array)
   if (size === 0) {
     return { ok: false, message: "That file is empty." };
   }
+
   const png = readPngSize(bytes);
   if (!png) {
     return {
@@ -80,12 +101,26 @@ export function validateImage(fileName: string, size: number, bytes: Uint8Array)
       message: "That file isn't really a PNG (only its name is), so it couldn't be read as an image.",
     };
   }
-  if (!isCapeSize(png.width, png.height)) {
+
+  if (type.sizes) {
+    if (!isAcceptedSize(typeId, png.width, png.height)) {
+      return {
+        ok: false,
+        message: `${type.label}s must be ${sizeListText(typeId)} pixels. That image is ${png.width}x${png.height}.`,
+      };
+    }
+  } else if (png.width > MAX_FREE_DIMENSION || png.height > MAX_FREE_DIMENSION) {
     return {
       ok: false,
-      message: `Capes must be ${CAPE_SIZE_TEXT}. That image is ${png.width}x${png.height}.`,
+      message: `That image is ${png.width}x${png.height}. Keep it to ${MAX_FREE_DIMENSION}x${MAX_FREE_DIMENSION} or smaller.`,
+    };
+  } else if (png.width < MIN_FREE_DIMENSION || png.height < MIN_FREE_DIMENSION) {
+    return {
+      ok: false,
+      message: `That image is ${png.width}x${png.height}, which is too small to make out.`,
     };
   }
+
   return { ok: true, width: png.width, height: png.height };
 }
 

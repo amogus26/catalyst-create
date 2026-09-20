@@ -1,5 +1,6 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
+import { DEFAULT_DESIGN_TYPE } from "../design-types";
 import type { Store, StoredImage, Submission, SubmissionStatus } from "./types";
 
 /**
@@ -29,8 +30,11 @@ const IMAGE_DIR = path.join(ROOT, "images");
 async function read(): Promise<Data> {
   try {
     const data = JSON.parse(await fs.readFile(DATA_FILE, "utf8")) as Data;
-    // Rows written before `featured` existed simply are not featured.
-    for (const row of data.submissions) row.featured = row.featured ?? false;
+    // Rows written before these columns existed are not featured, and are capes.
+    for (const row of data.submissions) {
+      row.featured = row.featured ?? false;
+      row.designType = row.designType ?? DEFAULT_DESIGN_TYPE;
+    }
     return data;
   } catch {
     return { submissions: [], votes: [] };
@@ -55,7 +59,7 @@ export function createLocalStore(): Store {
       return `local dev store (${path.relative(process.cwd(), ROOT)}/)`;
     },
 
-    async createSubmission({ displayName, bytes }) {
+    async createSubmission({ displayName, designType, bytes }) {
       const data = await read();
       const id = crypto.randomUUID();
       const imageFile = `${id}.png`;
@@ -71,6 +75,7 @@ export function createLocalStore(): Store {
         createdAt: new Date().toISOString(),
         reviewedAt: null,
         featured: false,
+        designType,
         imageFile,
       };
       data.submissions.push(submission);

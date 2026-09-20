@@ -1,29 +1,54 @@
 /*
- * The launcher's palette, so the site and the client read as one product. Kept in step with
- * theme/Palette.kt in the launcher repo - change them together.
+ * Light theme.
+ *
+ * The colours are the launcher's, moved onto paper rather than replaced: its blue is the accent
+ * and its gold still means "a vote", but both are darkened until they hold up as ink on white -
+ * the launcher's #4FA8E8 on a white background is about 2:1 against text, which is unreadable, so
+ * the accent here is a deeper shade of the same hue and the gold is used as a fill with dark text
+ * on it rather than as text itself.
+ *
+ * The one deliberate flourish: **the page is drawn on graph paper.** Everything this site is for -
+ * a 64x32 cape, a drawing canvas, a checkerboard behind a transparent texture - happens on a pixel
+ * grid, so the site sits on one too. It is a single 8px grid at about 4% ink: invisible until you
+ * look, and the thing that keeps an otherwise plain white page from being a generic plain white
+ * page. Cards float above it in flat white, which is what makes them read as cards at all without
+ * heavy borders.
  */
+
 :root {
-  --bg: #0f141d;
-  --bg-deep: #090d14;
-  --panel: #161c27;
-  --raised: #1c2331;
-  --edge: #2b3547;
-  --edge-soft: #222b3b;
-  --accent: #4fa8e8;
-  --accent-deep: #2b6fa3;
-  --coin: #f0b429;
-  --success: #5fbf87;
-  --amber: #d98a5a;
-  --danger: #c24c55;
-  --text: #e8ecf5;
-  --muted: #8b94a8;
+  /* paper and ink */
+  --paper: #ffffff;
+  --ground: #f7f8fa;
+  --ink: #12161d;
+  --muted: #5b6472;
+  --line: #e4e7ed;
+  --line-soft: #eef0f4;
+
+  /* the launcher's palette, darkened to work as ink on white */
+  --accent: #1b6dc1;
+  --accent-ink: #14538f;
+  --accent-wash: #eaf2fb;
+  --gold: #f0b429;
+  --gold-wash: #fdf3dc;
+  --gold-ink: #7a5406;
+  --success: #1f7a4d;
+  --success-ink: #176139;
+  --success-wash: #e8f5ee;
+  --danger: #b3261e;
+  --danger-wash: #fdecea;
+  --amber-ink: #8a5a12;
+  --amber-wash: #fdf1e0;
 
   --radius: 14px;
   --radius-sm: 9px;
   --shell: 1120px;
 
-  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.22);
-  --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.4), 0 16px 40px rgba(0, 0, 0, 0.35);
+  --shadow-card: 0 1px 2px rgba(18, 22, 29, 0.05), 0 6px 18px rgba(18, 22, 29, 0.06);
+  --shadow-lift: 0 2px 6px rgba(18, 22, 29, 0.07), 0 14px 32px rgba(18, 22, 29, 0.1);
+
+  /* the graph paper: one 8px grid, faint */
+  --grid-ink: rgba(18, 22, 29, 0.042);
+  --grid-step: 8px;
 }
 
 * {
@@ -37,16 +62,16 @@ body {
 }
 
 body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--ground);
+  background-image:
+    linear-gradient(var(--grid-ink) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-ink) 1px, transparent 1px);
+  background-size: var(--grid-step) var(--grid-step);
+  color: var(--ink);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-size: 15px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-  background-image:
-    radial-gradient(900px 420px at 15% -180px, rgba(79, 168, 232, 0.16), transparent 70%),
-    radial-gradient(760px 360px at 88% -120px, rgba(240, 180, 41, 0.09), transparent 70%);
-  background-repeat: no-repeat;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -65,10 +90,10 @@ h2,
 h3 {
   line-height: 1.15;
   margin: 0 0 12px;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.021em;
 }
 h1 {
-  font-size: clamp(30px, 5vw, 44px);
+  font-size: clamp(30px, 5vw, 43px);
   font-weight: 800;
 }
 h2 {
@@ -84,7 +109,7 @@ p {
 }
 
 .gold {
-  color: var(--coin);
+  color: var(--gold-ink);
 }
 .muted {
   color: var(--muted);
@@ -101,14 +126,15 @@ p {
   font-weight: 700;
   letter-spacing: 1.4px;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--accent-ink);
   margin: 0 0 8px;
 }
 
 code {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.92em;
-  background: rgba(0, 0, 0, 0.32);
+  background: var(--ground);
+  border: 1px solid var(--line);
   padding: 1px 5px;
   border-radius: 4px;
 }
@@ -124,8 +150,8 @@ code {
 /* --- header --------------------------------------------------------------- */
 
 .site-header {
-  border-bottom: 1px solid var(--edge-soft);
-  background: rgba(9, 13, 20, 0.82);
+  border-bottom: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.86);
   position: sticky;
   top: 0;
   z-index: 20;
@@ -143,25 +169,28 @@ code {
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
-  font-weight: 800;
+  gap: 10px;
+  color: var(--ink);
+  /* The pixel face, used here and nowhere else - the launcher draws its own mark in a pixel font,
+     and one word in the same voice ties the two products together without costing readability. */
+  font-family: var(--font-pixel), ui-monospace, monospace;
   font-size: 15px;
-  color: var(--text);
-  letter-spacing: -0.01em;
+  letter-spacing: 0.01em;
 }
 .brand:hover {
   text-decoration: none;
 }
 .brand .mark {
-  width: 15px;
-  height: 15px;
-  border-radius: 4px;
-  background: linear-gradient(140deg, var(--accent), var(--coin));
-  box-shadow: 0 0 14px rgba(79, 168, 232, 0.45);
+  width: 14px;
+  height: 14px;
+  background:
+    linear-gradient(var(--gold) 0 0) 0 0 / 7px 7px no-repeat,
+    linear-gradient(var(--accent) 0 0) 7px 7px / 7px 7px no-repeat,
+    linear-gradient(var(--accent-wash) 0 0) 0 0 / 14px 14px no-repeat;
 }
 .site-header nav {
   display: flex;
-  gap: 4px;
+  gap: 2px;
   margin-left: auto;
   font-size: 14px;
   flex-wrap: wrap;
@@ -172,15 +201,15 @@ code {
   border-radius: 7px;
 }
 .site-header nav a:hover {
-  color: var(--text);
-  background: rgba(255, 255, 255, 0.05);
+  color: var(--ink);
+  background: var(--ground);
   text-decoration: none;
 }
 
 /* --- hero ----------------------------------------------------------------- */
 
 .hero {
-  padding: 56px 0 34px;
+  padding: 54px 0 32px;
   max-width: 660px;
 }
 .hero .lead {
@@ -196,8 +225,8 @@ code {
 .chip {
   font-size: 12px;
   color: var(--muted);
-  border: 1px solid var(--edge);
-  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--line);
+  background: var(--paper);
   border-radius: 100px;
   padding: 5px 12px;
 }
@@ -207,7 +236,7 @@ code {
 .tabs {
   display: flex;
   gap: 6px;
-  border-bottom: 1px solid var(--edge-soft);
+  border-bottom: 1px solid var(--line);
   margin-bottom: 30px;
   overflow-x: auto;
 }
@@ -227,19 +256,19 @@ code {
   gap: 8px;
 }
 .tab:hover {
-  color: var(--text);
+  color: var(--ink);
   background: none;
   border-color: transparent;
-  border-bottom-color: var(--edge);
+  border-bottom-color: var(--line);
 }
 .tab.active {
-  color: var(--text);
+  color: var(--ink);
   border-bottom-color: var(--accent);
 }
 .tab-count {
   font-size: 11px;
   font-weight: 700;
-  color: var(--bg-deep);
+  color: var(--paper);
   background: var(--muted);
   border-radius: 100px;
   padding: 1px 7px;
@@ -264,9 +293,23 @@ code {
   max-width: 620px;
 }
 
+/* A short run of pixels under a heading - the same grid the designs live on, used as a rule. */
+.pixel-rule {
+  height: 4px;
+  width: 76px;
+  margin: 0 0 14px;
+  background:
+    linear-gradient(var(--gold) 0 0) 0 0 / 4px 4px no-repeat,
+    linear-gradient(var(--accent) 0 0) 8px 0 / 4px 4px no-repeat,
+    linear-gradient(var(--accent) 0 0) 16px 0 / 4px 4px no-repeat,
+    linear-gradient(rgba(27, 109, 193, 0.5) 0 0) 24px 0 / 4px 4px no-repeat,
+    linear-gradient(rgba(27, 109, 193, 0.28) 0 0) 32px 0 / 4px 4px no-repeat,
+    linear-gradient(rgba(27, 109, 193, 0.16) 0 0) 40px 0 / 4px 4px no-repeat;
+}
+
 .panel {
-  background: var(--panel);
-  border: 1px solid var(--edge-soft);
+  background: var(--paper);
+  border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 22px;
   box-shadow: var(--shadow-card);
@@ -277,12 +320,13 @@ code {
 
 .submit-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
   gap: 18px;
   align-items: start;
 }
 .panel.side {
-  background: rgba(22, 28, 39, 0.6);
+  background: var(--ground);
+  box-shadow: none;
 }
 .steps {
   margin: 0 0 16px;
@@ -294,10 +338,10 @@ code {
   margin-bottom: 9px;
 }
 .steps strong {
-  color: var(--text);
+  color: var(--ink);
 }
 
-@media (max-width: 800px) {
+@media (max-width: 860px) {
   .submit-layout {
     grid-template-columns: 1fr;
   }
@@ -323,8 +367,8 @@ code {
 }
 
 .design-card {
-  background: var(--panel);
-  border: 1px solid var(--edge-soft);
+  background: var(--paper);
+  border: 1px solid var(--line);
   border-radius: var(--radius);
   overflow: hidden;
   display: flex;
@@ -334,20 +378,20 @@ code {
 }
 .design-card:hover {
   transform: translateY(-2px);
-  border-color: var(--edge);
+  border-color: #d4d9e2;
   box-shadow: var(--shadow-lift);
 }
 
+/* The transparency checkerboard a pixel artist expects behind a texture. */
 .art-frame {
   position: relative;
   background:
-    linear-gradient(180deg, rgba(79, 168, 232, 0.07), transparent 60%),
-    repeating-conic-gradient(#12171f 0% 25%, #0d121a 0% 50%) 50% / 18px 18px;
+    repeating-conic-gradient(#f1f3f6 0% 25%, #fafbfc 0% 50%) 50% / 16px 16px;
   padding: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-bottom: 1px solid var(--edge-soft);
+  border-bottom: 1px solid var(--line-soft);
 }
 .design-card.large .art-frame {
   padding: 26px;
@@ -359,7 +403,7 @@ code {
   /* Cape textures are pixel art: never smooth them. */
   image-rendering: pixelated;
   display: block;
-  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.45));
+  filter: drop-shadow(0 4px 10px rgba(18, 22, 29, 0.18));
 }
 
 .design-card-body {
@@ -370,8 +414,6 @@ code {
 }
 .design-card.large .design-card-body {
   padding: 16px 18px 18px;
-  /* A round card gives the name a line of its own and makes voting the full-width thing to do;
-     side by side, a long name and a button fight over the same 260px. */
   flex-direction: column;
   align-items: stretch;
   gap: 12px;
@@ -385,7 +427,7 @@ code {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 3px;
 }
 .name {
   font-weight: 650;
@@ -395,6 +437,19 @@ code {
 }
 .design-card.large .name {
   font-size: 17px;
+}
+
+.type-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--accent-ink);
+  background: var(--accent-wash);
+  border-radius: 100px;
+  padding: 2px 9px 2px 7px;
+  align-self: flex-start;
 }
 
 /* badges ------------------------------------------------------------------- */
@@ -419,47 +474,47 @@ code {
   padding: 0;
   display: grid;
   place-items: center;
-  background: rgba(9, 13, 20, 0.85);
-  border: 1px solid var(--edge);
+  background: var(--paper);
+  border: 1px solid var(--line);
   color: var(--muted);
 }
 .badge-leading {
   top: 10px;
   right: 10px;
-  background: linear-gradient(120deg, var(--coin), #e0952a);
-  color: #241802;
-  box-shadow: 0 2px 14px rgba(240, 180, 41, 0.4);
+  background: var(--gold);
+  color: #2b1d00;
+  box-shadow: 0 2px 10px rgba(240, 180, 41, 0.45);
 }
 .badge-round {
   top: 10px;
   right: 10px;
-  background: rgba(9, 13, 20, 0.85);
-  border: 1px solid rgba(79, 168, 232, 0.55);
-  color: var(--accent);
+  background: var(--paper);
+  border: 1px solid rgba(27, 109, 193, 0.35);
+  color: var(--accent-ink);
 }
 .badge-live {
   top: 10px;
   right: 10px;
-  background: rgba(9, 13, 20, 0.85);
-  border: 1px solid rgba(95, 191, 135, 0.55);
-  color: var(--success);
+  background: var(--paper);
+  border: 1px solid rgba(31, 122, 77, 0.4);
+  color: var(--success-ink);
 }
 .badge-rejected {
   top: 10px;
   right: 10px;
-  background: rgba(9, 13, 20, 0.85);
-  border: 1px solid rgba(194, 76, 85, 0.55);
+  background: var(--paper);
+  border: 1px solid rgba(179, 38, 30, 0.4);
   color: var(--danger);
 }
 
 .design-card.leading {
-  border-color: rgba(240, 180, 41, 0.5);
-  box-shadow: 0 0 0 1px rgba(240, 180, 41, 0.14), var(--shadow-card);
+  border-color: rgba(240, 180, 41, 0.75);
+  box-shadow: 0 0 0 1px rgba(240, 180, 41, 0.3), var(--shadow-card);
 }
 .design-card.leading .art-frame {
   background:
-    linear-gradient(180deg, rgba(240, 180, 41, 0.12), transparent 60%),
-    repeating-conic-gradient(#12171f 0% 25%, #0d121a 0% 50%) 50% / 18px 18px;
+    linear-gradient(180deg, rgba(240, 180, 41, 0.14), transparent 65%),
+    repeating-conic-gradient(#f1f3f6 0% 25%, #fafbfc 0% 50%) 50% / 16px 16px;
 }
 
 /* --- controls ------------------------------------------------------------- */
@@ -468,9 +523,9 @@ button,
 .button {
   font: inherit;
   font-weight: 600;
-  color: var(--text);
-  background: var(--raised);
-  border: 1px solid var(--edge);
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   padding: 9px 15px;
   cursor: pointer;
@@ -478,8 +533,8 @@ button,
 }
 button:hover:not(:disabled),
 .button:hover {
-  background: #232c3d;
-  border-color: #3a475d;
+  background: var(--ground);
+  border-color: #d4d9e2;
   text-decoration: none;
 }
 button:active:not(:disabled) {
@@ -487,30 +542,31 @@ button:active:not(:disabled) {
 }
 button:disabled {
   cursor: default;
-  opacity: 0.62;
+  opacity: 0.55;
 }
 button.primary {
-  background: linear-gradient(180deg, rgba(79, 168, 232, 0.24), rgba(79, 168, 232, 0.14));
-  border-color: rgba(79, 168, 232, 0.6);
-  color: #cfe7fa;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
 }
 button.primary:hover:not(:disabled) {
-  background: linear-gradient(180deg, rgba(79, 168, 232, 0.34), rgba(79, 168, 232, 0.2));
+  background: var(--accent-ink);
+  border-color: var(--accent-ink);
 }
 button.approve {
-  background: rgba(95, 191, 135, 0.15);
-  border-color: rgba(95, 191, 135, 0.5);
-  color: var(--success);
+  background: var(--success-wash);
+  border-color: rgba(31, 122, 77, 0.4);
+  color: var(--success-ink);
 }
 button.reject {
-  background: rgba(194, 76, 85, 0.13);
-  border-color: rgba(194, 76, 85, 0.5);
+  background: var(--danger-wash);
+  border-color: rgba(179, 38, 30, 0.35);
   color: var(--danger);
 }
 button.featured-on {
-  background: rgba(240, 180, 41, 0.15);
-  border-color: rgba(240, 180, 41, 0.55);
-  color: var(--coin);
+  background: var(--gold-wash);
+  border-color: rgba(240, 180, 41, 0.6);
+  color: var(--gold-ink);
 }
 
 button.vote {
@@ -525,12 +581,13 @@ button.vote .label {
   display: none;
 }
 button.vote .count {
-  color: var(--coin);
+  color: var(--gold-ink);
   font-variant-numeric: tabular-nums;
 }
 button.vote.voted {
-  border-color: rgba(240, 180, 41, 0.45);
-  color: var(--coin);
+  background: var(--gold-wash);
+  border-color: rgba(240, 180, 41, 0.6);
+  color: var(--gold-ink);
 }
 button.vote-large {
   padding: 10px 18px;
@@ -554,16 +611,16 @@ input[type="text"],
 input[type="password"] {
   font: inherit;
   width: 100%;
-  color: var(--text);
-  background: rgba(9, 13, 20, 0.55);
-  border: 1px solid var(--edge);
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   padding: 11px 13px;
-  transition: border-color 130ms;
+  transition: border-color 130ms, box-shadow 130ms;
 }
 input[type="text"]:hover,
 input[type="password"]:hover {
-  border-color: #3a475d;
+  border-color: #d4d9e2;
 }
 input:focus-visible,
 button:focus-visible,
@@ -573,32 +630,177 @@ a:focus-visible,
   outline-offset: 2px;
 }
 
+.field-note {
+  margin: 8px 0 0;
+}
+
+/* --- mode switch and type picker ------------------------------------------ */
+
+.mode-switch {
+  display: inline-flex;
+  gap: 4px;
+  background: var(--ground);
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  padding: 3px;
+}
+.mode {
+  border: none;
+  background: none;
+  border-radius: 100px;
+  color: var(--muted);
+  font-size: 13.5px;
+  padding: 7px 15px;
+}
+.mode:hover:not(.on) {
+  background: transparent;
+  color: var(--ink);
+  border-color: transparent;
+}
+.mode.on {
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: var(--shadow-card);
+}
+
+.type-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.type-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13.5px;
+  padding: 8px 14px;
+  border-radius: 100px;
+  color: var(--muted);
+}
+.type-chip.on {
+  background: var(--accent-wash);
+  border-color: rgba(27, 109, 193, 0.45);
+  color: var(--accent-ink);
+}
+
 /* --- drop zone ------------------------------------------------------------ */
 
 .dropzone {
-  border: 1px dashed #3d4a61;
+  border: 1px dashed #c9cfda;
   border-radius: var(--radius);
-  background: rgba(9, 13, 20, 0.4);
-  padding: 30px 18px;
+  background: var(--paper);
+  padding: 34px 18px;
   text-align: center;
   cursor: pointer;
   transition: border-color 130ms, background 130ms;
 }
 .dropzone:hover {
-  border-color: #4d5c76;
+  border-color: var(--accent);
 }
 .dropzone.over {
   border-color: var(--accent);
-  background: rgba(79, 168, 232, 0.09);
+  background: var(--accent-wash);
+}
+.dropzone-line {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
 }
 .dropzone .preview {
-  max-width: 260px;
+  max-width: 240px;
   width: 100%;
   image-rendering: pixelated;
-  border-radius: 6px;
   display: block;
-  margin: 0 auto 12px;
-  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.45));
+  margin: 0 auto;
+  border-radius: 4px;
+}
+
+/* --- drawing canvas ------------------------------------------------------- */
+
+.draw-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.swatches {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.swatch {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border-radius: 5px;
+  border: 1px solid rgba(18, 22, 29, 0.18);
+  cursor: pointer;
+}
+.swatch.on {
+  box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--accent);
+}
+.swatch.custom {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: conic-gradient(#c2402f, #e2872b, #f0b429, #3f9142, #2f6fb5, #7a4fbf, #c2402f);
+}
+.swatch.custom input {
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+.tool-buttons {
+  display: flex;
+  gap: 6px;
+}
+.tool {
+  font-size: 13px;
+  padding: 7px 12px;
+}
+.tool.on {
+  background: var(--accent-wash);
+  border-color: rgba(27, 109, 193, 0.45);
+  color: var(--accent-ink);
+}
+
+/* Drawing wants room: with the canvas on the page the layout drops its sidebar, which takes a
+   texture pixel from about 9px on screen to a full 16. */
+.submit-layout:has(.draw) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.canvas-frame {
+  max-width: 1024px;
+  margin: 0 auto;
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: repeating-conic-gradient(#eef0f4 0% 25%, #fafbfc 0% 50%) 50% / 16px 16px;
+  line-height: 0;
+}
+.draw-canvas {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  image-rendering: pixelated;
+  touch-action: none;
+  cursor: crosshair;
+}
+/* The same grid the page is on, at the canvas's own pixel size, so a square is easy to aim at. */
+.canvas-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(18, 22, 29, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(18, 22, 29, 0.09) 1px, transparent 1px);
+  background-size: calc(100% / 64) calc(100% / 32);
 }
 
 /* --- notices -------------------------------------------------------------- */
@@ -611,34 +813,37 @@ a:focus-visible,
   font-size: 14px;
 }
 .notice.error {
-  background: rgba(194, 76, 85, 0.12);
-  border-color: rgba(194, 76, 85, 0.45);
+  background: var(--danger-wash);
+  border-color: rgba(179, 38, 30, 0.35);
+  color: #7d1b15;
 }
 .notice.ok {
-  background: rgba(95, 191, 135, 0.12);
-  border-color: rgba(95, 191, 135, 0.45);
+  background: var(--success-wash);
+  border-color: rgba(31, 122, 77, 0.35);
+  color: var(--success-ink);
 }
 .notice.info {
-  background: rgba(217, 138, 90, 0.12);
+  background: var(--amber-wash);
   border-color: rgba(217, 138, 90, 0.45);
+  color: var(--amber-ink);
 }
 
 .dev-banner {
-  background: rgba(217, 138, 90, 0.16);
+  background: var(--amber-wash);
   border-bottom: 1px solid rgba(217, 138, 90, 0.45);
-  color: var(--amber);
+  color: var(--amber-ink);
   font-size: 12.5px;
   text-align: center;
   padding: 7px 16px;
 }
 
 .empty {
-  border: 1px dashed var(--edge);
+  border: 1px dashed #d3d8e1;
   border-radius: var(--radius);
   padding: 46px 22px;
   text-align: center;
   color: var(--muted);
-  background: rgba(255, 255, 255, 0.012);
+  background: var(--paper);
 }
 
 .stack {
@@ -697,17 +902,17 @@ a:focus-visible,
   color: var(--muted);
 }
 .prose strong {
-  color: var(--text);
+  color: var(--ink);
 }
 
 /* --- footer --------------------------------------------------------------- */
 
 .site-footer {
-  border-top: 1px solid var(--edge-soft);
+  border-top: 1px solid var(--line);
   color: var(--muted);
   font-size: 13px;
   padding: 26px 22px 34px;
-  background: rgba(9, 13, 20, 0.5);
+  background: var(--paper);
 }
 .site-footer .inner {
   max-width: var(--shell);

@@ -1,9 +1,11 @@
+import { designType } from "@/lib/design-types";
 import type { Submission } from "@/lib/store";
+import { TypeIcon } from "./type-icon";
 import { VoteButton } from "./vote-button";
 
 /**
  * One design, as it appears anywhere on the public page: the image first and large, then who made
- * it and what it has taken in votes.
+ * it, what kind of cosmetic it is, and what it has taken in votes.
  *
  * The showcase and the voting round use the same card at two sizes rather than two cards, so a
  * design does not change character when it is picked for a round - it just gets more room.
@@ -21,13 +23,15 @@ export function DesignCard({
   rank?: number;
   leading?: boolean;
 }) {
+  const type = designType(submission.designType);
+
   return (
     <article className={`design-card${size === "large" ? " large" : ""}${leading ? " leading" : ""}`}>
       <div className="art-frame">
         <img
           className="art"
           src={`/api/images/${submission.id}`}
-          alt={`Cape design by ${submission.displayName}`}
+          alt={`${type.label} design by ${submission.displayName}`}
           loading="lazy"
         />
         {typeof rank === "number" && <span className="rank">{rank}</span>}
@@ -41,7 +45,10 @@ export function DesignCard({
           <span className="name" title={submission.displayName}>
             {submission.displayName}
           </span>
-          <span className="tiny muted">Community design</span>
+          <span className="type-tag">
+            <TypeIcon type={submission.designType} />
+            {type.label}
+          </span>
         </div>
         <VoteButton
           id={submission.id}

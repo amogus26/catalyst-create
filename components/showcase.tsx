@@ -14,6 +14,7 @@ export function Showcase({ items, voted }: { items: Submission[]; voted: Set<str
       <header className="section-head">
         <div>
           <p className="eyebrow">Showcase</p>
+          <div className="pixel-rule" aria-hidden="true" />
           <h2>Designs that made it through</h2>
           <p className="muted">
             {items.length === 0
