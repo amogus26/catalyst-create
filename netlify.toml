@@ -1,0 +1,21 @@
+# Netlify build settings.
+#
+# The Next.js runtime is installed as a devDependency and declared here. Netlify usually installs
+# it on its own when it detects Next.js, but that detection only runs for builds from a linked Git
+# repo - a deploy uploaded as a zip gets no runtime, publishes the static output only, and every
+# dynamic page and API route on the site 404s. Since this site is almost entirely dynamic, that is
+# the difference between a working site and an empty one.
+#
+# The four environment variables the site needs (ADMIN_PASSWORD, SUPABASE_URL,
+# SUPABASE_SERVICE_ROLE_KEY, SUPABASE_BUCKET) are set in the Netlify UI, not here - none of them
+# belongs in a committed file, and none may be prefixed NEXT_PUBLIC_.
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

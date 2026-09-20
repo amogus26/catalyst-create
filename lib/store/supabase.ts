@@ -23,9 +23,11 @@ interface Row {
   vote_count: number;
   created_at: string;
   reviewed_at: string | null;
+  featured: boolean;
 }
 
-const COLUMNS = "id, display_name, image_path, status, vote_count, created_at, reviewed_at";
+const COLUMNS =
+  "id, display_name, image_path, status, vote_count, created_at, reviewed_at, featured";
 
 function toSubmission(row: Row): Submission {
   return {
@@ -35,6 +37,7 @@ function toSubmission(row: Row): Submission {
     voteCount: row.vote_count,
     createdAt: row.created_at,
     reviewedAt: row.reviewed_at,
+    featured: row.featured,
   };
 }
 
@@ -113,6 +116,32 @@ export function createSupabaseStore(url: string, serviceRoleKey: string, bucket:
         bytes: new Uint8Array(await file.data.arrayBuffer()),
         contentType: file.data.type || "image/png",
       };
+    },
+
+    async listFeatured(limit) {
+      // Both conditions, every time: featured is a curation flag, approved is what makes a design
+      // public, and only the pair of them belongs in a round.
+      const { data, error } = await client
+        .from("submissions")
+        .select(COLUMNS)
+        .eq("status", "approved")
+        .eq("featured", true)
+        .order("vote_count", { ascending: false })
+        .order("created_at", { ascending: true })
+        .limit(limit);
+      if (error) throw new Error(`Could not list the featured designs: ${error.message}`);
+      return (data as Row[]).map(toSubmission);
+    },
+
+    async setFeatured(id, featured) {
+      const { data, error } = await client
+        .from("submissions")
+        .update({ featured })
+        .eq("id", id)
+        .select(COLUMNS)
+        .maybeSingle();
+      if (error) throw new Error(`Could not update the submission: ${error.message}`);
+      return data ? toSubmission(data as Row) : null;
     },
 
     async setStatus(id, status) {

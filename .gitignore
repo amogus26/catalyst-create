@@ -6,6 +6,10 @@ build/
 # Local dev store - uploaded files and rows when running without Supabase (see lib/store/local.ts)
 .localstore/
 
+# CLI state, not settings: which site/project this checkout happens to be linked to.
+.netlify/
+supabase/.temp/
+
 # Secrets. .env.example is committed; anything real is not.
 .env
 .env.local

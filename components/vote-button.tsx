@@ -11,10 +11,12 @@ export function VoteButton({
   id,
   initialCount,
   initiallyVoted,
+  size = "normal",
 }: {
   id: string;
   initialCount: number;
   initiallyVoted: boolean;
+  size?: "normal" | "large";
 }) {
   const [count, setCount] = useState(initialCount);
   const [voted, setVoted] = useState(initiallyVoted);
@@ -56,17 +58,24 @@ export function VoteButton({
 
   return (
     <button
-      className="vote"
+      className={`vote${size === "large" ? " vote-large" : ""}${voted ? " voted" : ""}`}
       type="button"
       onClick={vote}
+      aria-label={
+        voted ? `Voted. ${count} votes` : failed ? "Vote - that did not go through" : `Vote. ${count} votes`
+      }
       disabled={voted || busy}
-      title={failed ? "That did not go through - try again" : voted ? "You have voted for this one" : "Vote for this design"}
+      title={
+        failed
+          ? "That did not go through - try again"
+          : voted
+            ? "You have voted for this one"
+            : "Vote for this design"
+      }
     >
       <span aria-hidden="true">{voted ? "★" : "☆"}</span>
+      <span className="label">{voted ? "Voted" : "Vote"}</span>
       <span className="count">{count}</span>
-      <span className="sr-only" style={{ position: "absolute", left: -9999 }}>
-        {voted ? "voted" : "vote"}
-      </span>
     </button>
   );
 }

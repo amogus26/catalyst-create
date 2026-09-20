@@ -20,26 +20,37 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         {devStore && (
           <div className="dev-banner">
-            Local dev store: submissions live in <code>.localstore/</code> on this machine only. Set the
-            Supabase environment variables to use the real database.
+            Local dev store: submissions live in <code>.localstore/</code> on this machine only. Set
+            the Supabase environment variables to use the real database.
           </div>
         )}
         <header className="site-header">
           <div className="inner">
             <Link href="/" className="brand">
-              Catalyst <span>Designs</span>
+              <span className="mark" aria-hidden="true" />
+              Catalyst <span className="gold">Designs</span>
             </Link>
             <nav>
-              <Link href="/gallery">Gallery</Link>
-              <Link href="/submit">Submit a design</Link>
-              <Link href="/admin">Admin</Link>
+              <Link href="/#submit">Submit</Link>
+              <Link href="/#vote">Vote</Link>
+              <Link href="/#showcase">Showcase</Link>
+              <Link href="/terms">Terms</Link>
             </nav>
           </div>
         </header>
         <main className="shell">{children}</main>
         <footer className="site-footer">
-          Community designs for Catalyst Client. Every submission is looked at by a person before it is
-          shown here.
+          <div className="inner">
+            <p>
+              Community cape designs for Catalyst Client. Every submission is looked at by a person
+              before it is shown here.
+            </p>
+            <p className="tiny">
+              <Link href="/terms">Terms &amp; Privacy</Link>
+              <span className="dot">·</span>
+              <Link href="/admin">Reviewer sign-in</Link>
+            </p>
+          </div>
         </footer>
       </body>
     </html>

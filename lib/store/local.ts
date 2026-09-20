@@ -28,7 +28,10 @@ const IMAGE_DIR = path.join(ROOT, "images");
 
 async function read(): Promise<Data> {
   try {
-    return JSON.parse(await fs.readFile(DATA_FILE, "utf8")) as Data;
+    const data = JSON.parse(await fs.readFile(DATA_FILE, "utf8")) as Data;
+    // Rows written before `featured` existed simply are not featured.
+    for (const row of data.submissions) row.featured = row.featured ?? false;
+    return data;
   } catch {
     return { submissions: [], votes: [] };
   }
@@ -67,6 +70,7 @@ export function createLocalStore(): Store {
         voteCount: 0,
         createdAt: new Date().toISOString(),
         reviewedAt: null,
+        featured: false,
         imageFile,
       };
       data.submissions.push(submission);
@@ -101,6 +105,24 @@ export function createLocalStore(): Store {
       } catch {
         return null;
       }
+    },
+
+    async listFeatured(limit) {
+      const data = await read();
+      return data.submissions
+        .filter((row) => row.featured && row.status === "approved")
+        .sort((a, b) => b.voteCount - a.voteCount || a.createdAt.localeCompare(b.createdAt))
+        .slice(0, limit)
+        .map(publicView);
+    },
+
+    async setFeatured(id, featured) {
+      const data = await read();
+      const row = data.submissions.find((item) => item.id === id);
+      if (!row) return null;
+      row.featured = featured;
+      await write(data);
+      return publicView(row);
     },
 
     async setStatus(id, status: SubmissionStatus) {

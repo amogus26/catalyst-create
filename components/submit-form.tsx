@@ -110,8 +110,8 @@ export function SubmitForm() {
           >
             Submit another
           </button>
-          <a className="button" href="/gallery">
-            See the gallery
+          <a className="button" href="/#showcase">
+            See the showcase
           </a>
         </div>
       </div>

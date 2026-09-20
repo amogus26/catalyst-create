@@ -19,9 +19,9 @@ Four independent places, so no single mistake opens it:
 1. **The store cannot create anything else.** `Store.createSubmission` takes no status argument
    (`lib/store/types.ts`), so no route, test or future change can insert a visible row. The column
    defaults to `'pending'` in the database too.
-2. **The gallery only ever asks for approved rows.** `app/gallery/page.tsx` calls
-   `listByStatus("approved")`. Pending designs are not fetched and filtered out - they are never
-   loaded.
+2. **The public page only ever asks for approved rows.** `app/page.tsx` calls
+   `listByStatus("approved")` and `listFeatured()`, and `listFeatured` requires `approved` as well
+   as `featured`. Pending designs are not fetched and filtered out - they are never loaded.
 3. **Images are served by a route that checks the row first.** The Storage bucket is **private**, so
    no upload has a public URL at all. Bytes leave only through `app/api/images/[id]`, which returns
    404 for anything not approved unless the request carries a valid admin session.
@@ -83,6 +83,19 @@ That verifies the tables, the function, that the bucket exists and is private, a
 
 None of these may be prefixed `NEXT_PUBLIC_` - that would publish them to every visitor.
 
+## Where it is running
+
+| | |
+| --- | --- |
+| Site | https://catalyst-create.netlify.app |
+| Netlify project | `catalyst-create` (site id `c43726a8-24a2-4187-97e1-48568ad88731`) |
+| Supabase project | `catalyst-create` (ref `ekmqfqdwnktbaufjkufx`, eu-central-1) |
+
+**`netlify.toml` matters here.** Netlify installs its Next.js runtime automatically only for builds
+from a linked Git repository; a deploy uploaded as a zip gets no runtime, publishes the static
+output alone, and every dynamic page and API route 404s - which is the whole site. So the runtime is
+a devDependency and is declared in `netlify.toml`. Leave both in place.
+
 ## Deploying
 
 Push to GitHub first (see the bottom of this file), then either host:
@@ -130,29 +143,41 @@ the launcher repo - `community/CommunityArt.kt`, one constant. That is a separat
 - **The admin login is not rate-limited.** One shared password, compared in constant time, in a
   signed httpOnly cookie. Use a long random password. A guess limiter is a sensible follow-up.
 - **Rejected images are kept.** A rejected row keeps its file so that a mis-click can be undone
-  from "Recently reviewed" on the admin page. Nothing serves them - they are 404 to everyone but a
+  from the "Rejected" list on the admin page. Nothing serves them - they are 404 to everyone but a
   reviewer - but you should decide a retention policy before this site sees real traffic.
 - **The gallery loads every approved design at once.** Fine for a first contest; it needs paging
   before it is hundreds.
 
 ## Layout
 
+The public site is **one page**. Submitting, the current voting round and the showcase are three
+sections of `/` behind a tab switcher, not three routes - `/#submit`, `/#vote` and `/#showcase` are
+real links to each. `/terms` is separate because it is reference material, and `/admin` is separate
+because it is not public.
+
 ```
 app/
-  layout.tsx, page.tsx, globals.css   shell, home page, the launcher's palette
-  submit/                             the form (client) and its page
-  gallery/                            approved designs and the vote button
-  admin/                              password gate and the review queue
+  layout.tsx, page.tsx, globals.css   shell, the one public page, the launcher's palette
+  terms/                              terms of service and privacy, on one page
+  admin/                              password gate, review queue, round picking
   api/submissions/                    POST: create a pending submission
   api/votes/                          POST: one vote per browser
   api/images/[id]/                    GET: the only way an image leaves the server
   api/admin/login/                    POST/DELETE: open and close an admin session
   api/admin/review/                   POST: approve, reject, or send back to pending
+  api/admin/feature/                  POST: put an approved design in the round, or take it out
+components/
+  section-tabs.tsx                    the switch between the three sections of the main page
+  submit-form.tsx                     the form, with the client half of the file checks
+  featured-round.tsx, showcase.tsx    the two ways designs are shown
+  design-card.tsx, vote-button.tsx    one card and one vote, shared by both
+  feature-toggle.tsx                  the reviewer's round picker
 lib/
   validation.ts                       PNG and cape-size rules, shared by browser and server
   admin-session.ts                    password check and signed session cookie
   voter.ts                            the voter cookie
+  config.ts                           how many designs a round holds
   store/                              types.ts, index.ts (picks a driver), supabase.ts, local.ts
-supabase/migrations/0001_init.sql     tables, RLS, cast_vote, the private bucket
+supabase/migrations/                  0001 tables, RLS, cast_vote, private bucket; 0002 featured
 scripts/check-supabase.mjs            read-only check of a real project
 ```

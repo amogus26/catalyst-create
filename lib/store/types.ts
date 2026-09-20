@@ -19,6 +19,8 @@ export interface Submission {
   voteCount: number;
   createdAt: string;
   reviewedAt: string | null;
+  /** Picked by a reviewer for the current voting round. Only meaningful while approved. */
+  featured: boolean;
 }
 
 export interface StoredImage {
@@ -48,7 +50,16 @@ export interface Store {
   /** The raw image. Callers are responsible for deciding who may see it - see app/api/images. */
   readImage(id: string): Promise<StoredImage | null>;
 
+  /**
+   * The designs in the current voting round: featured *and* approved, highest-voted first, capped
+   * at [limit]. Featuring alone shows nothing - the approved check is repeated here on purpose.
+   */
+  listFeatured(limit: number): Promise<Submission[]>;
+
   setStatus(id: string, status: SubmissionStatus): Promise<Submission | null>;
+
+  /** Ticks or unticks a design for the round. Says nothing about whether it is visible. */
+  setFeatured(id: string, featured: boolean): Promise<Submission | null>;
 
   /**
    * One vote per voter per submission, and only on approved submissions. Returns null when there
