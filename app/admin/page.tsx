@@ -1,4 +1,5 @@
 import { FeatureToggle } from "@/components/feature-toggle";
+import { SectionHeader } from "@/components/section-header";
 import { TypeIcon } from "@/components/type-icon";
 import { designType } from "@/lib/design-types";
 import { adminPasswordConfigured, isAdmin } from "@/lib/admin-session";
@@ -21,7 +22,7 @@ export const dynamic = "force-dynamic";
 export default async function AdminPage() {
   if (!adminPasswordConfigured()) {
     return (
-      <div className="prose">
+      <div className="shell prose">
         <h1>Review queue</h1>
         <div className="notice info">
           <strong>ADMIN_PASSWORD is not set.</strong> Nobody can open this page, which also means
@@ -50,21 +51,18 @@ export default async function AdminPage() {
   );
 
   return (
-    <div className="admin">
-      <header className="section-head">
-        <div>
-          <p className="eyebrow">Reviewers only</p>
-          <h1>Review queue</h1>
-          <p className="muted">
-            {pending.length === 0
-              ? "Nothing is waiting."
-              : `${pending.length} design${pending.length === 1 ? "" : "s"} waiting. Nothing below is visible to anyone else yet.`}
-          </p>
-        </div>
-      </header>
+    <div className="shell admin">
+      <div className="page-head">
+        <p className="eyebrow">Reviewers only</p>
+        <h1 style={{ fontSize: 34 }}>Review queue</h1>
+      </div>
 
       <section className="section">
-        <h2>Waiting for review</h2>
+        <SectionHeader no="01" title="Waiting for review">
+          {pending.length === 0
+            ? "Nothing is waiting."
+            : `${pending.length} design${pending.length === 1 ? "" : "s"} waiting. Nothing here is visible to anyone else yet.`}
+        </SectionHeader>
         {pending.length === 0 ? (
           <div className="empty">Nothing to review right now.</div>
         ) : (
@@ -77,13 +75,13 @@ export default async function AdminPage() {
       </section>
 
       <section className="section">
-        <h2>Approved</h2>
-        <p className="muted small">
-          Live on the site. {featuredCount === 0
-            ? "None are in a voting round yet - add up to five."
-            : `${featuredCount} in the current round; the page shows the top ${FEATURED_LIMIT}.`}{" "}
-          Sending one back to pending takes it down again, which is how you undo an approval.
-        </p>
+        <SectionHeader no="02" title="Approved">
+          {`Live on the site. ${
+            featuredCount === 0
+              ? "None are in a voting round yet - add up to five."
+              : `${featuredCount} in the current round; the page shows the top ${FEATURED_LIMIT}.`
+          } Sending one back to pending takes it down again, which is how you undo an approval.`}
+        </SectionHeader>
         {approvedSorted.length === 0 ? (
           <div className="empty">Nothing approved yet.</div>
         ) : (
@@ -97,11 +95,10 @@ export default async function AdminPage() {
 
       {rejected.length > 0 && (
         <section className="section">
-          <h2>Rejected</h2>
-          <p className="muted small">
-            Not shown anywhere and not reachable by anyone but a reviewer. Kept so a mis-click can be
-            undone.
-          </p>
+          <SectionHeader no="03" title="Rejected">
+            Not shown anywhere and not reachable by anyone but a reviewer. Kept so a mis-click can
+            be undone.
+          </SectionHeader>
           <div className="showcase-grid">
             {rejected.slice(0, 8).map((submission) => (
               <AdminCard key={submission.id} submission={submission} featuredCount={featuredCount} />

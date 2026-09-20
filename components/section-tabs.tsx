@@ -3,24 +3,25 @@
 import { useEffect, useState, type ReactNode } from "react";
 
 /**
- * The main page is one page with three parts, not three pages. This is the switch between them.
+ * The main page is one page in three steps, and this is the switch between them.
  *
- * Each part is rendered on the server and handed in as a prop, so switching tabs costs nothing and
- * fetches nothing. The tab is mirrored into the URL hash, which means `/#showcase` and `/#vote` are
- * real links that land where they say - the anchors the sections would have had, without the giant
- * scroll they would have come with.
+ * Presented as steps rather than tabs on purpose: submit, then vote, then look at what got through
+ * is the order the site works in, and numbering them answers "what do I do first" without a
+ * sentence of instructions. Each part is rendered on the server and handed in as a prop, so
+ * switching costs nothing and fetches nothing, and the step is mirrored into the URL hash, which
+ * makes `/#vote` and `/#showcase` real links.
  */
 
-const TABS = [
-  { id: "submit", label: "Submit a design" },
-  { id: "vote", label: "Vote" },
-  { id: "showcase", label: "Showcase" },
+const STEPS = [
+  { id: "submit", no: "01", label: "Submit", hint: "Upload or draw one" },
+  { id: "vote", no: "02", label: "Vote", hint: "This round's five" },
+  { id: "showcase", no: "03", label: "Showcase", hint: "Everything approved" },
 ] as const;
 
-type TabId = (typeof TABS)[number]["id"];
+type StepId = (typeof STEPS)[number]["id"];
 
-function isTabId(value: string): value is TabId {
-  return TABS.some((tab) => tab.id === value);
+function isStepId(value: string): value is StepId {
+  return STEPS.some((step) => step.id === value);
 }
 
 export function SectionTabs({
@@ -34,50 +35,52 @@ export function SectionTabs({
   showcase: ReactNode;
   counts: { vote: number; showcase: number };
 }) {
-  const [active, setActive] = useState<TabId>("submit");
+  const [active, setActive] = useState<StepId>("submit");
 
   useEffect(() => {
     const fromHash = () => {
       const id = window.location.hash.replace("#", "");
-      if (isTabId(id)) setActive(id);
+      if (isStepId(id)) setActive(id);
     };
     fromHash();
     window.addEventListener("hashchange", fromHash);
     return () => window.removeEventListener("hashchange", fromHash);
   }, []);
 
-  function select(id: TabId) {
+  function select(id: StepId) {
     setActive(id);
-    // replaceState, not a new entry: flipping between tabs should not fill up the back button.
+    // replaceState, not a new entry: flipping between steps should not fill the back button.
     window.history.replaceState(null, "", `#${id}`);
   }
 
-  const count = (id: TabId) => (id === "vote" ? counts.vote : id === "showcase" ? counts.showcase : null);
+  const count = (id: StepId) =>
+    id === "vote" ? counts.vote : id === "showcase" ? counts.showcase : null;
 
   return (
     <>
-      <div className="tabs" role="tablist" aria-label="Sections">
-        {TABS.map((tab) => {
-          const badge = count(tab.id);
+      <nav className="steps-nav" aria-label="Steps">
+        {STEPS.map((step) => {
+          const badge = count(step.id);
           return (
             <button
-              key={tab.id}
-              role="tab"
+              key={step.id}
               type="button"
-              id={`tab-${tab.id}`}
-              aria-selected={active === tab.id}
-              aria-controls={`panel-${tab.id}`}
-              className={active === tab.id ? "tab active" : "tab"}
-              onClick={() => select(tab.id)}
+              aria-current={active === step.id ? "step" : undefined}
+              className={active === step.id ? "step on" : "step"}
+              onClick={() => select(step.id)}
             >
-              {tab.label}
-              {badge !== null && badge > 0 && <span className="tab-count">{badge}</span>}
+              <span className="step-no">{step.no}</span>
+              <span className="step-label">
+                <b>{step.label}</b>
+                <span>{step.hint}</span>
+              </span>
+              {badge !== null && badge > 0 && <span className="step-count">{badge}</span>}
             </button>
           );
         })}
-      </div>
+      </nav>
 
-      <div id={`panel-${active}`} role="tabpanel" aria-labelledby={`tab-${active}`}>
+      <div id={`panel-${active}`}>
         {active === "submit" && submit}
         {active === "vote" && vote}
         {active === "showcase" && showcase}

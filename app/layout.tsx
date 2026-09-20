@@ -52,7 +52,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </nav>
           </div>
         </header>
-        <main className="shell">{children}</main>
+        <main>{children}</main>
         <footer className="site-footer">
           <div className="inner">
             <p>

@@ -1,39 +1,44 @@
 /*
  * Light theme.
  *
- * The colours are the launcher's, moved onto paper rather than replaced: its blue is the accent
- * and its gold still means "a vote", but both are darkened until they hold up as ink on white -
- * the launcher's #4FA8E8 on a white background is about 2:1 against text, which is unreadable, so
- * the accent here is a deeper shade of the same hue and the gold is used as a fill with dark text
- * on it rather than as text itself.
+ * Two things carry the design, rather than a handful of small accents:
  *
- * The one deliberate flourish: **the page is drawn on graph paper.** Everything this site is for -
- * a 64x32 cape, a drawing canvas, a checkerboard behind a transparent texture - happens on a pixel
- * grid, so the site sits on one too. It is a single 8px grid at about 4% ink: invisible until you
- * look, and the thing that keeps an otherwise plain white page from being a generic plain white
- * page. Cards float above it in flat white, which is what makes them read as cards at all without
- * heavy borders.
+ * 1. **The hero is a drafting board.** A tinted band with a visible grid ruled across it, ending in
+ *    a hard edge where the page proper begins, with the site's own approved designs pinned up on it
+ *    as plates. The thing this site is for is people drawing on a grid, so the top of the page is
+ *    one - and the artwork on it is real, pulled from the showcase, not decoration.
+ * 2. **A numbered type system.** Submit, vote, showcase are steps 01, 02, 03, set in the pixel face
+ *    the launcher draws its own text in, and the page's type scale jumps properly between display,
+ *    heading and body instead of everything sitting at a similar size.
+ *
+ * The page ground is not flat white: an off-white base with two very soft washes of colour in the
+ * upper corners, so there is depth behind the cards without anything that reads as a "gradient".
+ *
+ * Colours are the launcher's, darkened until they work as ink on paper - its #4FA8E8 is about 2:1
+ * against white, which is unreadable, so the accent is a deeper shade of the same hue and the gold
+ * is a fill with dark text on it rather than text itself.
  */
 
 :root {
   /* paper and ink */
   --paper: #ffffff;
-  --ground: #f7f8fa;
-  --ink: #12161d;
-  --muted: #5b6472;
-  --line: #e4e7ed;
-  --line-soft: #eef0f4;
+  --ground: #f3f5f9;
+  --ground-deep: #eaeef4;
+  --ink: #101521;
+  --muted: #596274;
+  --line: #e1e6ee;
+  --line-soft: #edf0f5;
 
-  /* the launcher's palette, darkened to work as ink on white */
+  /* the launcher's palette, as ink on paper */
   --accent: #1b6dc1;
   --accent-ink: #14538f;
-  --accent-wash: #eaf2fb;
+  --accent-wash: #e9f1fb;
   --gold: #f0b429;
-  --gold-wash: #fdf3dc;
+  --gold-wash: #fdf2d9;
   --gold-ink: #7a5406;
   --success: #1f7a4d;
   --success-ink: #176139;
-  --success-wash: #e8f5ee;
+  --success-wash: #e7f4ed;
   --danger: #b3261e;
   --danger-wash: #fdecea;
   --amber-ink: #8a5a12;
@@ -41,14 +46,23 @@
 
   --radius: 14px;
   --radius-sm: 9px;
-  --shell: 1120px;
+  --radius-lg: 20px;
+  --shell: 1140px;
 
-  --shadow-card: 0 1px 2px rgba(18, 22, 29, 0.05), 0 6px 18px rgba(18, 22, 29, 0.06);
-  --shadow-lift: 0 2px 6px rgba(18, 22, 29, 0.07), 0 14px 32px rgba(18, 22, 29, 0.1);
+  /* one spacing scale, so vertical rhythm is a decision rather than an accident */
+  --s1: 6px;
+  --s2: 10px;
+  --s3: 16px;
+  --s4: 24px;
+  --s5: 34px;
+  --s6: 52px;
+  --s7: 76px;
+  --s8: 104px;
 
-  /* the graph paper: one 8px grid, faint */
-  --grid-ink: rgba(18, 22, 29, 0.042);
-  --grid-step: 8px;
+  --shadow-sm: 0 1px 2px rgba(16, 21, 33, 0.05), 0 4px 12px rgba(16, 21, 33, 0.05);
+  --shadow-card: 0 1px 2px rgba(16, 21, 33, 0.05), 0 8px 22px rgba(16, 21, 33, 0.07);
+  --shadow-lift: 0 2px 6px rgba(16, 21, 33, 0.07), 0 18px 38px rgba(16, 21, 33, 0.11);
+  --shadow-plate: 0 10px 30px rgba(16, 21, 33, 0.16), 0 2px 6px rgba(16, 21, 33, 0.08);
 }
 
 * {
@@ -62,15 +76,17 @@ body {
 }
 
 body {
+  /* Depth without a visible gradient: an off-white base lifted by two soft washes that only
+     really show near the top of the page, where the hero sits. */
   background-color: var(--ground);
   background-image:
-    linear-gradient(var(--grid-ink) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid-ink) 1px, transparent 1px);
-  background-size: var(--grid-step) var(--grid-step);
+    radial-gradient(1100px 520px at 12% -6%, rgba(27, 109, 193, 0.1), transparent 62%),
+    radial-gradient(900px 460px at 92% 2%, rgba(240, 180, 41, 0.09), transparent 60%);
+  background-attachment: fixed;
   color: var(--ink);
   font-family: var(--font-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  font-size: 15px;
-  line-height: 1.6;
+  font-size: 15.5px;
+  line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
   display: flex;
@@ -88,29 +104,31 @@ a:hover {
 h1,
 h2,
 h3 {
-  line-height: 1.15;
-  margin: 0 0 12px;
-  letter-spacing: -0.021em;
+  margin: 0 0 var(--s2);
 }
 h1 {
-  font-size: clamp(30px, 5vw, 43px);
+  font-size: clamp(38px, 4.7vw, 56px);
   font-weight: 800;
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+  /* Let the browser even out the lines rather than forcing a break that only suits one width. */
+  text-wrap: balance;
 }
 h2 {
-  font-size: 23px;
-  font-weight: 700;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -0.026em;
 }
 h3 {
   font-size: 16px;
   font-weight: 700;
+  letter-spacing: -0.012em;
 }
 p {
-  margin: 0 0 14px;
+  margin: 0 0 var(--s3);
 }
 
-.gold {
-  color: var(--gold-ink);
-}
 .muted {
   color: var(--muted);
 }
@@ -119,21 +137,22 @@ p {
 }
 .tiny {
   font-size: 12px;
-  line-height: 1.5;
+  line-height: 1.55;
 }
-.eyebrow {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 1.4px;
-  text-transform: uppercase;
-  color: var(--accent-ink);
-  margin: 0 0 8px;
+.gold {
+  color: var(--gold-ink);
+}
+
+/* The pixel face, from the launcher's own drawn text. Used for numbers and labels, never prose. */
+.pixel {
+  font-family: var(--font-pixel), ui-monospace, monospace;
+  letter-spacing: 0.02em;
 }
 
 code {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.92em;
-  background: var(--ground);
+  background: var(--paper);
   border: 1px solid var(--line);
   padding: 1px 5px;
   border-radius: 4px;
@@ -143,24 +162,30 @@ code {
   width: 100%;
   max-width: var(--shell);
   margin: 0 auto;
-  padding: 0 22px 80px;
+  padding: 0 24px;
+}
+/* main no longer carries the shell class (pages open their own, so a hero can run full width),
+   so the grow-to-fill has to live on main itself - without it the footer rides up the page on any
+   page short enough not to fill the viewport. */
+main {
   flex: 1;
+  padding-bottom: var(--s8);
 }
 
 /* --- header --------------------------------------------------------------- */
 
 .site-header {
   border-bottom: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.86);
+  background: rgba(255, 255, 255, 0.82);
   position: sticky;
   top: 0;
-  z-index: 20;
-  backdrop-filter: blur(10px);
+  z-index: 30;
+  backdrop-filter: blur(12px);
 }
 .site-header .inner {
   max-width: var(--shell);
   margin: 0 auto;
-  padding: 13px 22px;
+  padding: 14px 24px;
   display: flex;
   align-items: center;
   gap: 20px;
@@ -171,11 +196,8 @@ code {
   align-items: center;
   gap: 10px;
   color: var(--ink);
-  /* The pixel face, used here and nowhere else - the launcher draws its own mark in a pixel font,
-     and one word in the same voice ties the two products together without costing readability. */
   font-family: var(--font-pixel), ui-monospace, monospace;
   font-size: 15px;
-  letter-spacing: 0.01em;
 }
 .brand:hover {
   text-decoration: none;
@@ -186,7 +208,7 @@ code {
   background:
     linear-gradient(var(--gold) 0 0) 0 0 / 7px 7px no-repeat,
     linear-gradient(var(--accent) 0 0) 7px 7px / 7px 7px no-repeat,
-    linear-gradient(var(--accent-wash) 0 0) 0 0 / 14px 14px no-repeat;
+    linear-gradient(#cfdcea 0 0) 0 0 / 14px 14px no-repeat;
 }
 .site-header nav {
   display: flex;
@@ -202,116 +224,283 @@ code {
 }
 .site-header nav a:hover {
   color: var(--ink);
-  background: var(--ground);
+  background: var(--ground-deep);
   text-decoration: none;
 }
 
-/* --- hero ----------------------------------------------------------------- */
+/* --- the hero band -------------------------------------------------------- */
 
+.hero-band {
+  position: relative;
+  /* Already full width: the band is a child of <main>, not of the shell, so it needs no bleed
+     trick - and a 50vw one would overflow the page by the width of the scrollbar. */
+  margin-bottom: var(--s6);
+  background: linear-gradient(180deg, #fbfcfe 0%, #f2f5fa 100%);
+  border-bottom: 1px solid var(--line);
+  overflow: hidden;
+}
+/* The ruling: a real drafting grid, strong enough to see, faded out before the text sits on it. */
+.hero-band::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(27, 60, 110, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(27, 60, 110, 0.07) 1px, transparent 1px);
+  background-size: 24px 24px;
+  -webkit-mask-image: radial-gradient(120% 100% at 50% 0%, #000 35%, transparent 78%);
+  mask-image: radial-gradient(120% 100% at 50% 0%, #000 35%, transparent 78%);
+  pointer-events: none;
+}
 .hero {
-  padding: 54px 0 32px;
-  max-width: 660px;
+  position: relative;
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding: var(--s7) 24px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.86fr);
+  gap: var(--s6);
+  align-items: center;
+}
+.hero-copy {
+  max-width: 34rem;
+}
+.hero .eyebrow {
+  margin-bottom: var(--s3);
 }
 .hero .lead {
-  font-size: 17px;
+  font-size: 18px;
   color: var(--muted);
-  margin-bottom: 20px;
+  margin-bottom: var(--s4);
+  max-width: 34rem;
 }
-.hero-meta {
+.hero-actions {
   display: flex;
-  gap: 9px;
+  gap: var(--s2);
   flex-wrap: wrap;
-}
-.chip {
-  font-size: 12px;
-  color: var(--muted);
-  border: 1px solid var(--line);
-  background: var(--paper);
-  border-radius: 100px;
-  padding: 5px 12px;
+  align-items: center;
 }
 
-/* --- tabs ----------------------------------------------------------------- */
-
-.tabs {
-  display: flex;
-  gap: 6px;
-  border-bottom: 1px solid var(--line);
-  margin-bottom: 30px;
-  overflow-x: auto;
-}
-.tab {
-  background: none;
-  border: none;
-  border-bottom: 2px solid transparent;
-  border-radius: 0;
-  color: var(--muted);
-  font-size: 14.5px;
-  font-weight: 600;
-  padding: 11px 14px;
-  cursor: pointer;
-  white-space: nowrap;
+.eyebrow {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  font-family: var(--font-pixel), ui-monospace, monospace;
+  font-size: 10px;
+  color: var(--accent-ink);
+  background: var(--accent-wash);
+  border: 1px solid rgba(27, 109, 193, 0.2);
+  border-radius: 100px;
+  padding: 5px 11px;
+  margin: 0 0 var(--s2);
 }
-.tab:hover {
+
+/* --- the plates: real designs pinned to the board ------------------------- */
+
+.plates {
+  position: relative;
+  height: 320px;
+  display: block;
+}
+.plate {
+  position: absolute;
+  width: 62%;
+  border-radius: 10px;
+  background: var(--paper);
+  padding: 9px;
+  box-shadow: var(--shadow-plate);
+  border: 1px solid rgba(16, 21, 33, 0.06);
+}
+.plate img,
+.plate .plate-blank {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  object-fit: contain;
+  image-rendering: pixelated;
+  border-radius: 4px;
+  background: repeating-conic-gradient(#eef1f5 0% 25%, #fafbfd 0% 50%) 50% / 12px 12px;
+}
+.plate-caption {
+  font-size: 10.5px;
+  color: var(--muted);
+  padding: 7px 2px 1px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.plate-caption b {
   color: var(--ink);
-  background: none;
-  border-color: transparent;
-  border-bottom-color: var(--line);
+  font-weight: 650;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.tab.active {
-  color: var(--ink);
-  border-bottom-color: var(--accent);
+/* A pile with the best one on top: two plates tucked behind at opposing angles, the front one
+   square-ish and centred, so the eye lands on it and the captions cannot collide. */
+.plate.behind-1 {
+  left: 0;
+  top: 0;
+  width: 58%;
+  transform: rotate(-8deg);
+  z-index: 1;
 }
-.tab-count {
+.plate.behind-2 {
+  right: 0;
+  bottom: 2%;
+  width: 58%;
+  transform: rotate(7deg);
+  z-index: 2;
+}
+.plate.front {
+  left: 13%;
+  top: 19%;
+  width: 68%;
+  transform: rotate(-1.5deg);
+  z-index: 3;
+}
+/* Loose pixels scattered around the plates, in the brand colours. */
+.plates::after {
+  content: "";
+  position: absolute;
+  inset: -6% -2%;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--gold) 0 0) 4% 12% / 10px 10px no-repeat,
+    linear-gradient(var(--accent) 0 0) 96% 70% / 8px 8px no-repeat,
+    linear-gradient(rgba(27, 109, 193, 0.45) 0 0) 88% 6% / 6px 6px no-repeat,
+    linear-gradient(rgba(240, 180, 41, 0.5) 0 0) 10% 92% / 7px 7px no-repeat;
+}
+
+@media (max-width: 940px) {
+  .hero {
+    grid-template-columns: 1fr;
+    padding: var(--s6) 24px;
+    gap: var(--s5);
+  }
+  .plates {
+    height: 240px;
+  }
+}
+
+/* --- the three steps ------------------------------------------------------ */
+
+.steps-nav {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--s2);
+  margin-bottom: var(--s6);
+}
+.step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  padding: 14px 16px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  transition: border-color 140ms, box-shadow 140ms, transform 140ms;
+}
+/* Scoped under .steps-nav on purpose: the generic `button:hover` rule further down carries more
+   specificity than a bare `.step.on`, so an unscoped version loses its accent the moment the
+   pointer rests on the step that is already selected. */
+.steps-nav .step:hover:not(.on) {
+  background: var(--paper);
+  border-color: #c9d3e2;
+  transform: translateY(-1px);
+}
+.steps-nav .step.on,
+.steps-nav .step.on:hover {
+  background: var(--paper);
+  border-color: rgba(27, 109, 193, 0.55);
+  box-shadow: 0 0 0 1px rgba(27, 109, 193, 0.25), var(--shadow-card);
+}
+.step-no {
+  font-family: var(--font-pixel), ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--muted);
+  background: var(--ground);
+  border-radius: 6px;
+  padding: 6px 7px;
+  line-height: 1;
+}
+.step.on .step-no {
+  background: var(--accent);
+  color: #fff;
+}
+.step-label {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.step-label b {
+  font-size: 14.5px;
+  font-weight: 650;
+  letter-spacing: -0.012em;
+}
+.step-label span {
+  font-size: 12px;
+  color: var(--muted);
+}
+.step-count {
+  margin-left: auto;
   font-size: 11px;
   font-weight: 700;
-  color: var(--paper);
-  background: var(--muted);
+  color: var(--muted);
+  background: var(--ground);
   border-radius: 100px;
-  padding: 1px 7px;
+  padding: 2px 8px;
 }
-.tab.active .tab-count {
-  background: var(--accent);
+.step.on .step-count {
+  background: var(--accent-wash);
+  color: var(--accent-ink);
+}
+
+@media (max-width: 760px) {
+  .steps-nav {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* --- sections ------------------------------------------------------------- */
 
 .section {
-  margin-bottom: 52px;
+  margin-bottom: var(--s7);
+}
+.section:last-child {
+  margin-bottom: 0;
 }
 .section-head {
-  margin-bottom: 22px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: var(--s5);
+  padding-bottom: var(--s4);
+  border-bottom: 1px solid var(--line);
+}
+.section-no {
+  font-family: var(--font-pixel), ui-monospace, monospace;
+  font-size: 13px;
+  color: var(--accent);
+  padding-top: 6px;
+  flex: none;
 }
 .section-head h2 {
-  margin-bottom: 6px;
+  margin-bottom: var(--s1);
 }
-.section-head .muted {
+.section-head p {
   margin: 0;
-  max-width: 620px;
-}
-
-/* A short run of pixels under a heading - the same grid the designs live on, used as a rule. */
-.pixel-rule {
-  height: 4px;
-  width: 76px;
-  margin: 0 0 14px;
-  background:
-    linear-gradient(var(--gold) 0 0) 0 0 / 4px 4px no-repeat,
-    linear-gradient(var(--accent) 0 0) 8px 0 / 4px 4px no-repeat,
-    linear-gradient(var(--accent) 0 0) 16px 0 / 4px 4px no-repeat,
-    linear-gradient(rgba(27, 109, 193, 0.5) 0 0) 24px 0 / 4px 4px no-repeat,
-    linear-gradient(rgba(27, 109, 193, 0.28) 0 0) 32px 0 / 4px 4px no-repeat,
-    linear-gradient(rgba(27, 109, 193, 0.16) 0 0) 40px 0 / 4px 4px no-repeat;
+  color: var(--muted);
+  max-width: 62ch;
 }
 
 .panel {
   background: var(--paper);
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  padding: 22px;
+  padding: var(--s4);
   box-shadow: var(--shadow-card);
 }
 .panel h3 {
@@ -320,28 +509,45 @@ code {
 
 .submit-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
-  gap: 18px;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: var(--s4);
   align-items: start;
 }
+/* The aside is a tinted card, not grey on grey - it has to read as a different kind of thing. */
 .panel.side {
-  background: var(--ground);
+  background: linear-gradient(180deg, #f8fbff 0%, #f3f7fd 100%);
+  border-color: rgba(27, 109, 193, 0.18);
   box-shadow: none;
 }
-.steps {
-  margin: 0 0 16px;
-  padding-left: 18px;
+.steps-list {
+  margin: 0 0 var(--s3);
+  padding: 0;
+  list-style: none;
+  counter-reset: howto;
   color: var(--muted);
   font-size: 13.5px;
 }
-.steps li {
-  margin-bottom: 9px;
+.steps-list li {
+  position: relative;
+  padding-left: 26px;
+  margin-bottom: var(--s2);
+  counter-increment: howto;
 }
-.steps strong {
+.steps-list li::before {
+  content: counter(howto, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 1px;
+  font-family: var(--font-pixel), ui-monospace, monospace;
+  font-size: 10px;
+  color: var(--accent);
+}
+.steps-list strong {
   color: var(--ink);
+  font-weight: 650;
 }
 
-@media (max-width: 860px) {
+@media (max-width: 940px) {
   .submit-layout {
     grid-template-columns: 1fr;
   }
@@ -351,19 +557,17 @@ code {
 
 .showcase-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(232px, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(236px, 1fr));
+  gap: var(--s4);
 }
-
 .round-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(276px, 1fr));
+  gap: var(--s4);
 }
-/* Five across is too thin to be a "choose one" layout; three then two reads better. */
 .round-grid.count-4,
 .round-grid.count-5 {
-  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(292px, 1fr));
 }
 
 .design-card {
@@ -373,37 +577,34 @@ code {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-sm);
   transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
 }
 .design-card:hover {
-  transform: translateY(-2px);
-  border-color: #d4d9e2;
+  transform: translateY(-3px);
+  border-color: #cdd6e4;
   box-shadow: var(--shadow-lift);
 }
 
-/* The transparency checkerboard a pixel artist expects behind a texture. */
 .art-frame {
   position: relative;
-  background:
-    repeating-conic-gradient(#f1f3f6 0% 25%, #fafbfc 0% 50%) 50% / 16px 16px;
-  padding: 18px;
+  background: repeating-conic-gradient(#eef1f5 0% 25%, #fafbfd 0% 50%) 50% / 16px 16px;
+  padding: var(--s3);
   display: flex;
   align-items: center;
   justify-content: center;
   border-bottom: 1px solid var(--line-soft);
 }
 .design-card.large .art-frame {
-  padding: 26px;
+  padding: var(--s4);
 }
 .art {
   width: 100%;
   aspect-ratio: 2 / 1;
   object-fit: contain;
-  /* Cape textures are pixel art: never smooth them. */
   image-rendering: pixelated;
   display: block;
-  filter: drop-shadow(0 4px 10px rgba(18, 22, 29, 0.18));
+  filter: drop-shadow(0 4px 10px rgba(16, 21, 33, 0.18));
 }
 
 .design-card-body {
@@ -413,7 +614,7 @@ code {
   gap: 12px;
 }
 .design-card.large .design-card-body {
-  padding: 16px 18px 18px;
+  padding: var(--s3) 18px 18px;
   flex-direction: column;
   align-items: stretch;
   gap: 12px;
@@ -427,10 +628,11 @@ code {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
 }
 .name {
   font-weight: 650;
+  letter-spacing: -0.012em;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -464,19 +666,20 @@ code {
   font-weight: 700;
   border-radius: 100px;
   padding: 3px 9px;
-  letter-spacing: 0.02em;
 }
 .rank {
   top: 10px;
   left: 10px;
-  width: 23px;
-  height: 23px;
+  width: 24px;
+  height: 24px;
   padding: 0;
   display: grid;
   place-items: center;
   background: var(--paper);
   border: 1px solid var(--line);
   color: var(--muted);
+  font-family: var(--font-pixel), ui-monospace, monospace;
+  font-size: 10px;
 }
 .badge-leading {
   top: 10px;
@@ -508,13 +711,13 @@ code {
 }
 
 .design-card.leading {
-  border-color: rgba(240, 180, 41, 0.75);
+  border-color: rgba(240, 180, 41, 0.8);
   box-shadow: 0 0 0 1px rgba(240, 180, 41, 0.3), var(--shadow-card);
 }
 .design-card.leading .art-frame {
   background:
-    linear-gradient(180deg, rgba(240, 180, 41, 0.14), transparent 65%),
-    repeating-conic-gradient(#f1f3f6 0% 25%, #fafbfc 0% 50%) 50% / 16px 16px;
+    linear-gradient(180deg, rgba(240, 180, 41, 0.16), transparent 65%),
+    repeating-conic-gradient(#eef1f5 0% 25%, #fafbfd 0% 50%) 50% / 16px 16px;
 }
 
 /* --- controls ------------------------------------------------------------- */
@@ -534,7 +737,7 @@ button,
 button:hover:not(:disabled),
 .button:hover {
   background: var(--ground);
-  border-color: #d4d9e2;
+  border-color: #cdd6e4;
   text-decoration: none;
 }
 button:active:not(:disabled) {
@@ -544,29 +747,51 @@ button:disabled {
   cursor: default;
   opacity: 0.55;
 }
-button.primary {
+button.primary,
+.button.primary {
   background: var(--accent);
   border-color: var(--accent);
   color: #fff;
+  box-shadow: 0 1px 2px rgba(20, 83, 143, 0.3), 0 6px 16px rgba(27, 109, 193, 0.22);
 }
-button.primary:hover:not(:disabled) {
+button.primary:hover:not(:disabled),
+.button.primary:hover {
   background: var(--accent-ink);
   border-color: var(--accent-ink);
 }
-button.approve {
+.button.ghost {
+  background: transparent;
+  border-color: rgba(16, 21, 33, 0.14);
+}
+/* Each tinted variant states its own hover. Without one, `button:hover` - which out-specifies a
+   single class - drags them all back to the plain grey hover and the colour coding disappears
+   exactly when the pointer is on the thing. */
+button.approve,
+button.approve:hover:not(:disabled) {
   background: var(--success-wash);
   border-color: rgba(31, 122, 77, 0.4);
   color: var(--success-ink);
 }
-button.reject {
+button.approve:hover:not(:disabled) {
+  background: #dcefe4;
+}
+button.reject,
+button.reject:hover:not(:disabled) {
   background: var(--danger-wash);
   border-color: rgba(179, 38, 30, 0.35);
   color: var(--danger);
 }
-button.featured-on {
+button.reject:hover:not(:disabled) {
+  background: #fbe0dd;
+}
+button.featured-on,
+button.featured-on:hover:not(:disabled) {
   background: var(--gold-wash);
   border-color: rgba(240, 180, 41, 0.6);
   color: var(--gold-ink);
+}
+button.featured-on:hover:not(:disabled) {
+  background: #fbeac6;
 }
 
 button.vote {
@@ -601,7 +826,7 @@ label {
   display: block;
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 1.2px;
+  letter-spacing: 1.1px;
   text-transform: uppercase;
   color: var(--muted);
   margin-bottom: 8px;
@@ -620,9 +845,14 @@ input[type="password"] {
 }
 input[type="text"]:hover,
 input[type="password"]:hover {
-  border-color: #d4d9e2;
+  border-color: #cdd6e4;
 }
-input:focus-visible,
+input[type="text"]:focus,
+input[type="password"]:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(27, 109, 193, 0.14);
+  outline: none;
+}
 button:focus-visible,
 a:focus-visible,
 .dropzone:focus-visible {
@@ -657,10 +887,11 @@ a:focus-visible,
   color: var(--ink);
   border-color: transparent;
 }
-.mode.on {
+.mode.on,
+.mode.on:hover:not(:disabled) {
   background: var(--paper);
   color: var(--ink);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-sm);
 }
 
 .type-picker {
@@ -677,7 +908,8 @@ a:focus-visible,
   border-radius: 100px;
   color: var(--muted);
 }
-.type-chip.on {
+.type-chip.on,
+.type-chip.on:hover:not(:disabled) {
   background: var(--accent-wash);
   border-color: rgba(27, 109, 193, 0.45);
   color: var(--accent-ink);
@@ -686,16 +918,17 @@ a:focus-visible,
 /* --- drop zone ------------------------------------------------------------ */
 
 .dropzone {
-  border: 1px dashed #c9cfda;
+  border: 1px dashed #c3ccda;
   border-radius: var(--radius);
-  background: var(--paper);
-  padding: 34px 18px;
+  background: #fbfcfe;
+  padding: 36px 18px;
   text-align: center;
   cursor: pointer;
   transition: border-color 130ms, background 130ms;
 }
 .dropzone:hover {
   border-color: var(--accent);
+  background: #f8fbff;
 }
 .dropzone.over {
   border-color: var(--accent);
@@ -735,7 +968,7 @@ a:focus-visible,
   height: 24px;
   padding: 0;
   border-radius: 5px;
-  border: 1px solid rgba(18, 22, 29, 0.18);
+  border: 1px solid rgba(16, 21, 33, 0.18);
   cursor: pointer;
 }
 .swatch.on {
@@ -761,18 +994,16 @@ a:focus-visible,
   font-size: 13px;
   padding: 7px 12px;
 }
-.tool.on {
+.tool.on,
+.tool.on:hover:not(:disabled) {
   background: var(--accent-wash);
   border-color: rgba(27, 109, 193, 0.45);
   color: var(--accent-ink);
 }
 
-/* Drawing wants room: with the canvas on the page the layout drops its sidebar, which takes a
-   texture pixel from about 9px on screen to a full 16. */
 .submit-layout:has(.draw) {
   grid-template-columns: minmax(0, 1fr);
 }
-
 .canvas-frame {
   max-width: 1024px;
   margin: 0 auto;
@@ -780,7 +1011,7 @@ a:focus-visible,
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   overflow: hidden;
-  background: repeating-conic-gradient(#eef0f4 0% 25%, #fafbfc 0% 50%) 50% / 16px 16px;
+  background: repeating-conic-gradient(#eef1f5 0% 25%, #fafbfd 0% 50%) 50% / 16px 16px;
   line-height: 0;
 }
 .draw-canvas {
@@ -791,15 +1022,14 @@ a:focus-visible,
   touch-action: none;
   cursor: crosshair;
 }
-/* The same grid the page is on, at the canvas's own pixel size, so a square is easy to aim at. */
 .canvas-frame::after {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
   background-image:
-    linear-gradient(rgba(18, 22, 29, 0.09) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(18, 22, 29, 0.09) 1px, transparent 1px);
+    linear-gradient(rgba(16, 21, 33, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16, 21, 33, 0.09) 1px, transparent 1px);
   background-size: calc(100% / 64) calc(100% / 32);
 }
 
@@ -808,7 +1038,7 @@ a:focus-visible,
 .notice {
   border-radius: var(--radius-sm);
   padding: 13px 15px;
-  margin: 0 0 16px;
+  margin: 0 0 var(--s3);
   border: 1px solid;
   font-size: 14px;
 }
@@ -838,33 +1068,43 @@ a:focus-visible,
 }
 
 .empty {
-  border: 1px dashed #d3d8e1;
+  border: 1px dashed #ccd5e2;
   border-radius: var(--radius);
-  padding: 46px 22px;
+  padding: var(--s7) var(--s4);
   text-align: center;
   color: var(--muted);
   background: var(--paper);
+}
+.empty b {
+  display: block;
+  color: var(--ink);
+  font-size: 15.5px;
+  margin-bottom: 6px;
 }
 
 .stack {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--s3);
 }
 .row {
   display: flex;
-  gap: 10px;
+  gap: var(--s2);
   align-items: center;
   flex-wrap: wrap;
+}
+.footnote {
+  margin: var(--s4) 0 0;
+  color: var(--muted);
 }
 
 /* --- admin ---------------------------------------------------------------- */
 
 .admin {
-  padding-top: 36px;
+  padding-top: var(--s6);
 }
-.admin .section h2 {
-  margin-bottom: 4px;
+.admin .section {
+  margin-bottom: var(--s6);
 }
 .admin-card .design-card-body {
   flex-direction: column;
@@ -880,16 +1120,20 @@ a:focus-visible,
   font-size: 13px;
   padding: 7px 12px;
 }
+.page-head {
+  padding-top: var(--s6);
+  margin-bottom: var(--s5);
+}
 
 /* --- long-form text (terms) ----------------------------------------------- */
 
 .prose {
   max-width: 680px;
-  padding-top: 36px;
+  padding-top: var(--s6);
 }
 .prose h2 {
-  font-size: 19px;
-  margin-top: 34px;
+  font-size: 20px;
+  margin-top: var(--s5);
 }
 .prose ul {
   padding-left: 20px;
@@ -911,7 +1155,7 @@ a:focus-visible,
   border-top: 1px solid var(--line);
   color: var(--muted);
   font-size: 13px;
-  padding: 26px 22px 34px;
+  padding: var(--s5) 24px var(--s6);
   background: var(--paper);
 }
 .site-footer .inner {

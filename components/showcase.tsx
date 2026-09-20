@@ -1,5 +1,6 @@
 import type { Submission } from "@/lib/store";
 import { DesignCard } from "./design-card";
+import { SectionHeader } from "./section-header";
 
 /**
  * Everything that has been through review, newest rounds and old ones alike, most-voted first.
@@ -11,26 +12,16 @@ import { DesignCard } from "./design-card";
 export function Showcase({ items, voted }: { items: Submission[]; voted: Set<string> }) {
   return (
     <section className="section" id="showcase">
-      <header className="section-head">
-        <div>
-          <p className="eyebrow">Showcase</p>
-          <div className="pixel-rule" aria-hidden="true" />
-          <h2>Designs that made it through</h2>
-          <p className="muted">
-            {items.length === 0
-              ? "Nothing has been approved yet."
-              : `${items.length} design${items.length === 1 ? "" : "s"}, most-voted first. Every one of them was looked at by a person before it appeared here.`}
-          </p>
-        </div>
-      </header>
+      <SectionHeader no="03" title="Designs that made it through">
+        {items.length === 0
+          ? "Nothing has been approved yet."
+          : `${items.length} design${items.length === 1 ? "" : "s"}, most-voted first. Every one of them was looked at by a person before it appeared here.`}
+      </SectionHeader>
 
       {items.length === 0 ? (
         <div className="empty">
-          <p style={{ margin: 0, fontWeight: 600 }}>Nothing has been approved yet.</p>
-          <p className="small" style={{ margin: "8px 0 0" }}>
-            Submitted designs appear here once a reviewer has looked at them. Yours could be the
-            first.
-          </p>
+          <b>Nothing has been approved yet.</b>
+          Submitted designs appear here once a reviewer has looked at them. Yours could be the first.
         </div>
       ) : (
         <div className="showcase-grid">

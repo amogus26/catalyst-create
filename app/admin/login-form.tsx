@@ -33,10 +33,13 @@ export function LoginForm() {
   }
 
   return (
-    <div style={{ paddingTop: 32, maxWidth: 420 }}>
-      <h1>Review queue</h1>
-      <p className="muted small">This page is for whoever is reviewing submissions.</p>
-      <form className="panel stack" onSubmit={submit} style={{ marginTop: 16 }}>
+    <div className="shell">
+      <div className="page-head" style={{ maxWidth: 420 }}>
+        <p className="eyebrow">Reviewers only</p>
+        <h1 style={{ fontSize: 34 }}>Review queue</h1>
+        <p className="muted small">This page is for whoever is reviewing submissions.</p>
+      </div>
+      <form className="panel stack" onSubmit={submit} style={{ maxWidth: 420 }}>
         {error && (
           <div className="notice error" role="alert" style={{ margin: 0 }}>
             {error}
