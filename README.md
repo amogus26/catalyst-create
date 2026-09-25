@@ -2,7 +2,8 @@
 
 A small public site where players submit cosmetic designs for Catalyst Client - capes, wings, hats,
 backpacks - and other players vote on them. Designs can be uploaded as a PNG or drawn in the
-browser. Next.js + Supabase.
+browser. It also holds the Terms of Service and Privacy Policy for all of Catalyst, and the code
+server the launcher redeems codes with. Next.js + Supabase.
 
 ## The rule this site is built around
 
@@ -81,9 +82,10 @@ Delete `.localstore/` to start over.
 
 1. Create a project at [supabase.com](https://supabase.com) - the free tier is enough. Pick a
    region near your players and save the database password somewhere.
-2. Open **SQL Editor**, paste all of `supabase/migrations/0001_init.sql`, and run it. That creates
-   the two tables, the `cast_vote` function, turns on row-level security, and creates the Storage
-   bucket.
+2. Open **SQL Editor** and run the files in `supabase/migrations/` in order - `0001_init.sql`
+   creates the two tables, the `cast_vote` function, row-level security and the Storage bucket;
+   `0002` and `0003` add columns; `0004_redeem_codes.sql` adds the redeem code tables and the
+   `redeem_code` function.
 3. Open **Storage** and check there is a `submissions` bucket and that it is **not public**. If the
    SQL could not create it, make it by hand: New bucket, name `submissions`, public **off**.
    (A public bucket would make every upload readable by URL before review. That is the one setting
@@ -125,222 +127,111 @@ from a linked Git repository; a deploy uploaded as a zip gets no runtime, publis
 output alone, and every dynamic page and API route 404s - which is the whole site. So the runtime is
 a devDependency and is declared in `netlify.toml`. Leave both in place.
 
+## Redeem codes
+
+Codes for the launcher - gift cards, giveaways, stream codes - are made on **`/admin/codes`**
+(same reviewer password) and work in every launcher the moment they are made.
+
+- **Making:** pick the reward (coins, a sale on wings, a free shop item or a code-only exclusive),
+  how many codes, how many players each may be used by, an optional last day and a note. The server
+  generates `CATL-XXXX-XXXX-XXXX` codes (31-letter alphabet, no 0/O/1/I/L) and stores **only their
+  SHA-256**; the readable codes come back once, to copy or download. Batches can be cancelled, and
+  so can one leaked code.
+- **Redeeming:** the launcher posts `{code, device}` to **`/api/codes/redeem`**. `device` is a
+  random id the launcher keeps in `~/.visuals-launcher/device.json` - never hardware, never a
+  person. The `redeem_code` database function locks the code, checks cancelled / expired / already
+  redeemed on this install / used up, records the redemption and hands back the reward, all in one
+  step, so a code's last use can't go to two players at once.
+- **The launcher applies the reward** (`coins:500`, `sale:20:7`, `item:Moth Wings`,
+  `special:Creator Cape` - `lib/rewards.ts`, the launcher's `CodeGrant`). What it gave is kept on
+  the player's computer until accounts exist.
+- **Keeping the two sides in step:** the launcher and this site each hash a code themselves.
+  `npm run check:codes` checks this site against the example the launcher's `CodesTest` pins. Item
+  names in `lib/rewards.ts` must match the launcher's shop (`CosmeticsPage.kt`).
+- No rate limit: 31^12 codes make guessing one by asking hopeless.
+
+## Legal pages
+
+`/terms` (Terms of Service) and `/privacy` (Privacy Policy) cover all of Catalyst - launcher,
+client, this site, coins, battle pass, codes and community designs - written from what the
+software actually does. The facts they depend on live in **`lib/legal.ts`**: who runs it, the
+contact address (**null until the team has one - set it**, the GDPR requires one), the country
+whose law applies and its data protection authority, and the ages. They are carefully written but
+not a lawyer's work: have them checked before real payments or a big audience.
+
 ## Deploying
 
-Push to GitHub first (see the bottom of this file), then either host:
-
-### Vercel
-
-1. [vercel.com](https://vercel.com) -> **Add New -> Project** -> import the repository.
-2. Framework preset is detected as Next.js; leave the build settings alone.
-3. **Environment Variables**: add `ADMIN_PASSWORD`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` and
-   `SUPABASE_BUCKET` for Production (and Preview, if you want preview deploys to work - they will
-   share the same database, so prefer a second Supabase project if that matters).
-4. **Deploy**.
-5. Open the deployed URL, submit a test design, then open `/admin` and approve it. If `/admin` will
-   not open, `ADMIN_PASSWORD` is missing.
-
-### Netlify
-
-1. [netlify.com](https://netlify.com) -> **Add new site -> Import an existing project**.
-2. Netlify detects Next.js and installs its Next runtime; build command `npm run build`.
-3. **Site configuration -> Environment variables**: the same four.
-4. **Deploy site**, then check it the same way.
-
-### After it is live
-
-The launcher's "Community designs" card points at a placeholder
-(`https://catalyst.example/create`). Once this site has a real address, that link gets updated in
-the launcher repo - `community/CommunityArt.kt`, one constant. That is a separate change.
+The live site is uploaded with the Netlify CLI or API (it is not built from Git), so pushing to
+GitHub does not change it. To deploy: apply any new migration to the Supabase project first, then
+`netlify deploy --prod` from this folder (the Next.js runtime is declared in `netlify.toml`). The
+environment variables are set in Netlify's UI. After deploying, open `/admin` to check the password
+works, and `/admin/codes` to check the codes tables exist.
 
 ## What this version deliberately does not have
 
 - **No automatic content filtering.** The human approval step is the moderation.
-- **No rewards.** Picking winners is something you do by looking at the gallery. Nothing here grants
-  coins or talks to the launcher.
+- **No rewards for submitting.** Picking winners is something you do by looking at the gallery.
 - **No user accounts.** A display name is a label anyone can type, not an identity. It is reviewed
   along with the image, because it is shown publicly too.
-- **No connection to the launcher.**
+- **The launcher talks to this site in one place only:** redeeming a code.
 
 ## Known limits, stated plainly
 
 - **Voting is one per browser, not one per person.** A cookie identifies the voter and the database
-  refuses a second vote from the same cookie on the same design. Clearing cookies, opening a private
-  window, or picking up a phone gets another vote. Treat the counts as a rough signal for a human
-  picking winners, not as something to award prizes on automatically. Real anti-abuse needs
-  identity - accounts, or the launcher's own sign-in - and is a later piece of work.
+  refuses a second vote from the same cookie on the same design. Treat the counts as a rough signal
+  for a human picking winners, not as something to award prizes on automatically.
 - **The admin login is not rate-limited.** One shared password, compared in constant time, in a
-  signed httpOnly cookie. Use a long random password. A guess limiter is a sensible follow-up.
-- **Rejected images are kept.** A rejected row keeps its file so that a mis-click can be undone
-  from the "Rejected" list on the admin page. Nothing serves them - they are 404 to everyone but a
-  reviewer - but you should decide a retention policy before this site sees real traffic.
-- **The gallery loads every approved design at once.** Fine for a first contest; it needs paging
-  before it is hundreds.
+  signed httpOnly cookie. Use a long random password.
+- **Rejected images are kept** so a mis-click can be undone. Nothing serves them - they are 404 to
+  everyone but a reviewer - but decide a retention policy before real traffic.
+- **The gallery loads every approved design at once**, and the codes page groups the newest 10,000
+  codes in the app. Both need paging eventually.
+- **A shared code is once per install, not once per person** - the launcher's device id is random
+  and can be reset by deleting a file. Single-use codes are unaffected: they are used up for everyone.
 
 ## Layout
 
-The public site is **one page**. Submitting, the current voting round and the showcase are three
-sections of `/` behind a tab switcher, not three routes - `/#submit`, `/#vote` and `/#showcase` are
-real links to each. `/terms` is separate because it is reference material, and `/admin` is separate
-because it is not public.
+The public site is **one page** that scrolls: the current round (`/#vote`), the gallery
+(`/#gallery`) and the submit form (`/#submit`). `/terms` and `/privacy` are the legal pages, and
+`/admin` and `/admin/codes` are the reviewers' pages.
 
 ```
 app/
-  layout.tsx, page.tsx, globals.css   shell, the one public page, the launcher's palette
-  terms/                              terms of service and privacy, on one page
+  layout.tsx, page.tsx, globals.css   shell, the one public page, the dark theme
+  terms/, privacy/                    Terms of Service and Privacy Policy (facts in lib/legal.ts)
   admin/                              password gate, review queue, round picking
+  admin/codes/                        making and cancelling redeem codes
   api/submissions/                    POST: create a pending submission
   api/votes/                          POST: one vote per browser
   api/images/[id]/                    GET: the only way an image leaves the server
+  api/codes/redeem/                   POST: the launcher redeems a code
   api/admin/login/                    POST/DELETE: open and close an admin session
   api/admin/review/                   POST: approve, reject, or send back to pending
   api/admin/feature/                  POST: put an approved design in the round, or take it out
+  api/admin/codes/                    POST: make a batch; revoke/: cancel a batch or a code
 components/
-  section-tabs.tsx                    the switch between the three sections of the main page
-  submit-form.tsx                     the form, with the client half of the file checks
-  featured-round.tsx, showcase.tsx    the two ways designs are shown
+  hero-stage.tsx                      the leading design, big, at the top of the page
+  featured-round.tsx, gallery.tsx     the round, and every approved design with a type filter
   design-card.tsx, vote-button.tsx    one card and one vote, shared by both
-  draw-canvas.tsx                     the 64x32 cape canvas and its four tools
-  type-icon.tsx                       a small pixel mark per kind of design
-  feature-toggle.tsx                  the reviewer's round picker
+  submit-form.tsx, draw-canvas.tsx    the form, and the 64x32 cape canvas
+  logo.tsx, logo-shapes.ts            the client's logo as SVG, from the launcher's traced shapes
+  type-icon.tsx, feature-toggle.tsx   a pixel mark per kind; the reviewer's round picker
 lib/
-  validation.ts                       PNG and size rules, shared by browser and server
-  design-types.ts                     the kinds of design, and which have fixed sizes
-  admin-session.ts                    password check and signed session cookie
-  voter.ts                            the voter cookie
-  config.ts                           how many designs a round holds
+  codes.ts, rewards.ts                code format and fingerprint; rewards in the launcher's grammar
+  legal.ts                            operator, contact, country and ages for the legal pages
+  validation.ts, design-types.ts      PNG and size rules; the kinds of design
+  admin-session.ts, voter.ts          password check and session cookie; the voter cookie
   store/                              types.ts, index.ts (picks a driver), supabase.ts, local.ts
-supabase/migrations/                  0001 tables, RLS, cast_vote, private bucket; 0002 featured;
-                                      0003 design_type
-scripts/check-supabase.mjs            read-only check of a real project
-scripts/remove-submissions.mjs        deletes submissions by display name, rows and images
+supabase/migrations/                  0001 tables, RLS, cast_vote, bucket; 0002 featured;
+                                      0003 design_type; 0004 redeem codes
+scripts/                              check-supabase.mjs, check-codes.mjs, remove-submissions.mjs
 ```
 
 ## Look and feel
 
-Light theme, Inter for text, and the launcher's own colours darkened until they hold up as ink on
-paper - its #4FA8E8 is about 2:1 against white, which is unreadable, so the accent is a deeper
-shade of the same hue and the gold is a fill with dark text rather than text itself.
-
-Two things carry the design rather than a handful of small accents:
-
-- **The hero is a drafting board.** A tinted band with a grid ruled across it, ending in a hard
-  edge where the page proper begins, with the site's own approved designs pinned to it as plates.
-  What this site is for is people drawing on a grid, so the top of the page is one - and the
-  artwork on it is real, taken from the showcase, not decoration. Only the front plate is
-  captioned; three captions in a pile of overlapping plates collide whatever the offsets are.
-- **A numbered system.** Submit, vote and showcase are steps 01, 02 and 03 - in the step cards, in
-  each section heading, and in the "how it works" list - set in the pixel face the launcher draws
-  its own text in. It answers "what do I do first" without a sentence of instructions.
-
-The page ground is an off-white with two soft washes of colour in the upper corners, so there is
-depth behind the cards without anything that reads as a gradient. Spacing comes from one scale
-(`--s1` to `--s8`) so vertical rhythm is a decision rather than an accident.
-
-One trap worth knowing: the generic `button:hover` rule out-specifies a single variant class like
-`.step.on` or `.approve`, so any tinted button needs its own hover rule (or scoping) or it snaps
-back to plain grey exactly when the pointer is on it. The variants in `globals.css` all state
-theirs; keep that up when adding more.
-
-## Deploying
-
-Push to GitHub first (see the bottom of this file), then either host:
-
-### Vercel
-
-1. [vercel.com](https://vercel.com) -> **Add New -> Project** -> import the repository.
-2. Framework preset is detected as Next.js; leave the build settings alone.
-3. **Environment Variables**: add `ADMIN_PASSWORD`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` and
-   `SUPABASE_BUCKET` for Production (and Preview, if you want preview deploys to work - they will
-   share the same database, so prefer a second Supabase project if that matters).
-4. **Deploy**.
-5. Open the deployed URL, submit a test design, then open `/admin` and approve it. If `/admin` will
-   not open, `ADMIN_PASSWORD` is missing.
-
-### Netlify
-
-1. [netlify.com](https://netlify.com) -> **Add new site -> Import an existing project**.
-2. Netlify detects Next.js and installs its Next runtime; build command `npm run build`.
-3. **Site configuration -> Environment variables**: the same four.
-4. **Deploy site**, then check it the same way.
-
-### After it is live
-
-The launcher's "Community designs" card points at a placeholder
-(`https://catalyst.example/create`). Once this site has a real address, that link gets updated in
-the launcher repo - `community/CommunityArt.kt`, one constant. That is a separate change.
-
-## What this version deliberately does not have
-
-- **No automatic content filtering.** The human approval step is the moderation.
-- **No rewards.** Picking winners is something you do by looking at the gallery. Nothing here grants
-  coins or talks to the launcher.
-- **No user accounts.** A display name is a label anyone can type, not an identity. It is reviewed
-  along with the image, because it is shown publicly too.
-- **No connection to the launcher.**
-
-## Known limits, stated plainly
-
-- **Voting is one per browser, not one per person.** A cookie identifies the voter and the database
-  refuses a second vote from the same cookie on the same design. Clearing cookies, opening a private
-  window, or picking up a phone gets another vote. Treat the counts as a rough signal for a human
-  picking winners, not as something to award prizes on automatically. Real anti-abuse needs
-  identity - accounts, or the launcher's own sign-in - and is a later piece of work.
-- **The admin login is not rate-limited.** One shared password, compared in constant time, in a
-  signed httpOnly cookie. Use a long random password. A guess limiter is a sensible follow-up.
-- **Rejected images are kept.** A rejected row keeps its file so that a mis-click can be undone
-  from the "Rejected" list on the admin page. Nothing serves them - they are 404 to everyone but a
-  reviewer - but you should decide a retention policy before this site sees real traffic.
-- **The gallery loads every approved design at once.** Fine for a first contest; it needs paging
-  before it is hundreds.
-
-## Layout
-
-The public site is **one page**. Submitting, the current voting round and the showcase are three
-sections of `/` behind a tab switcher, not three routes - `/#submit`, `/#vote` and `/#showcase` are
-real links to each. `/terms` is separate because it is reference material, and `/admin` is separate
-because it is not public.
-
-```
-app/
-  layout.tsx, page.tsx, globals.css   shell, the one public page, the launcher's palette
-  terms/                              terms of service and privacy, on one page
-  admin/                              password gate, review queue, round picking
-  api/submissions/                    POST: create a pending submission
-  api/votes/                          POST: one vote per browser
-  api/images/[id]/                    GET: the only way an image leaves the server
-  api/admin/login/                    POST/DELETE: open and close an admin session
-  api/admin/review/                   POST: approve, reject, or send back to pending
-  api/admin/feature/                  POST: put an approved design in the round, or take it out
-components/
-  section-tabs.tsx                    the switch between the three sections of the main page
-  submit-form.tsx                     the form, with the client half of the file checks
-  featured-round.tsx, showcase.tsx    the two ways designs are shown
-  design-card.tsx, vote-button.tsx    one card and one vote, shared by both
-  draw-canvas.tsx                     the 64x32 cape canvas and its four tools
-  type-icon.tsx                       a small pixel mark per kind of design
-  feature-toggle.tsx                  the reviewer's round picker
-lib/
-  validation.ts                       PNG and size rules, shared by browser and server
-  design-types.ts                     the kinds of design, and which have fixed sizes
-  admin-session.ts                    password check and signed session cookie
-  voter.ts                            the voter cookie
-  config.ts                           how many designs a round holds
-  store/                              types.ts, index.ts (picks a driver), supabase.ts, local.ts
-supabase/migrations/                  0001 tables, RLS, cast_vote, private bucket; 0002 featured;
-                                      0003 design_type
-scripts/check-supabase.mjs            read-only check of a real project
-scripts/remove-submissions.mjs        deletes submissions by display name, rows and images
-```
-
-## Look and feel
-
-Light theme, Inter for text, and the launcher's own colours darkened until they hold up as ink on
-white - its #4FA8E8 is about 2:1 against a white background, which is unreadable, so the accent is
-a deeper shade of the same hue and the gold is used as a fill with dark text rather than as text.
-
-The page is drawn on graph paper: a single 8px grid at about 4% ink, behind everything. The site is
-about pixel art on a 64x32 grid, so the page sits on one too, and the drawing canvas uses the same
-grid at its own pixel size. The wordmark is set in a pixel face and nothing else is - the launcher
-draws its own mark in a pixel font, and one word in the same voice ties the two together without
-costing any readability.
+Dark, like the launcher: its navy ground, its sky blue for actions, its sculk teal for the light
+behind the hero, and its coin gold for winning. Designs sit on a dark stage so the art is the
+brightest thing on the page, drawn pixel-sharp. Everything is on one scroll with very little text:
+a big headline, three one-line steps, the round, the gallery and the form - no tabs to find things
+behind. Inter for text; the pixel face only labels sections, as the launcher's does. The logo is
+the launcher's own traced logo as an SVG, never the raster artwork.

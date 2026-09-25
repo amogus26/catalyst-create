@@ -3,32 +3,26 @@ import { DesignCard } from "./design-card";
 import { SectionHeader } from "./section-header";
 
 /**
- * The current round: the designs a reviewer has picked out, up to five, laid out as something to
- * choose between rather than as more showcase.
- *
- * "Leading" is only claimed when one design is genuinely ahead - it has votes, and more of them
- * than the next one. A badge on a three-way tie at zero would be a lie told in gold.
+ * The current round: the designs a reviewer picked, up to five, big enough to choose between.
+ * "Leading" is only claimed when one design is really ahead - a gold badge on a tie at zero would lie.
  */
 export function FeaturedRound({ items, voted }: { items: Submission[]; voted: Set<string> }) {
   const leaderIsClear =
-    items.length > 1 && items[0].voteCount > 0 && items[0].voteCount > items[1].voteCount;
+    items.length > 0 && items[0].voteCount > 0 && (items.length === 1 || items[0].voteCount > items[1].voteCount);
 
   return (
     <section className="section" id="vote">
-      <SectionHeader no="02" title="Vote for this round's winner">
-        {items.length === 0
-          ? "A reviewer picks a handful of approved designs to put up for a vote."
-          : `${items.length} design${items.length === 1 ? "" : "s"} in the running. Vote for as many as you like - one vote each, per browser.`}
+      <SectionHeader kicker="Vote" title="This round">
+        {items.length === 0 ? "No round is running right now." : "Vote for every design you like - one vote each."}
       </SectionHeader>
 
       {items.length === 0 ? (
         <div className="empty">
-          <b>No round is running yet.</b>
-          Approved designs get picked for a round from the review page. Until then, everything that
-          has been through review is in the showcase.
+          <b>The next round is being picked.</b>
+          Everything approved so far is in the gallery below.
         </div>
       ) : (
-        <div className={`round-grid count-${items.length}`}>
+        <div className="design-grid round">
           {items.map((submission, index) => (
             <DesignCard
               key={submission.id}
@@ -41,12 +35,6 @@ export function FeaturedRound({ items, voted }: { items: Submission[]; voted: Se
           ))}
         </div>
       )}
-
-      <p className="tiny muted footnote">
-        Votes are counted once per browser, not once per person - clearing your cookies or opening
-        another browser gets another vote. They are a guide for whoever picks the winner, not the
-        decision itself.
-      </p>
     </section>
   );
 }

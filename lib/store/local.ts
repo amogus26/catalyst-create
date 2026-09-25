@@ -1,6 +1,8 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
+import type { RedeemResult } from "../codes";
 import { DEFAULT_DESIGN_TYPE } from "../design-types";
+import { groupBatches, type StoredCode } from "./code-batches";
 import type { Store, StoredImage, Submission, SubmissionStatus } from "./types";
 
 /**
@@ -161,5 +163,75 @@ export function createLocalStore(): Store {
           .map((vote) => vote.submissionId),
       );
     },
+
+    async createCodes({ batchId, hashes, reward, note, maxUses, expiresOn }) {
+      const book = await readCodes();
+      const createdAt = new Date().toISOString();
+      for (const hash of hashes) {
+        book.codes.push({ hash, batchId, reward, note, maxUses, uses: 0, expiresOn, revoked: false, createdAt });
+      }
+      await writeCodes(book);
+    },
+
+    async listCodeBatches() {
+      return groupBatches((await readCodes()).codes);
+    },
+
+    async redeemCode(hash, deviceId): Promise<RedeemResult> {
+      // The same order of checks as the database function in 0004_redeem_codes.sql.
+      const book = await readCodes();
+      const code = book.codes.find((item) => item.hash === hash);
+      if (!code) return { outcome: "unknown" };
+      if (code.revoked) return { outcome: "revoked" };
+      const today = new Date().toISOString().slice(0, 10);
+      if (code.expiresOn && code.expiresOn < today) return { outcome: "expired", expiresOn: code.expiresOn };
+      if (book.redemptions.some((item) => item.hash === hash && item.deviceId === deviceId)) {
+        return { outcome: "already" };
+      }
+      if (code.uses >= code.maxUses) return { outcome: "used" };
+      book.redemptions.push({ hash, deviceId, redeemedAt: new Date().toISOString() });
+      code.uses += 1;
+      await writeCodes(book);
+      return { outcome: "redeemed", reward: code.reward, ...(code.expiresOn ? { expiresOn: code.expiresOn } : {}) };
+    },
+
+    async revokeBatch(batchId) {
+      const book = await readCodes();
+      const live = book.codes.filter((code) => code.batchId === batchId && !code.revoked);
+      live.forEach((code) => (code.revoked = true));
+      await writeCodes(book);
+      return live.length;
+    },
+
+    async revokeCode(hash) {
+      const book = await readCodes();
+      const code = book.codes.find((item) => item.hash === hash);
+      if (!code) return false;
+      code.revoked = true;
+      await writeCodes(book);
+      return true;
+    },
   };
+}
+
+// --------------------------------------------------------------------------- redeem codes
+
+interface CodeBook {
+  codes: (StoredCode & { hash: string })[];
+  redemptions: { hash: string; deviceId: string; redeemedAt: string }[];
+}
+
+const CODES_FILE = path.join(ROOT, "codes.json");
+
+async function readCodes(): Promise<CodeBook> {
+  try {
+    return JSON.parse(await fs.readFile(CODES_FILE, "utf8")) as CodeBook;
+  } catch {
+    return { codes: [], redemptions: [] };
+  }
+}
+
+async function writeCodes(book: CodeBook): Promise<void> {
+  await fs.mkdir(ROOT, { recursive: true });
+  await fs.writeFile(CODES_FILE, JSON.stringify(book, null, 2), "utf8");
 }

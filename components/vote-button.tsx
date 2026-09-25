@@ -73,7 +73,7 @@ export function VoteButton({
             : "Vote for this design"
       }
     >
-      <span aria-hidden="true">{voted ? "★" : "☆"}</span>
+      <span className="star" aria-hidden="true">{voted ? "★" : "☆"}</span>
       <span className="label">{voted ? "Voted" : "Vote"}</span>
       <span className="count">{count}</span>
     </button>

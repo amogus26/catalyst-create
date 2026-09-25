@@ -38,7 +38,7 @@ export function ReviewButtons({ id, status }: { id: string; status: SubmissionSt
   return (
     <>
       {error && (
-        <div className="notice error tiny" role="alert" style={{ margin: 0, padding: "8px 10px" }}>
+        <div className="notice error tiny" role="alert">
           {error}
         </div>
       )}
@@ -46,7 +46,7 @@ export function ReviewButtons({ id, status }: { id: string; status: SubmissionSt
         {status === "pending" ? (
           <>
             <button
-              className="approve"
+              className="approve small"
               type="button"
               disabled={busy !== null}
               onClick={() => review("approved")}
@@ -54,7 +54,7 @@ export function ReviewButtons({ id, status }: { id: string; status: SubmissionSt
               {busy === "approved" ? "Approving..." : "Approve"}
             </button>
             <button
-              className="reject"
+              className="reject small"
               type="button"
               disabled={busy !== null}
               onClick={() => review("rejected")}
@@ -63,7 +63,7 @@ export function ReviewButtons({ id, status }: { id: string; status: SubmissionSt
             </button>
           </>
         ) : (
-          <button type="button" disabled={busy !== null} onClick={() => review("pending")}>
+          <button type="button" className="small" disabled={busy !== null} onClick={() => review("pending")}>
             {busy === "pending" ? "Moving..." : "Back to pending"}
           </button>
         )}

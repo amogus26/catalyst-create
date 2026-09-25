@@ -144,21 +144,20 @@ export function SubmitForm() {
 
   if (done) {
     return (
-      <div className="stack" role="status">
+      <div className="stack done" role="status">
         <div>
-          <h3 style={{ color: "var(--success-ink)" }}>Submitted for review</h3>
-          <p style={{ margin: 0 }}>
-            Thanks. Your design is <strong>waiting for review and is not in the showcase yet</strong>{" "}
-            - nobody else can see it until one of us has looked at it. If it is approved it will show
-            up in the showcase; if it is not, it simply will not appear.
+          <h3>Sent for review</h3>
+          <p>
+            Thanks! Nobody else can see your design until a reviewer approves it - then it shows up in
+            the gallery.
           </p>
         </div>
         <div className="row">
-          <button type="button" onClick={reset}>
+          <button type="button" className="primary" onClick={reset}>
             Submit another
           </button>
-          <a className="button" href="/#showcase">
-            See the showcase
+          <a className="button" href="/#gallery">
+            See the gallery
           </a>
         </div>
       </div>
@@ -175,23 +174,15 @@ export function SubmitForm() {
         </div>
       )}
 
-      <div className="mode-switch" role="group" aria-label="How to submit">
-        <button
-          type="button"
-          className={mode === "upload" ? "mode on" : "mode"}
-          onClick={() => setMode("upload")}
-          aria-pressed={mode === "upload"}
-        >
-          Upload a file
-        </button>
-        <button
-          type="button"
-          className={mode === "draw" ? "mode on" : "mode"}
-          onClick={() => setMode("draw")}
-          aria-pressed={mode === "draw"}
-        >
-          Draw a cape
-        </button>
+      <div>
+        <div className="segmented" role="group" aria-label="How to submit">
+          <button type="button" onClick={() => setMode("upload")} aria-pressed={mode === "upload"}>
+            Upload a file
+          </button>
+          <button type="button" onClick={() => setMode("draw")} aria-pressed={mode === "draw"}>
+            Draw a cape
+          </button>
+        </div>
       </div>
 
       <div>
@@ -201,7 +192,7 @@ export function SubmitForm() {
           type="text"
           value={displayName}
           maxLength={DISPLAY_NAME_MAX}
-          placeholder="Shown next to your design"
+          placeholder="Shown with your design"
           onChange={(event) => setDisplayName(event.target.value)}
         />
       </div>
@@ -209,13 +200,13 @@ export function SubmitForm() {
       {mode === "upload" ? (
         <>
           <div>
-            <label>Kind of design</label>
-            <div className="type-picker" role="group" aria-label="Kind of design">
+            <span className="label">Kind of design</span>
+            <div className="chips" role="group" aria-label="Kind of design">
               {DESIGN_TYPES.map((option) => (
                 <button
                   key={option.id}
                   type="button"
-                  className={option.id === type ? "type-chip on" : "type-chip"}
+                  className="chip"
                   aria-pressed={option.id === type}
                   onClick={() => {
                     setType(option.id);
@@ -259,7 +250,10 @@ export function SubmitForm() {
               {picked ? (
                 <img className="preview" src={picked.previewUrl} alt="" />
               ) : (
-                <p className="dropzone-line">Drag and drop an image, or click to browse</p>
+                <div>
+                  <p className="big">Drop a PNG here</p>
+                  <p className="tiny muted">or click to choose a file</p>
+                </div>
               )}
             </div>
             <p className="tiny muted field-note">
@@ -288,7 +282,7 @@ export function SubmitForm() {
         <button className="primary" type="submit" disabled={sending}>
           {sending ? "Sending..." : mode === "draw" ? "Submit drawing" : "Submit for review"}
         </button>
-        <span className="tiny muted">Nothing is published automatically.</span>
+        <span className="tiny muted">A person checks it before anyone sees it.</span>
       </div>
     </form>
   );

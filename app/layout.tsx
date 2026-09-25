@@ -1,14 +1,11 @@
 import type { Metadata } from "next";
 import { Inter, Silkscreen } from "next/font/google";
 import Link from "next/link";
+import { Logo } from "@/components/logo";
 import { usingDevStore } from "@/lib/store";
 import "./globals.css";
 
-/**
- * The launcher sets no font family at all - it takes the platform's sans and draws its own pixel
- * face (`MinecraftText`) for headline moments. So there is no typeface to inherit, only that idea:
- * Inter carries the text, and the pixel face appears on the wordmark and nowhere else.
- */
+/** Inter carries the text; the pixel face - the launcher's own voice - only labels things. */
 const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-sans" });
 const silkscreen = Silkscreen({
   subsets: ["latin"],
@@ -20,13 +17,12 @@ const silkscreen = Silkscreen({
 export const metadata: Metadata = {
   title: "Catalyst Designs",
   description:
-    "Submit a cape design for Catalyst Client and vote on everyone else's. Every submission is reviewed by a person before it appears.",
+    "Design capes and other cosmetics for Catalyst Client, and vote on everyone else's. Every design is checked by a person before it appears.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  // Decided from the environment rather than by building a store: this layout is rendered for
-  // every page, including during `next build`, and building the store there is neither wanted nor
-  // safe (see lib/store/index.ts).
+  // From the environment rather than by building a store - this renders during `next build` too
+  // (see lib/store/index.ts).
   const devStore = usingDevStore();
 
   return (
@@ -34,35 +30,52 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         {devStore && (
           <div className="dev-banner">
-            Local dev store: submissions live in <code>.localstore/</code> on this machine only. Set
-            the Supabase environment variables to use the real database.
+            Local dev store - data lives in <code>.localstore/</code> on this machine only.
           </div>
         )}
         <header className="site-header">
           <div className="inner">
             <Link href="/" className="brand">
-              <span className="mark" aria-hidden="true" />
-              Catalyst <span className="gold">Designs</span>
+              <Logo size={30} />
+              <span>
+                Catalyst <span className="gold">Designs</span>
+              </span>
             </Link>
-            <nav>
-              <Link href="/#submit">Submit</Link>
+            <nav aria-label="Site">
               <Link href="/#vote">Vote</Link>
-              <Link href="/#showcase">Showcase</Link>
-              <Link href="/terms">Terms</Link>
+              <Link href="/#gallery">Gallery</Link>
+              <Link href="/#submit" className="optional">
+                Submit
+              </Link>
+              <Link href="/terms" className="optional">
+                Terms
+              </Link>
             </nav>
+            <Link href="/#submit" className="button primary small header-cta">
+              Submit a design
+            </Link>
           </div>
         </header>
         <main>{children}</main>
         <footer className="site-footer">
           <div className="inner">
-            <p>
-              Community cosmetic designs for Catalyst Client. Every submission is looked at by a person
-              before it is shown here.
-            </p>
-            <p className="tiny">
-              <Link href="/terms">Terms &amp; Privacy</Link>
-              <span className="dot">·</span>
-              <Link href="/admin">Reviewer sign-in</Link>
+            <div>
+              <Link href="/" className="brand">
+                <Logo size={24} />
+                <span>
+                  Catalyst <span className="gold">Designs</span>
+                </span>
+              </Link>
+              <p style={{ marginTop: 10 }}>Community cosmetics for Catalyst Client.</p>
+            </div>
+            <nav aria-label="Footer">
+              <Link href="/terms">Terms of Service</Link>
+              <Link href="/privacy">Privacy Policy</Link>
+              <Link href="/admin">Reviewers</Link>
+            </nav>
+            <p className="legal">
+              Not an official Minecraft product. Not approved by or associated with Mojang or
+              Microsoft. Minecraft is a trademark of Mojang Synergies AB.
             </p>
           </div>
         </footer>

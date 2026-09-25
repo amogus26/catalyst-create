@@ -1,5 +1,7 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import type { RedeemResult } from "../codes";
 import type { DesignTypeId } from "../design-types";
+import { groupBatches } from "./code-batches";
 import type { Store, StoredImage, Submission, SubmissionStatus } from "./types";
 
 /**
@@ -182,5 +184,86 @@ export function createSupabaseStore(url: string, serviceRoleKey: string, bucket:
       if (error) throw new Error(`Could not read votes: ${error.message}`);
       return new Set((data as { submission_id: string }[]).map((row) => row.submission_id));
     },
+
+    async createCodes({ batchId, hashes, reward, note, maxUses, expiresOn }) {
+      const rows = hashes.map((hash) => ({
+        hash,
+        reward,
+        note,
+        batch_id: batchId,
+        max_uses: maxUses,
+        expires_on: expiresOn,
+      }));
+      const { error } = await client.from("redeem_codes").insert(rows);
+      if (error) throw new Error(`Could not store the codes: ${error.message}`);
+    },
+
+    async listCodeBatches() {
+      // ponytail: grouped here from the newest 10,000 codes; move to a SQL view once batches pass that.
+      const { data, error } = await client
+        .from("redeem_codes")
+        .select("batch_id, reward, note, max_uses, uses, expires_on, revoked, created_at")
+        .order("created_at", { ascending: false })
+        .limit(10_000);
+      if (error) throw new Error(`Could not list the codes: ${error.message}`);
+      return groupBatches(
+        (data as CodeRow[]).map((row) => ({
+          batchId: row.batch_id,
+          reward: row.reward,
+          note: row.note,
+          maxUses: row.max_uses,
+          uses: row.uses,
+          expiresOn: row.expires_on,
+          revoked: row.revoked,
+          createdAt: row.created_at,
+        })),
+      );
+    },
+
+    async redeemCode(hash, deviceId) {
+      const { data, error } = await client.rpc("redeem_code", { p_hash: hash, p_device: deviceId });
+      if (error) throw new Error(`Could not redeem the code: ${error.message}`);
+      const row = (Array.isArray(data) ? data[0] : data) as
+        | { outcome: RedeemResult["outcome"]; reward: string | null; expires_on: string | null }
+        | undefined;
+      if (!row) throw new Error("The database gave no answer.");
+      return {
+        outcome: row.outcome,
+        ...(row.reward ? { reward: row.reward } : {}),
+        ...(row.expires_on ? { expiresOn: row.expires_on } : {}),
+      };
+    },
+
+    async revokeBatch(batchId) {
+      const { data, error } = await client
+        .from("redeem_codes")
+        .update({ revoked: true })
+        .eq("batch_id", batchId)
+        .eq("revoked", false)
+        .select("hash");
+      if (error) throw new Error(`Could not cancel the batch: ${error.message}`);
+      return (data ?? []).length;
+    },
+
+    async revokeCode(hash) {
+      const { data, error } = await client
+        .from("redeem_codes")
+        .update({ revoked: true })
+        .eq("hash", hash)
+        .select("hash");
+      if (error) throw new Error(`Could not cancel the code: ${error.message}`);
+      return (data ?? []).length > 0;
+    },
   };
+}
+
+interface CodeRow {
+  batch_id: string;
+  reward: string;
+  note: string | null;
+  max_uses: number;
+  uses: number;
+  expires_on: string | null;
+  revoked: boolean;
+  created_at: string;
 }

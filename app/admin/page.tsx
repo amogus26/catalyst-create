@@ -5,6 +5,7 @@ import { designType } from "@/lib/design-types";
 import { adminPasswordConfigured, isAdmin } from "@/lib/admin-session";
 import { FEATURED_LIMIT } from "@/lib/config";
 import { getStore, type Submission } from "@/lib/store";
+import { AdminBar } from "./admin-bar";
 import { LoginForm } from "./login-form";
 import { ReviewButtons } from "./review-buttons";
 
@@ -24,7 +25,7 @@ export default async function AdminPage() {
     return (
       <div className="shell prose">
         <h1>Review queue</h1>
-        <div className="notice info">
+        <div className="notice info" style={{ marginTop: 20 }}>
           <strong>ADMIN_PASSWORD is not set.</strong> Nobody can open this page, which also means
           nothing can be approved. Put a long random password in <code>.env.local</code> (or in the
           host&apos;s environment variables) and restart.
@@ -52,21 +53,18 @@ export default async function AdminPage() {
 
   return (
     <div className="shell admin">
-      <div className="page-head">
-        <p className="eyebrow">Reviewers only</p>
-        <h1 style={{ fontSize: 34 }}>Review queue</h1>
-      </div>
+      <AdminBar title="Review queue" current="designs" />
 
       <section className="section">
-        <SectionHeader no="01" title="Waiting for review">
+        <SectionHeader kicker="Queue" title="Waiting for review">
           {pending.length === 0
             ? "Nothing is waiting."
-            : `${pending.length} design${pending.length === 1 ? "" : "s"} waiting. Nothing here is visible to anyone else yet.`}
+            : `${pending.length} design${pending.length === 1 ? "" : "s"} waiting - hidden from everyone else until approved.`}
         </SectionHeader>
         {pending.length === 0 ? (
           <div className="empty">Nothing to review right now.</div>
         ) : (
-          <div className="showcase-grid">
+          <div className="design-grid">
             {pending.map((submission) => (
               <AdminCard key={submission.id} submission={submission} featuredCount={featuredCount} />
             ))}
@@ -75,17 +73,17 @@ export default async function AdminPage() {
       </section>
 
       <section className="section">
-        <SectionHeader no="02" title="Approved">
-          {`Live on the site. ${
+        <SectionHeader kicker="Live" title="Approved">
+          {`${
             featuredCount === 0
               ? "None are in a voting round yet - add up to five."
-              : `${featuredCount} in the current round; the page shows the top ${FEATURED_LIMIT}.`
-          } Sending one back to pending takes it down again, which is how you undo an approval.`}
+              : `${featuredCount} in the round; the site shows the top ${FEATURED_LIMIT}.`
+          } Back to pending takes one down again.`}
         </SectionHeader>
         {approvedSorted.length === 0 ? (
           <div className="empty">Nothing approved yet.</div>
         ) : (
-          <div className="showcase-grid">
+          <div className="design-grid">
             {approvedSorted.map((submission) => (
               <AdminCard key={submission.id} submission={submission} featuredCount={featuredCount} />
             ))}
@@ -95,11 +93,10 @@ export default async function AdminPage() {
 
       {rejected.length > 0 && (
         <section className="section">
-          <SectionHeader no="03" title="Rejected">
-            Not shown anywhere and not reachable by anyone but a reviewer. Kept so a mis-click can
-            be undone.
+          <SectionHeader kicker="Hidden" title="Rejected">
+            Never shown. Kept so a mis-click can be undone.
           </SectionHeader>
-          <div className="showcase-grid">
+          <div className="design-grid">
             {rejected.slice(0, 8).map((submission) => (
               <AdminCard key={submission.id} submission={submission} featuredCount={featuredCount} />
             ))}
@@ -129,25 +126,17 @@ function AdminCard({
           alt={`${designType(submission.designType).label} submission by ${submission.displayName}`}
           loading="lazy"
         />
-        {label && (
-          <span className={submission.status === "approved" ? "badge-live" : "badge-rejected"}>
-            {label}
-          </span>
-        )}
+        {label && <span className={submission.status === "approved" ? "badge live" : "badge rejected"}>{label}</span>}
       </div>
       <div className="design-card-body">
         <div className="who">
           <span className="name" title={submission.displayName}>
             {submission.displayName}
           </span>
-          <span className="tiny muted">
-            <span className="type-tag">
-              <TypeIcon type={submission.designType} />
-              {designType(submission.designType).label}
-            </span>
-            {" - "}
-            {new Date(submission.createdAt).toLocaleDateString()} - {submission.voteCount}{" "}
-            {submission.voteCount === 1 ? "vote" : "votes"}
+          <span className="type-tag">
+            <TypeIcon type={submission.designType} />
+            {designType(submission.designType).label} - {new Date(submission.createdAt).toLocaleDateString("en-GB")} -{" "}
+            {submission.voteCount} {submission.voteCount === 1 ? "vote" : "votes"}
           </span>
         </div>
         <div className="admin-actions">

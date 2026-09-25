@@ -46,13 +46,13 @@ export function FeatureToggle({
   return (
     <>
       {error && (
-        <div className="notice error tiny" role="alert" style={{ margin: 0, padding: "8px 10px" }}>
+        <div className="notice error tiny" role="alert">
           {error}
         </div>
       )}
       <button
         type="button"
-        className={featured ? "featured-on" : ""}
+        className={featured ? "featured-on small" : "small"}
         disabled={busy}
         onClick={toggle}
         title={

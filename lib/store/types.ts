@@ -10,6 +10,7 @@
  *    else; only the admin routes ask for `pending`.
  */
 
+import type { CodeBatch, RedeemResult } from "../codes";
 import type { DesignTypeId } from "../design-types";
 
 export type SubmissionStatus = "pending" | "approved" | "rejected";
@@ -74,4 +75,31 @@ export interface Store {
 
   /** Which of [ids] this voter has already voted on, so the gallery can show its buttons spent. */
   votedIds(voterId: string, ids: string[]): Promise<Set<string>>;
+
+  // ------------------------------------------------------------------ redeem codes (lib/codes.ts)
+
+  /** Stores a batch of codes by fingerprint only. The readable codes never reach the store. */
+  createCodes(input: {
+    batchId: string;
+    hashes: string[];
+    reward: string;
+    note: string | null;
+    maxUses: number;
+    expiresOn: string | null;
+  }): Promise<void>;
+
+  /** Every batch, newest first, with how far through its uses it is. */
+  listCodeBatches(): Promise<CodeBatch[]>;
+
+  /**
+   * One launcher install redeeming one code, atomically: a shared code's last use cannot go to two
+   * installs at once, and one install cannot redeem the same code twice.
+   */
+  redeemCode(hash: string, deviceId: string): Promise<RedeemResult>;
+
+  /** Cancels every code in a batch, used or not. Returns how many were cancelled. */
+  revokeBatch(batchId: string): Promise<number>;
+
+  /** Cancels one code by fingerprint. False when there is no such code. */
+  revokeCode(hash: string): Promise<boolean>;
 }

@@ -1,31 +1,28 @@
 import type { ReactNode } from "react";
 
 /**
- * Every section opens the same way: its step number in the pixel face, the heading, a line of
- * explanation, and a rule under the lot.
- *
- * The number is the point. Submit, vote and showcase are not three unrelated panels, they are the
- * order this site works in, and a reader who lands halfway down should be able to tell which part
- * of it they are looking at.
+ * How every section opens: a small label in the pixel face, a big heading, one line under it, and
+ * anything else - filters, a count - at the far end.
  */
 export function SectionHeader({
-  no,
+  kicker,
   title,
   children,
+  aside,
 }: {
-  no: string;
+  kicker: string;
   title: string;
   children?: ReactNode;
+  aside?: ReactNode;
 }) {
   return (
     <header className="section-head">
-      <span className="section-no" aria-hidden="true">
-        {no}
-      </span>
       <div>
+        <span className="kicker">{kicker}</span>
         <h2>{title}</h2>
         {children && <p>{children}</p>}
       </div>
+      {aside}
     </header>
   );
 }

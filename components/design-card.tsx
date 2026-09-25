@@ -4,11 +4,9 @@ import { TypeIcon } from "./type-icon";
 import { VoteButton } from "./vote-button";
 
 /**
- * One design, as it appears anywhere on the public page: the image first and large, then who made
- * it, what kind of cosmetic it is, and what it has taken in votes.
- *
- * The showcase and the voting round use the same card at two sizes rather than two cards, so a
- * design does not change character when it is picked for a round - it just gets more room.
+ * One design, anywhere on the public page: the art big on its stage, then who made it, what it is,
+ * and its vote. The round and the gallery use the same card at two sizes, so a design keeps its look
+ * when it is picked for a round.
  */
 export function DesignCard({
   submission,
@@ -26,7 +24,7 @@ export function DesignCard({
   const type = designType(submission.designType);
 
   return (
-    <article className={`design-card${size === "large" ? " large" : ""}${leading ? " leading" : ""}`}>
+    <article className={`design-card${leading ? " leading" : ""}`}>
       <div className="art-frame">
         <img
           className="art"
@@ -34,13 +32,12 @@ export function DesignCard({
           alt={`${type.label} design by ${submission.displayName}`}
           loading="lazy"
         />
-        {typeof rank === "number" && <span className="rank">{rank}</span>}
-        {leading && <span className="badge-leading">Leading</span>}
-        {size === "normal" && submission.featured && <span className="badge-round">In this round</span>}
+        {typeof rank === "number" && <span className="rank">#{rank}</span>}
+        {leading && <span className="leading-tag">Leading</span>}
+        {size === "normal" && submission.featured && <span className="round-tag">In the round</span>}
       </div>
       <div className="design-card-body">
-        {/* The count lives on the button and nowhere else: printed twice on one card, the two
-            numbers only have to disagree once - after a vote - to look broken. */}
+        {/* The count lives on the button only: printed twice, the two would disagree after a vote. */}
         <div className="who">
           <span className="name" title={submission.displayName}>
             {submission.displayName}
@@ -50,12 +47,7 @@ export function DesignCard({
             {type.label}
           </span>
         </div>
-        <VoteButton
-          id={submission.id}
-          initialCount={submission.voteCount}
-          initiallyVoted={voted}
-          size={size}
-        />
+        <VoteButton id={submission.id} initialCount={submission.voteCount} initiallyVoted={voted} size={size} />
       </div>
     </article>
   );

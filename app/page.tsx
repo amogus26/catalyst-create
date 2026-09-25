@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { FeaturedRound } from "@/components/featured-round";
-import { HeroPlates } from "@/components/hero-plates";
+import { Gallery } from "@/components/gallery";
+import { HeroStage } from "@/components/hero-stage";
 import { SectionHeader } from "@/components/section-header";
-import { SectionTabs } from "@/components/section-tabs";
-import { Showcase } from "@/components/showcase";
 import { SubmitForm } from "@/components/submit-form";
 import { FEATURED_LIMIT } from "@/lib/config";
 import { getStore } from "@/lib/store";
@@ -12,14 +11,10 @@ import { currentVoterId } from "@/lib/voter";
 // Approvals and votes change under this page constantly; never serve it from the build.
 export const dynamic = "force-dynamic";
 
-/** How many designs are pinned to the board in the hero. */
-const PLATES = 3;
-
 /**
- * The whole public site, bar the terms: submitting, the current round, and the showcase, as three
- * steps of one page (see [SectionTabs]). Everything it shows has been through review - it asks the
- * store for approved designs and for the current round, and there is no query here that could
- * return anything else.
+ * The whole public site bar the legal pages, as one scroll: the round, the gallery and the form are
+ * all on it, in the order people use them. Everything shown has been through review - the store is
+ * only ever asked for approved designs and the current round.
  */
 export default async function HomePage() {
   const store = getStore();
@@ -31,77 +26,104 @@ export default async function HomePage() {
   const voterId = await currentVoterId();
   const ids = [...new Set([...featured, ...approved].map((submission) => submission.id))];
   const voted = voterId ? await store.votedIds(voterId, ids) : new Set<string>();
+  const votes = approved.reduce((sum, submission) => sum + submission.voteCount, 0);
+  const leader = featured[0] ?? approved[0] ?? null;
 
   return (
-    <>
-      <section className="hero-band">
-        <div className="hero">
-          <div className="hero-copy">
-            <p className="eyebrow">For Catalyst Client</p>
-            <h1>Cosmetics drawn by the people wearing them</h1>
-            <p className="lead">
-              Make a cape, a pair of wings or something else to wear - upload it, or draw one here on
-              a 64x32 grid. A person looks at every submission before anybody else sees it, and the
-              best of each round gets worn in game.
-            </p>
-            <div className="hero-actions">
-              <Link href="/#submit" className="button primary">
-                Submit a design
-              </Link>
-              <Link href="/#vote" className="button ghost">
-                Vote on this round
-              </Link>
+    <div className="shell">
+      <section className="hero">
+        <div>
+          <span className="round-chip">
+            <span className="pulse" aria-hidden="true" />
+            {featured.length > 0
+              ? `Voting is open - ${featured.length} design${featured.length === 1 ? "" : "s"} in this round`
+              : "Submissions are open"}
+          </span>
+          <h1>
+            Design what Catalyst players <span className="accent">wear</span>.
+          </h1>
+          <p className="lead">
+            Upload a cape or draw one right here. A person checks every design, players vote, and
+            the winners go into the client.
+          </p>
+          <div className="hero-actions">
+            <Link href="/#submit" className="button primary">
+              Submit a design
+            </Link>
+            <Link href="/#vote" className="button">
+              Vote on the round
+            </Link>
+          </div>
+          <div className="hero-stats">
+            <div>
+              <b>{approved.length}</b>
+              <span>designs in the gallery</span>
+            </div>
+            <div>
+              <b>{votes}</b>
+              <span>votes cast</span>
+            </div>
+            <div>
+              <b>{featured.length}</b>
+              <span>in this round</span>
             </div>
           </div>
-          <HeroPlates designs={approved.slice(0, PLATES)} />
         </div>
+        <HeroStage leader={leader} leading={featured.length > 0} />
       </section>
 
-      <div className="shell">
-        <SectionTabs
-          counts={{ vote: featured.length, showcase: approved.length }}
-          submit={
-            <section className="section" id="submit">
-              <SectionHeader no="01" title="Submit a design">
-                Upload a PNG, or draw a cape in the browser. Nothing you submit is shown to anyone
-                until a reviewer has looked at it - expect that to take a day or two.
-              </SectionHeader>
-              <div className="submit-layout">
-                <div className="panel">
-                  <SubmitForm />
-                </div>
-                <aside className="panel side">
-                  <h3>How it works</h3>
-                  <ol className="steps-list">
-                    <li>
-                      <strong>You submit.</strong> Your design goes into a queue. It is not public,
-                      and nobody but a reviewer can see it.
-                    </li>
-                    <li>
-                      <strong>A person looks at it.</strong> Both the image and the name on it. If it
-                      is fine, it is approved; if not, it never appears.
-                    </li>
-                    <li>
-                      <strong>It joins the showcase.</strong> Approved designs can be voted on, and a
-                      few get picked for each round.
-                    </li>
-                    <li>
-                      <strong>No art to hand?</strong> <em>Draw a cape</em> is a 64x32 grid you can
-                      draw on directly - what comes out is a real cape texture.
-                    </li>
-                  </ol>
-                  <p className="tiny muted footnote">
-                    By submitting you agree it is your own work and that it follows the{" "}
-                    <Link href="/terms">terms and acceptable use</Link>.
-                  </p>
-                </aside>
-              </div>
-            </section>
-          }
-          vote={<FeaturedRound items={featured} voted={voted} />}
-          showcase={<Showcase items={approved} voted={voted} />}
-        />
-      </div>
-    </>
+      <ol className="steps">
+        <li>
+          <span className="no">01</span>
+          <div>
+            <b>Submit</b>
+            <span>Upload a PNG or draw a cape.</span>
+          </div>
+        </li>
+        <li>
+          <span className="no">02</span>
+          <div>
+            <b>Get checked</b>
+            <span>A person reviews it, usually within two days.</span>
+          </div>
+        </li>
+        <li>
+          <span className="no">03</span>
+          <div>
+            <b>Win the vote</b>
+            <span>The round&apos;s winners are made into cosmetics.</span>
+          </div>
+        </li>
+      </ol>
+
+      <FeaturedRound items={featured} voted={voted} />
+
+      <Gallery items={approved} voted={[...voted]} />
+
+      <section className="section" id="submit">
+        <SectionHeader kicker="Submit" title="Send in your design">
+          Nobody sees it until a reviewer has approved it.
+        </SectionHeader>
+        <div className="submit-layout">
+          <div className="form-card">
+            <SubmitForm />
+          </div>
+          <aside className="rules">
+            <h3>What gets approved</h3>
+            <ul>
+              <li>Your own work - no art, logos or characters you don&apos;t have the rights to.</li>
+              <li>Nothing hateful, sexual, violent or aimed at a real person.</li>
+              <li>Capes are 64x32, or an exact 2:1 HD size like 128x64.</li>
+              <li>A display name that follows the same rules - it is shown with your design.</li>
+            </ul>
+            <p className="fine">
+              By submitting you agree to the <Link href="/terms">Terms of Service</Link> and let us
+              show your design here and, if it wins, in the client. See the{" "}
+              <Link href="/privacy">Privacy Policy</Link> for what we store.
+            </p>
+          </aside>
+        </div>
+      </section>
+    </div>
   );
 }

@@ -63,7 +63,7 @@ export const DESIGN_TYPES: DesignType[] = [
     label: "Wings",
     sizes: null,
     requirement: "PNG, up to 1024x1024, under 1 MB",
-    note: "Wings have no fixed texture size in the client yet, so anything sensible is accepted. If you are working to the elytra layout, 64x32 is a good bet.",
+    note: "Any sensible size - wings have no fixed size yet (the elytra layout is 64x32).",
     drawable: false,
   },
   {
@@ -71,7 +71,7 @@ export const DESIGN_TYPES: DesignType[] = [
     label: "Hat",
     sizes: null,
     requirement: "PNG, up to 1024x1024, under 1 MB",
-    note: "Hats have no fixed texture size in the client yet, so anything sensible is accepted.",
+    note: "Any sensible size - hats have no fixed size yet.",
     drawable: false,
   },
   {
@@ -79,7 +79,7 @@ export const DESIGN_TYPES: DesignType[] = [
     label: "Backpack",
     sizes: null,
     requirement: "PNG, up to 1024x1024, under 1 MB",
-    note: "Backpacks have no fixed texture size in the client yet, so anything sensible is accepted.",
+    note: "Any sensible size - backpacks have no fixed size yet.",
     drawable: false,
   },
 ];

@@ -146,9 +146,8 @@ export function DrawCanvas({ canvasRef }: { canvasRef: RefObject<HTMLCanvasEleme
         />
       </div>
 
-      <p className="tiny muted" style={{ margin: "10px 0 0" }}>
-        {CAPE_WIDTH}x{CAPE_HEIGHT} pixels - a real cape texture, shown large. Nothing drawn here
-        needs checking for size: it is already the right one.
+      <p className="tiny muted">
+        {CAPE_WIDTH}x{CAPE_HEIGHT} - a real cape texture, shown large.
       </p>
     </div>
   );
