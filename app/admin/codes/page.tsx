@@ -31,11 +31,27 @@ export default async function CodesPage() {
     return <LoginForm />;
   }
 
-  const batches = await getStore().listCodeBatches();
+  // Before supabase/migrations/0004_redeem_codes.sql has run there are no tables to read - say so
+  // rather than failing the whole page.
+  let batches: Awaited<ReturnType<ReturnType<typeof getStore>["listCodeBatches"]>> = [];
+  let missingTables = false;
+  try {
+    batches = await getStore().listCodeBatches();
+  } catch (error) {
+    console.error("[catalyst-create] listing codes failed:", error);
+    missingTables = true;
+  }
 
   return (
     <div className="shell admin">
       <AdminBar title="Redeem codes" current="codes" />
+      {missingTables && (
+        <div className="notice error" style={{ marginTop: 24 }}>
+          The codes tables aren&apos;t set up in the database yet. Run{" "}
+          <code>supabase/migrations/0004_redeem_codes.sql</code> in Supabase&apos;s SQL Editor, then
+          reload this page.
+        </div>
+      )}
 
       <div className="codes-layout section">
         <section>
