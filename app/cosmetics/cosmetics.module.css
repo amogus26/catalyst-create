@@ -1,0 +1,330 @@
+/* The cosmetics shop: a sticky 3D viewer beside a grid of items, then what is earned and what is locked. */
+
+.shop {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  gap: clamp(20px, 3vw, 40px);
+  align-items: start;
+}
+.viewerCol {
+  position: sticky;
+  top: calc(var(--header-h) + 16px);
+  display: grid;
+  gap: 14px;
+}
+.viewer {
+  --glow: #5b7cff;
+  position: relative;
+  aspect-ratio: 1 / 1.02;
+  border-radius: 22px;
+  overflow: hidden;
+  background:
+    radial-gradient(60% 50% at 50% 62%, color-mix(in srgb, var(--glow) 26%, transparent), transparent 70%),
+    linear-gradient(180deg, #0f1824, #0a1018);
+  box-shadow: inset 0 0 0 1px var(--line-strong), 0 30px 70px -30px rgba(0, 0, 0, 0.9);
+  transition: background 0.5s var(--ease);
+  cursor: grab;
+}
+.viewer:active {
+  cursor: grabbing;
+}
+.viewerCanvas,
+.viewerPoster {
+  position: absolute;
+  inset: 0;
+}
+.viewerPoster {
+  display: grid;
+  place-items: center;
+  padding: 18%;
+}
+.viewerPoster svg {
+  width: 100%;
+  height: 100%;
+}
+.dragHint {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  font-family: var(--font-pixel), monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: rgba(8, 12, 18, 0.6);
+  pointer-events: none;
+}
+.detail {
+  padding: 20px 22px;
+  display: grid;
+  gap: 12px;
+}
+.detailHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+}
+.detailHead h2 {
+  margin-top: 8px;
+  font-size: clamp(24px, 2.4vw, 32px);
+  letter-spacing: -0.03em;
+}
+.lore {
+  color: var(--text-soft);
+  font-style: italic;
+}
+.detailActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+}
+.where {
+  color: var(--muted);
+  font-size: 13.5px;
+}
+.priceBig {
+  font-size: 22px;
+}
+.noPrice {
+  color: var(--muted);
+  font-size: 13.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.gridCol {
+  display: grid;
+  gap: 18px;
+}
+.filters {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 0 0 1px var(--line);
+  justify-self: start;
+}
+.filters button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: inherit;
+  font-size: 14.5px;
+  font-weight: 650;
+  padding: 9px 16px;
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+  color: var(--text-soft);
+  background: transparent;
+  transition: background 0.2s, color 0.2s;
+}
+.filters button span {
+  font-size: 12px;
+  color: var(--muted);
+}
+.filters button[aria-pressed="true"] {
+  color: #06101a;
+  background: var(--text);
+}
+.filters button[aria-pressed="true"] span {
+  color: #3a4456;
+}
+.grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.card {
+  --rarity: #9aa4b5;
+  position: relative;
+  width: 100%;
+  display: grid;
+  gap: 10px;
+  padding: 12px 12px 14px;
+  border: 0;
+  border-radius: 18px;
+  font: inherit;
+  text-align: left;
+  color: var(--text);
+  cursor: pointer;
+  background:
+    radial-gradient(90% 70% at 50% 30%, color-mix(in srgb, var(--rarity) 20%, transparent), transparent 70%),
+    linear-gradient(180deg, rgba(22, 31, 45, 0.9), rgba(12, 18, 27, 0.95));
+  box-shadow: inset 0 0 0 1px var(--line);
+  transition: transform 0.3s var(--ease), box-shadow 0.3s;
+}
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--rarity) 55%, transparent), 0 20px 40px -24px var(--rarity);
+}
+.cardOn {
+  box-shadow: inset 0 0 0 2px var(--rarity), 0 18px 44px -20px var(--rarity);
+}
+.cardArt {
+  display: block;
+  aspect-ratio: 1;
+  padding: 8%;
+}
+.cardArt svg {
+  width: 100%;
+  height: 100%;
+  transition: transform 0.5s var(--ease);
+}
+.card:hover .cardArt svg {
+  transform: scale(1.06) translateY(-3px);
+}
+.cardTags {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  gap: 6px;
+}
+.cardBody {
+  display: grid;
+  gap: 4px;
+}
+.cardBody b {
+  font-size: 15px;
+  line-height: 1.25;
+}
+.preview {
+  margin-top: 28px;
+}
+@media (max-width: 1100px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 860px) {
+  .shop {
+    grid-template-columns: 1fr;
+  }
+  .viewerCol {
+    position: static;
+  }
+  .viewer {
+    aspect-ratio: 1 / 0.9;
+  }
+}
+@media (max-width: 420px) {
+  .grid {
+    gap: 8px;
+  }
+  .card {
+    padding: 10px;
+  }
+}
+
+/* ------------------------------------------------------------------ earned */
+
+.earnGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 12px;
+}
+.earnCard {
+  height: 100%;
+  padding: 16px 14px;
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: 6px;
+}
+.earnArt {
+  width: 88px;
+  height: 88px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 4px;
+  border-radius: 16px;
+  background: radial-gradient(closest-side, rgba(240, 180, 41, 0.14), transparent);
+}
+.earnArt svg {
+  max-width: 100%;
+  max-height: 100%;
+}
+.earnCard b {
+  font-size: 14px;
+  line-height: 1.25;
+}
+.earnFrom {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* ------------------------------------------------------------------ locked */
+
+.lockedGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.locked {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 22px;
+  border-radius: 20px;
+  color: var(--text);
+  background: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.025) 0 10px, transparent 10px 20px), rgba(12, 18, 27, 0.9);
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+  transition: transform 0.3s var(--ease), box-shadow 0.3s;
+}
+.locked:hover {
+  text-decoration: none;
+  transform: translateY(-4px);
+  box-shadow: inset 0 0 0 1px rgba(240, 180, 41, 0.5), 0 20px 40px -24px rgba(240, 180, 41, 0.6);
+}
+.locked b {
+  font-family: var(--font-pixel), monospace;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+}
+.locked > span:last-child {
+  color: var(--gold-soft);
+  font-size: 14px;
+  font-weight: 650;
+}
+.lockedArt {
+  position: relative;
+  width: 140px;
+  height: 140px;
+}
+.lockedArt svg:first-child {
+  width: 100%;
+  height: 100%;
+  filter: blur(1.5px) saturate(0.4);
+  opacity: 0.8;
+}
+.lockBadge {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  color: var(--gold-soft);
+  background: rgba(8, 12, 18, 0.85);
+  box-shadow: inset 0 0 0 1px rgba(240, 180, 41, 0.45);
+}
+@media (max-width: 760px) {
+  .lockedGrid {
+    grid-template-columns: 1fr;
+  }
+}

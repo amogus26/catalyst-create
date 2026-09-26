@@ -2,26 +2,32 @@
   "name": "catalyst-create",
   "version": "0.1.0",
   "private": true,
-  "description": "Community cape design submissions and voting for Catalyst Client. Every submission is hidden until a human approves it.",
+  "description": "Catalyst Client - the official website: the launcher and client, the cosmetics and coin shops, the battle pass, redeem codes, and Catalyst Designs (community cape submissions and voting, every one checked by a person).",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "check:supabase": "node scripts/check-supabase.mjs",
-    "check:codes": "node --no-warnings scripts/check-codes.mjs"
+    "check:codes": "node --no-warnings scripts/check-codes.mjs",
+    "check:curseforge": "node --no-warnings scripts/check-curseforge.mjs"
   },
   "dependencies": {
+    "@react-three/drei": "^10.7.9",
+    "@react-three/fiber": "^9.8.1",
     "@supabase/supabase-js": "^2.45.0",
+    "motion": "^13.4.4",
     "next": "^15.5.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "three": "^0.186.1"
   },
   "devDependencies": {
     "@netlify/plugin-nextjs": "^5.16.0",
     "@types/node": "^22.7.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@types/three": "^0.186.0",
     "typescript": "^5.6.0"
   }
 }

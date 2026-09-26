@@ -1,4 +1,5 @@
 import { designType } from "@/lib/design-types";
+import { View3DButton } from "./designs/cape-preview";
 import type { Submission } from "@/lib/store";
 
 /**
@@ -17,6 +18,7 @@ export function HeroStage({ leader, leading }: { leader: Submission | null; lead
   return (
     <figure className="stage" style={{ margin: 0 }}>
       <img src={`/api/images/${leader.id}`} alt={`${designType(leader.designType).label} by ${leader.displayName}`} />
+      {leader.designType === "cape" && <View3DButton id={leader.id} label={`Cape by ${leader.displayName}`} />}
       <figcaption>
         <span>
           <b>{leader.displayName}</b> - {designType(leader.designType).label}

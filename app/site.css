@@ -1,0 +1,666 @@
+/*
+ * The Catalyst site: the chrome every page shares (header, footer, buttons, section layout) and the
+ * pieces the marketing pages are built from. The Designs pages and /admin keep their own classes in
+ * globals.css - this file only adds.
+ *
+ * The look is the launcher's: its navy ground, the Deep Dark hall's teal light, sky blue for actions,
+ * coin gold for anything you earn. Motion is slow and lit rather than bouncy - drifting light, souls
+ * rising, things arriving as you reach them - and all of it switches off for prefers-reduced-motion.
+ */
+
+:root {
+  --header-h: 68px;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --teal-glow: rgba(55, 211, 196, 0.16);
+  --blue-glow: rgba(79, 168, 232, 0.18);
+  --gold-glow: rgba(240, 180, 41, 0.18);
+  --panel: rgba(17, 24, 35, 0.72);
+  --panel-solid: #101722;
+  --wide: 1240px;
+}
+
+html {
+  scroll-padding-top: calc(var(--header-h) + 16px);
+}
+
+/* ------------------------------------------------------------------ skip link + focus */
+
+.skip-link {
+  position: absolute;
+  left: 12px;
+  top: -60px;
+  z-index: 100;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--blue);
+  color: #06101a;
+  font-weight: 700;
+}
+.skip-link:focus {
+  top: 12px;
+  text-decoration: none;
+}
+
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--blue-soft);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+.wide {
+  width: 100%;
+  max-width: var(--wide);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+/* ------------------------------------------------------------------ header */
+
+.top {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  transition: background 0.3s var(--ease), border-color 0.3s var(--ease);
+  border-bottom: 1px solid transparent;
+}
+.top.scrolled,
+.top.open {
+  background: rgba(7, 11, 17, 0.78);
+  backdrop-filter: saturate(1.5) blur(16px);
+  -webkit-backdrop-filter: saturate(1.5) blur(16px);
+  border-bottom-color: var(--line);
+}
+.top-inner {
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+.top .brand {
+  font-size: 18px;
+  gap: 11px;
+}
+.top .brand small {
+  font-family: var(--font-pixel), monospace;
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  color: var(--teal);
+  border: 1px solid rgba(55, 211, 196, 0.35);
+  border-radius: 5px;
+  padding: 2px 5px 1px;
+  margin-left: 2px;
+}
+.top-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: auto;
+}
+.top-nav a {
+  position: relative;
+  color: var(--text-soft);
+  font-size: 14.5px;
+  font-weight: 560;
+  padding: 8px 12px;
+  border-radius: 999px;
+  transition: color 0.2s, background 0.2s;
+}
+.top-nav a:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.05);
+  text-decoration: none;
+}
+.top-nav a[aria-current="page"] {
+  color: var(--text);
+}
+.top-nav a[aria-current="page"]::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 2px;
+  width: 4px;
+  height: 4px;
+  margin-left: -2px;
+  background: var(--teal);
+  box-shadow: 0 0 10px var(--teal);
+}
+.top-cta {
+  margin-left: 6px;
+}
+.menu-button {
+  display: none;
+  margin-left: auto;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid var(--line-strong);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  cursor: pointer;
+  place-items: center;
+}
+.menu-button span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: currentColor;
+  position: relative;
+  transition: transform 0.25s var(--ease), background 0.2s;
+}
+.menu-button span::before,
+.menu-button span::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 18px;
+  height: 2px;
+  background: currentColor;
+  transition: transform 0.25s var(--ease), top 0.25s var(--ease);
+}
+.menu-button span::before {
+  top: -6px;
+}
+.menu-button span::after {
+  top: 6px;
+}
+.top.open .menu-button span {
+  background: transparent;
+}
+.top.open .menu-button span::before {
+  top: 0;
+  transform: rotate(45deg);
+}
+.top.open .menu-button span::after {
+  top: 0;
+  transform: rotate(-45deg);
+}
+.scroll-meter {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, var(--teal), var(--blue) 60%, var(--gold));
+  box-shadow: 0 0 12px rgba(55, 211, 196, 0.6);
+}
+.mobile-sheet {
+  display: none;
+}
+@media (max-width: 980px) {
+  .top .top-nav,
+  .top .top-cta {
+    display: none;
+  }
+  .menu-button {
+    display: grid;
+  }
+  .top.open .mobile-sheet {
+    display: block;
+  }
+  .mobile-sheet {
+    border-top: 1px solid var(--line);
+    padding: 12px 0 22px;
+    max-height: calc(100vh - var(--header-h));
+    overflow-y: auto;
+  }
+  .mobile-sheet nav {
+    display: grid;
+    gap: 2px;
+  }
+  .mobile-sheet a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 13px 4px;
+    color: var(--text);
+    font-size: 18px;
+    font-weight: 650;
+    border-bottom: 1px solid var(--line);
+  }
+  .mobile-sheet a:hover {
+    text-decoration: none;
+    color: var(--blue-soft);
+  }
+  .mobile-sheet .btn {
+    margin-top: 16px;
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ------------------------------------------------------------------ buttons */
+
+/*
+ * One button family for the site. At rest it is a soft rounded pill; under the pointer its corners
+ * step in like a Minecraft block's edge (the clip-path's steps grow from nothing), it lifts a little and
+ * its light brightens. The steps are real pixels at 4px - the same corner as the launcher's buttons.
+ */
+.btn {
+  --step: 0px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 22px;
+  border: 0;
+  border-radius: 12px;
+  font: inherit;
+  font-size: 15.5px;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  line-height: 1.1;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.2s var(--ease), background 0.2s, box-shadow 0.2s, border-radius 0.2s, clip-path 0.2s var(--ease);
+  clip-path: polygon(
+    var(--step) 0, calc(100% - var(--step)) 0, calc(100% - var(--step)) var(--step), 100% var(--step),
+    100% calc(100% - var(--step)), calc(100% - var(--step)) calc(100% - var(--step)), calc(100% - var(--step)) 100%,
+    var(--step) 100%, var(--step) calc(100% - var(--step)), 0 calc(100% - var(--step)), 0 var(--step), var(--step) var(--step)
+  );
+  white-space: nowrap;
+}
+.btn:hover {
+  --step: 4px;
+  border-radius: 0;
+  transform: translateY(-2px);
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.1);
+}
+.btn:active {
+  transform: translateY(0);
+}
+.btn svg {
+  flex: none;
+}
+.btn.primary {
+  color: #04121d;
+  background: linear-gradient(180deg, #7cc2f3, var(--blue));
+  box-shadow: 0 10px 30px -10px rgba(79, 168, 232, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+.btn.primary:hover {
+  background: linear-gradient(180deg, #9ad3fa, #62b5ef);
+}
+.btn.gold {
+  color: #2a1a00;
+  background: linear-gradient(180deg, #ffd978, var(--gold));
+  box-shadow: 0 10px 30px -10px rgba(240, 180, 41, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+.btn.gold:hover {
+  background: linear-gradient(180deg, #ffe49a, #f6c347);
+}
+.btn.big {
+  padding: 17px 28px;
+  font-size: 17px;
+  border-radius: 14px;
+}
+.btn.small {
+  padding: 9px 15px;
+  font-size: 14px;
+  border-radius: 10px;
+}
+.btn[aria-disabled="true"],
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+}
+.btn[aria-disabled="true"]:hover,
+.btn:disabled:hover {
+  --step: 0px;
+  border-radius: 12px;
+}
+.btn .sub {
+  font-weight: 600;
+  opacity: 0.7;
+  font-size: 0.86em;
+}
+
+/* ------------------------------------------------------------------ type */
+
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-pixel), monospace;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--teal);
+}
+.kicker::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  background: currentColor;
+  box-shadow: 0 0 12px currentColor;
+}
+.kicker.gold {
+  color: var(--gold-soft);
+}
+.kicker.blue {
+  color: var(--blue-soft);
+}
+.display {
+  font-size: clamp(44px, 7.2vw, 96px);
+  font-weight: 850;
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+}
+.headline {
+  font-size: clamp(32px, 4.6vw, 58px);
+  font-weight: 820;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+}
+.lede {
+  font-size: clamp(17px, 1.6vw, 20px);
+  line-height: 1.55;
+  color: var(--text-soft);
+  max-width: 640px;
+}
+.shine-text {
+  background: linear-gradient(100deg, #b9f5ee 0%, var(--teal) 30%, var(--blue-soft) 60%, #e9f4ff 90%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shine-text 9s linear infinite;
+}
+.gold-text {
+  background: linear-gradient(100deg, #fff1bf 0%, var(--gold-soft) 30%, var(--gold) 60%, #fff4cf 90%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shine-text 7s linear infinite;
+}
+@keyframes shine-text {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* ------------------------------------------------------------------ sections */
+
+.band {
+  position: relative;
+  padding: clamp(72px, 10vw, 140px) 0;
+}
+.band.tight {
+  padding: clamp(48px, 6vw, 88px) 0;
+}
+.band-head {
+  display: grid;
+  gap: 16px;
+  max-width: 760px;
+  margin-bottom: clamp(36px, 5vw, 60px);
+}
+.band-head.center {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  justify-items: center;
+}
+.band-head.center .lede {
+  margin: 0 auto;
+}
+
+/* ------------------------------------------------------------------ the hall: drifting light and rising souls */
+
+.hall {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.hall.fade {
+  mask-image: linear-gradient(transparent, #000 25%, #000 75%, transparent);
+  -webkit-mask-image: linear-gradient(transparent, #000 25%, #000 75%, transparent);
+}
+.hall .pool {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(40px);
+  opacity: 0.9;
+  animation: pool-drift 22s ease-in-out infinite alternate;
+}
+.hall .ribbon {
+  position: absolute;
+  left: -10%;
+  width: 120%;
+  height: 340px;
+  opacity: 0.55;
+  animation: ribbon-drift 26s ease-in-out infinite alternate;
+}
+.hall .ribbon path {
+  fill: none;
+  stroke-linecap: round;
+}
+.hall .soul {
+  position: absolute;
+  bottom: -12px;
+  width: var(--s, 4px);
+  height: var(--s, 4px);
+  background: #6ff5e6;
+  color: #6ff5e6;
+  box-shadow: 0 0 8px 1px currentColor;
+  opacity: 0;
+  animation: soul-rise var(--d, 14s) linear infinite;
+  animation-delay: var(--delay, 0s);
+}
+@keyframes pool-drift {
+  to {
+    transform: translate3d(4%, -3%, 0) scale(1.08);
+  }
+}
+@keyframes ribbon-drift {
+  to {
+    transform: translate3d(-4%, 18px, 0);
+  }
+}
+@keyframes soul-rise {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.9;
+  }
+  80% {
+    opacity: 0.55;
+  }
+  100% {
+    transform: translate3d(var(--x, 20px), calc(-1 * var(--h, 700px)), 0);
+    opacity: 0;
+  }
+}
+
+/* ------------------------------------------------------------------ panels, cards and tilt */
+
+.panel {
+  position: relative;
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(22, 31, 45, 0.8), rgba(13, 19, 28, 0.82));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07), inset 0 0 0 1px var(--line), 0 24px 60px -30px rgba(0, 0, 0, 0.7);
+}
+.tilt {
+  --rx: 0deg;
+  --ry: 0deg;
+  --mx: 50%;
+  --my: 50%;
+  transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry));
+  transition: transform 0.45s var(--ease), box-shadow 0.3s;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.tilt.active {
+  transition: transform 0.08s linear, box-shadow 0.3s;
+}
+.tilt::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(420px circle at var(--mx) var(--my), rgba(255, 255, 255, 0.09), transparent 45%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.tilt.active::after {
+  opacity: 1;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px 2px;
+  border-radius: 6px;
+  font-family: var(--font-pixel), monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 1px solid currentColor;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.tag.solid {
+  border-color: transparent;
+  color: #0b0f16;
+}
+
+.coin-price {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 800;
+  color: var(--gold-soft);
+  font-variant-numeric: tabular-nums;
+}
+.coin-price s {
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.86em;
+}
+
+/* ------------------------------------------------------------------ footer */
+
+.foot {
+  position: relative;
+  margin-top: 40px;
+  border-top: 1px solid var(--line);
+  padding: 56px 0 44px;
+  color: var(--muted);
+  font-size: 14px;
+  background: linear-gradient(180deg, transparent, rgba(4, 7, 11, 0.6));
+}
+.foot-grid {
+  display: grid;
+  grid-template-columns: 1.4fr repeat(4, 1fr);
+  gap: 32px;
+}
+.foot h2 {
+  margin: 0 0 12px;
+  font-family: var(--font-pixel), monospace;
+  font-weight: 400;
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+}
+.foot ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+.foot a {
+  color: var(--text-soft);
+}
+.foot a:hover {
+  color: var(--text);
+}
+.foot .about p {
+  margin-top: 12px;
+  max-width: 280px;
+  line-height: 1.55;
+}
+.foot .legal {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px 24px;
+  font-size: 12.5px;
+}
+@media (max-width: 860px) {
+  .foot-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .foot .about {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ------------------------------------------------------------------ misc */
+
+.page-top {
+  position: relative;
+  padding: clamp(56px, 9vw, 120px) 0 clamp(28px, 4vw, 48px);
+  overflow: hidden;
+}
+.note {
+  display: block;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(79, 168, 232, 0.07);
+  box-shadow: inset 0 0 0 1px rgba(79, 168, 232, 0.2);
+  color: var(--text-soft);
+  font-size: 14.5px;
+  line-height: 1.55;
+}
+.note b {
+  color: var(--text);
+}
+.note.gold {
+  background: rgba(240, 180, 41, 0.07);
+  box-shadow: inset 0 0 0 1px rgba(240, 180, 41, 0.22);
+}
+.pixel-art {
+  image-rendering: pixelated;
+  shape-rendering: crispEdges;
+}
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .hall .soul {
+    display: none;
+  }
+  .tilt {
+    transform: none !important;
+  }
+}

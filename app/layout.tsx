@@ -1,9 +1,10 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Silkscreen } from "next/font/google";
-import Link from "next/link";
-import { Logo } from "@/components/logo";
+import { SiteFooter } from "@/components/site/footer";
+import { SiteHeader } from "@/components/site/header";
 import { usingDevStore } from "@/lib/store";
 import "./globals.css";
+import "./site.css";
 
 /** Inter carries the text; the pixel face - the launcher's own voice - only labels things. */
 const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-sans" });
@@ -15,9 +16,24 @@ const silkscreen = Silkscreen({
 });
 
 export const metadata: Metadata = {
-  title: "Catalyst Designs",
+  metadataBase: new URL("https://catalyst-create.netlify.app"),
+  title: {
+    default: "Catalyst Client - Minecraft, set up for you",
+    template: "%s · Catalyst Client",
+  },
   description:
-    "Design capes and other cosmetics for Catalyst Client, and vote on everyone else's. Every design is checked by a person before it appears.",
+    "Catalyst is a Minecraft launcher and client in one: it installs your mods and keeps them updated, adds 46 modules, and brings cosmetics, a battle pass and daily rewards.",
+  openGraph: {
+    type: "website",
+    siteName: "Catalyst Client",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Catalyst Client" }],
+  },
+  twitter: { card: "summary_large_image" },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#080c12",
+  colorScheme: "dark",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -27,58 +43,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html lang="en" className={`${inter.variable} ${silkscreen.variable}`}>
+      <head>
+        {/* Without JavaScript nothing fades in, so anything waiting to fade in is simply shown. */}
+        <noscript>
+          <style>{`[style*="opacity:0"]{opacity:1!important;transform:none!important}`}</style>
+        </noscript>
+      </head>
       <body>
+        <a className="skip-link" href="#main">
+          Skip to content
+        </a>
         {devStore && (
           <div className="dev-banner">
             Local dev store - data lives in <code>.localstore/</code> on this machine only.
           </div>
         )}
-        <header className="site-header">
-          <div className="inner">
-            <Link href="/" className="brand">
-              <Logo size={30} />
-              <span>
-                Catalyst <span className="gold">Designs</span>
-              </span>
-            </Link>
-            <nav aria-label="Site">
-              <Link href="/#vote">Vote</Link>
-              <Link href="/#gallery">Gallery</Link>
-              <Link href="/#submit" className="optional">
-                Submit
-              </Link>
-              <Link href="/terms" className="optional">
-                Terms
-              </Link>
-            </nav>
-            <Link href="/#submit" className="button primary small header-cta">
-              Submit a design
-            </Link>
-          </div>
-        </header>
-        <main>{children}</main>
-        <footer className="site-footer">
-          <div className="inner">
-            <div>
-              <Link href="/" className="brand">
-                <Logo size={24} />
-                <span>
-                  Catalyst <span className="gold">Designs</span>
-                </span>
-              </Link>
-              <p style={{ marginTop: 10 }}>Community cosmetics for Catalyst Client.</p>
-            </div>
-            <nav aria-label="Footer">
-              <Link href="/terms">Terms of Service</Link>
-              <Link href="/privacy">Privacy Policy</Link>
-              <Link href="/admin">Reviewers</Link>
-            </nav>
-            <p className="legal">
-              Not an official Minecraft product. Not approved by or associated with Mojang or
-              Microsoft. Minecraft is a trademark of Mojang Synergies AB.
-            </p>
-          </div>
-        </footer>
+        <SiteHeader />
+        <main id="main">{children}</main>
+        <SiteFooter />
       </body>
     </html>
   );

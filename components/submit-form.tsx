@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
+import { CapePreview } from "./designs/cape-preview";
 import { DrawCanvas } from "./draw-canvas";
 import { TypeIcon } from "./type-icon";
 import {
@@ -156,7 +157,7 @@ export function SubmitForm() {
           <button type="button" className="primary" onClick={reset}>
             Submit another
           </button>
-          <a className="button" href="/#gallery">
+          <a className="button" href="/designs#gallery">
             See the gallery
           </a>
         </div>
@@ -260,6 +261,7 @@ export function SubmitForm() {
               {picked ? `${picked.file.name} - ${picked.width}x${picked.height}` : limitText(type)}
             </p>
             {!picked && active.note && <p className="tiny muted field-note">{active.note}</p>}
+            {picked && type === "cape" && <CapePreview source={{ url: picked.previewUrl }} caption="Your cape on a player - drag to turn" />}
             <input
               id="pick"
               ref={fileInput}
@@ -275,7 +277,10 @@ export function SubmitForm() {
           </div>
         </>
       ) : (
-        <DrawCanvas canvasRef={canvasRef} />
+        <div className="draw-with-preview">
+          <DrawCanvas canvasRef={canvasRef} />
+          <CapePreview source={{ canvas: canvasRef }} caption="Live on a player - drag to turn" />
+        </div>
       )}
 
       <div className="row">

@@ -1,9 +1,84 @@
-# Catalyst Designs
+# Catalyst Client - the website
 
-A small public site where players submit cosmetic designs for Catalyst Client - capes, wings, hats,
-backpacks - and other players vote on them. Designs can be uploaded as a PNG or drawn in the
-browser. It also holds the Terms of Service and Privacy Policy for all of Catalyst, and the code
-server the launcher redeems codes with. Next.js + Supabase.
+The official site for Catalyst Client: what the launcher and client do, the store (cosmetics, coins,
+battle pass), how to redeem a code, downloads, and **Catalyst Designs** - where players submit
+cosmetic designs and vote on them. It also holds the Terms of Service and Privacy Policy for all of
+Catalyst, the code server the launcher redeems codes with, and the CurseForge relay for the
+launcher's mod browser. Next.js + Supabase, on Netlify.
+
+## Pages
+
+| Path | What it is |
+| --- | --- |
+| `/` | Home: a 3D hero, a tour of the real launcher, the features, the client's 46 modules, the store |
+| `/cosmetics` | The shop as the launcher has it - capes and wings in coins, a 3D viewer, rewards you earn |
+| `/coins` | Coin packs, what coins buy, Catalyst+ and the daily rewards calendar |
+| `/battle-pass` | The season: 50 levels on a scrolling track, the quests and the XP they give |
+| `/redeem` | Where codes come from and how to redeem one in the launcher |
+| `/designs` | Catalyst Designs: the round (`#vote`), the gallery (`#gallery`), submitting (`#submit`) |
+| `/download` | Windows and macOS, what you need, and the release notes |
+| `/terms`, `/privacy` | The legal pages (facts in `lib/legal.ts`) |
+| `/admin`, `/admin/codes` | The reviewers' pages |
+
+Catalyst Designs used to be the whole site at `/`. Old links still land in the right place:
+`/#vote`, `/#gallery` and `/#submit` are sent on to `/designs#...` by
+`components/site/hash-redirect.tsx` (a hash never reaches the server), and `/vote`, `/gallery` and
+`/submit` redirect in `next.config.mjs`.
+
+## No real payments yet
+
+Nothing on this site takes money. Prices are shown the way the launcher shows them, and every buy
+button says **Buy in the launcher** or **Coming soon**. There is no payment provider and no card field
+anywhere. **Before real payments exist, the Terms (`lib/legal.ts`, `app/terms`) must be reviewed** -
+they were written for a store that sells nothing yet.
+
+Codes are redeemed **only in the launcher**, which ties a redemption to its device id (see Redeem
+codes below). `/redeem` explains the steps; there is deliberately no web form, because one would
+bypass that.
+
+## Where the facts come from
+
+Everything the pages say about the app - versions, modules, shop items and prices, coin packs,
+daily rewards, the season, quests, themes, release notes - lives in **`lib/catalyst.ts`**, copied
+from the launcher and client source (each block names the Kotlin file it came from). When the app
+changes, change it there and every page follows. `lib/sprites.ts` holds the reward icons,
+generated from the launcher's `RewardIcons.kt`, and `components/site/cosmetic-art.tsx` draws capes
+and wings the way `CosmeticArt.kt` does. The screenshots in `assets/screens/` are of the real
+launcher and client.
+
+- **Sample data is labelled.** The daily rewards and the season are the launcher's own sample data
+  until there is a server, and the pages mark them *Preview*.
+- **No numbers are made up.** There are no player counts, downloads or ratings anywhere, because
+  none exist yet. Add them only when they are real.
+- **Download links are a placeholder.** `DOWNLOAD_URLS` in `lib/catalyst.ts` is
+  `{ windows: null, macos: null }`. While a link is `null`, every Download button goes to `/download`,
+  which says the build is not out yet. Put the real URLs there when there are builds.
+
+## 3D, motion and speed
+
+The 3D (three.js through `@react-three/fiber` and `drei`) is the character in the hero, the viewer
+on `/cosmetics`, the coins on `/coins` and the cape preview on `/designs`. Scroll animation uses
+`motion`. The rules, all in `components/three/stage.tsx` and `components/site/`:
+
+- The 3D is its own chunk, loaded after the page has painted (`next/dynamic` with `ssr: false`,
+  mounted when the browser is idle), so it never holds up the first view.
+- The pixel ratio is capped at 1.75, and a scene stops drawing while it is off screen.
+- A still picture stands in while the 3D loads, without WebGL, and if the scene throws.
+- **Reduced motion** (`prefers-reduced-motion`): nothing turns or floats, a scene draws one still
+  frame, the pinned scroll sections become plain lists, and everything that would fade in is simply
+  there. The markup is the same with and without it, so nothing re-renders on load.
+- The character, capes and wings are drawn in code (`components/three/textures.ts`) - our own skin,
+  no Mojang assets.
+
+**Regenerating the pictures.** `public/stills/hero.webp` is the hero scene itself: open
+`/?still` (it holds a three-quarter pose and keeps the canvas readable), wait for it to draw, then
+in the browser console run
+`Object.assign(document.createElement("a"), { href: document.querySelector("canvas").toDataURL("image/webp", 0.86), download: "hero.webp" }).click()`.
+`public/og.png`, the picture shown when a link is shared, is a 1200x630 screenshot of the top of the
+home page.
+
+Desktop Lighthouse on a production build (September 2026): performance 98-100 on every page, and 100
+for accessibility, best practices and SEO; largest paint 0.7-1.2 s, no layout shift.
 
 ## The rule this site is built around
 
@@ -21,7 +96,7 @@ Four independent places, so no single mistake opens it:
 1. **The store cannot create anything else.** `Store.createSubmission` takes no status argument
    (`lib/store/types.ts`), so no route, test or future change can insert a visible row. The column
    defaults to `'pending'` in the database too.
-2. **The public page only ever asks for approved rows.** `app/page.tsx` calls
+2. **The public page only ever asks for approved rows.** `app/designs/page.tsx` calls
    `listByStatus("approved")` and `listFeatured()`, and `listFeatured` requires `approved` as well
    as `featured`. Pending designs are not fetched and filtered out - they are never loaded.
 3. **Images are served by a route that checks the row first.** The Storage bucket is **private**, so
@@ -59,6 +134,10 @@ real cape texture - and is only *displayed* large (16px per texture pixel on a d
 anything drawn is already the right size and needs no dimension check at all. A drawing is turned
 into a PNG and posted to the same route as an upload, so it arrives pending and goes through the
 same review. Tools are deliberately four: a colour, a pencil, an eraser and a clear.
+
+A cape - drawn or uploaded - is shown on a turning 3D player beside the form as it is made, and every
+cape in the gallery has a **View in 3D** button. The preview reads the file in the browser; nothing is
+sent until the form is submitted.
 
 Capes only, for now, because the cape is the only type whose dimensions are settled.
 
@@ -111,6 +190,7 @@ That verifies the tables, the function, that the bucket exists and is private, a
 | `SUPABASE_SERVICE_ROLE_KEY` | production | The service-role/secret key. **Server only.** |
 | `SUPABASE_BUCKET` | optional | Defaults to `submissions`. |
 | `SUPABASE_ANON_KEY` | optional | Only used by `npm run check:supabase` for its RLS check. |
+| `CURSEFORGE_API_KEY` | optional | Turns on the CurseForge relay. **Server only.** Without it the relay answers 503. |
 
 None of these may be prefixed `NEXT_PUBLIC_` - that would publish them to every visitor.
 
@@ -150,6 +230,20 @@ Codes for the launcher - gift cards, giveaways, stream codes - are made on **`/a
   names in `lib/rewards.ts` must match the launcher's shop (`CosmeticsPage.kt`).
 - No rate limit: 31^12 codes make guessing one by asking hopeless.
 
+## CurseForge relay
+
+The launcher's mod browser searches Modrinth itself, but CurseForge needs a private key on every
+request, so CurseForge goes through this site: `lib/curseforge.ts` and `app/api/mods/curseforge/*`
+(search, categories, a mod, its files, one file). Set `CURSEFORGE_API_KEY` to turn it on and check it
+with `npm run check:curseforge`. The key never goes to the launcher.
+
+- **Nothing is cached.** CurseForge's terms do not allow keeping their data, so every reply is
+  `no-store` (for browsers and Netlify's CDN) and every request goes to CurseForge fresh. The test
+  checks both.
+- **Downloads are switched off** (`501`) until CurseForge confirms in writing that relaying files is
+  allowed; the route's comment says what to build then.
+- A per-address rate limit keeps one caller from spending the key's quota.
+
 ## Legal pages
 
 `/terms` (Terms of Service) and `/privacy` (Privacy Policy) cover all of Catalyst - launcher,
@@ -163,9 +257,19 @@ not a lawyer's work: have them checked before real payments or a big audience.
 
 The live site is uploaded with the Netlify CLI or API (it is not built from Git), so pushing to
 GitHub does not change it. To deploy: apply any new migration to the Supabase project first, then
-`netlify deploy --prod` from this folder (the Next.js runtime is declared in `netlify.toml`). The
+`netlify deploy --build --prod` from this folder (the Next.js runtime is declared in `netlify.toml`).
+Leave out `--prod` for a draft deploy: a private preview URL, with the live site untouched. The
 environment variables are set in Netlify's UI. After deploying, open `/admin` to check the password
 works, and `/admin/codes` to check the codes tables exist.
+
+Before a deploy, all of these should pass:
+
+```bash
+npm run typecheck
+npm run build
+npm run check:codes        # this site and the launcher hash codes the same way
+npm run check:curseforge   # the relay, against a fake CurseForge
+```
 
 ## What this version deliberately does not have
 
@@ -173,7 +277,9 @@ works, and `/admin/codes` to check the codes tables exist.
 - **No rewards for submitting.** Picking winners is something you do by looking at the gallery.
 - **No user accounts.** A display name is a label anyone can type, not an identity. It is reviewed
   along with the image, because it is shown publicly too.
-- **The launcher talks to this site in one place only:** redeeming a code.
+- **The launcher talks to this site in two places only:** redeeming a code, and CurseForge searches
+  through the relay.
+- **No payments, no accounts, no web redeem form** - see No real payments yet.
 
 ## Known limits, stated plainly
 
@@ -191,13 +297,14 @@ works, and `/admin/codes` to check the codes tables exist.
 
 ## Layout
 
-The public site is **one page** that scrolls: the current round (`/#vote`), the gallery
-(`/#gallery`) and the submit form (`/#submit`). `/terms` and `/privacy` are the legal pages, and
-`/admin` and `/admin/codes` are the reviewers' pages.
-
 ```
 app/
-  layout.tsx, page.tsx, globals.css   shell, the one public page, the dark theme
+  layout.tsx, template.tsx            the header and footer on every page; each page fades in
+  site.css, globals.css               the site's look; the Designs, admin and legal pages' styles
+  page.tsx, home.module.css           the home page
+  cosmetics/, coins/, battle-pass/    the store pages
+  redeem/, download/                  how to redeem a code; downloads and release notes
+  designs/                            Catalyst Designs: the round, the gallery, the submit form
   terms/, privacy/                    Terms of Service and Privacy Policy (facts in lib/legal.ts)
   admin/                              password gate, review queue, round picking
   admin/codes/                        making and cancelling redeem codes
@@ -205,33 +312,40 @@ app/
   api/votes/                          POST: one vote per browser
   api/images/[id]/                    GET: the only way an image leaves the server
   api/codes/redeem/                   POST: the launcher redeems a code
-  api/admin/login/                    POST/DELETE: open and close an admin session
-  api/admin/review/                   POST: approve, reject, or send back to pending
-  api/admin/feature/                  POST: put an approved design in the round, or take it out
-  api/admin/codes/                    POST: make a batch; revoke/: cancel a batch or a code
+  api/mods/curseforge/                GET: the CurseForge relay (no caching)
+  api/admin/                          login, review, feature, codes - reviewers only
 components/
-  hero-stage.tsx                      the leading design, big, at the top of the page
-  featured-round.tsx, gallery.tsx     the round, and every approved design with a type filter
-  design-card.tsx, vote-button.tsx    one card and one vote, shared by both
-  submit-form.tsx, draw-canvas.tsx    the form, and the 64x32 cape canvas
+  site/                               header, footer, download button, motion helpers, icons,
+                                      the "hall" light backdrop, pixel sprites, cosmetic artwork
+  three/                              the 3D: stage (limits and fallbacks), player, textures, scenes
+  home/, cosmetics/, coins/,          the pieces of each page
+  battle-pass/, redeem/, download/
+  designs/cape-preview.tsx            the 3D cape preview and the View in 3D dialog
+  hero-stage.tsx, featured-round.tsx, gallery.tsx, design-card.tsx, vote-button.tsx,
+  submit-form.tsx, draw-canvas.tsx    Catalyst Designs
   logo.tsx, logo-shapes.ts            the client's logo as SVG, from the launcher's traced shapes
-  type-icon.tsx, feature-toggle.tsx   a pixel mark per kind; the reviewer's round picker
 lib/
+  catalyst.ts, sprites.ts             facts from the launcher and client; the reward icons
   codes.ts, rewards.ts                code format and fingerprint; rewards in the launcher's grammar
+  curseforge.ts                       the CurseForge relay
   legal.ts                            operator, contact, country and ages for the legal pages
   validation.ts, design-types.ts      PNG and size rules; the kinds of design
   admin-session.ts, voter.ts          password check and session cookie; the voter cookie
   store/                              types.ts, index.ts (picks a driver), supabase.ts, local.ts
+assets/screens/                       screenshots of the real launcher and client
+public/stills/, public/og.png         the hero's still picture; the link-sharing picture
 supabase/migrations/                  0001 tables, RLS, cast_vote, bucket; 0002 featured;
                                       0003 design_type; 0004 redeem codes
-scripts/                              check-supabase.mjs, check-codes.mjs, remove-submissions.mjs
+scripts/                              check-supabase, check-codes, check-curseforge,
+                                      remove-submissions
 ```
 
 ## Look and feel
 
-Dark, like the launcher: its navy ground, its sky blue for actions, its sculk teal for the light
-behind the hero, and its coin gold for winning. Designs sit on a dark stage so the art is the
-brightest thing on the page, drawn pixel-sharp. Everything is on one scroll with very little text:
-a big headline, three one-line steps, the round, the gallery and the form - no tabs to find things
-behind. Inter for text; the pixel face only labels sections, as the launcher's does. The logo is
-the launcher's own traced logo as an SVG, never the raster artwork.
+Dark, like the launcher: its navy ground, its sky blue for actions, its sculk teal for light and its
+coin gold for anything you can earn or buy. Pages open on a "hall" - soft pools of teal light with
+ribbons and specks drifting up, drawn in CSS - and sections rise in as they are reached. Wide screens
+get pinned scroll sections (the launcher tour on the home page, the battle pass track); phones get the
+same content as plain lists. Inter for text; the pixel face only labels things, as the launcher's
+does. Buttons have the launcher's stepped pixel corners. The logo is the launcher's own traced logo
+as an SVG, never the raster artwork. Every page says it is not affiliated with Mojang or Microsoft.

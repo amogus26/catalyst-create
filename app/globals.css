@@ -239,24 +239,6 @@ button.small {
 
 /* ------------------------------------------------------------------ header and footer */
 
-.site-header {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  background: rgba(8, 12, 18, 0.72);
-  backdrop-filter: saturate(1.4) blur(14px);
-  -webkit-backdrop-filter: saturate(1.4) blur(14px);
-  border-bottom: 1px solid var(--line);
-}
-.site-header .inner {
-  max-width: var(--shell);
-  margin: 0 auto;
-  padding: 0 var(--gutter);
-  height: 68px;
-  display: flex;
-  align-items: center;
-  gap: 28px;
-}
 .brand {
   display: inline-flex;
   align-items: center;
@@ -276,71 +258,6 @@ button.small {
   display: block;
   filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.35));
 }
-.site-header nav {
-  display: flex;
-  gap: 4px;
-  margin-left: auto;
-}
-.site-header nav a {
-  color: var(--text-soft);
-  font-size: 15px;
-  font-weight: 550;
-  padding: 8px 12px;
-  border-radius: 999px;
-}
-.site-header nav a:hover {
-  color: var(--text);
-  background: rgba(255, 255, 255, 0.05);
-  text-decoration: none;
-}
-@media (max-width: 760px) {
-  .site-header nav .optional {
-    display: none;
-  }
-  .site-header .inner {
-    gap: 12px;
-  }
-  .site-header .header-cta {
-    display: none;
-  }
-}
-
-.site-footer {
-  margin-top: 96px;
-  border-top: 1px solid var(--line);
-  padding: 36px 0 44px;
-  color: var(--muted);
-  font-size: 14px;
-}
-.site-footer .inner {
-  max-width: var(--shell);
-  margin: 0 auto;
-  padding: 0 var(--gutter);
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 18px 32px;
-  align-items: start;
-}
-.site-footer nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 20px;
-}
-.site-footer nav a {
-  color: var(--text-soft);
-}
-.site-footer .legal {
-  grid-column: 1 / -1;
-  font-size: 12.5px;
-  color: var(--muted);
-  max-width: 760px;
-}
-@media (max-width: 640px) {
-  .site-footer .inner {
-    grid-template-columns: 1fr;
-  }
-}
-
 /* ------------------------------------------------------------------ hero */
 
 .hero {
@@ -1303,4 +1220,119 @@ button.featured-on:hover {
 }
 .table-wrap {
   overflow-x: auto;
+}
+
+/* ------------------------------------------------------------------ 3D cape preview (Designs) */
+
+.draw-with-preview {
+  display: grid;
+  gap: 14px;
+}
+.cape-3d {
+  position: relative;
+  margin: 12px 0 0;
+  height: 300px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: radial-gradient(60% 60% at 50% 65%, rgba(55, 211, 196, 0.16), transparent 70%), var(--stage);
+  box-shadow: inset 0 0 0 1px var(--line);
+  cursor: grab;
+}
+.cape-3d:active {
+  cursor: grabbing;
+}
+.cape-3d-canvas,
+.cape-3d-poster {
+  position: absolute;
+  inset: 0;
+}
+.cape-3d figcaption {
+  position: absolute;
+  left: 12px;
+  bottom: 10px;
+  font-size: 12px;
+  color: var(--muted);
+  pointer-events: none;
+}
+.view-3d {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  background: rgba(8, 12, 18, 0.78);
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.2s, transform 0.2s;
+}
+.design-card:hover .view-3d,
+.view-3d:focus-visible {
+  opacity: 1;
+  transform: none;
+}
+@media (hover: none) {
+  .view-3d {
+    opacity: 1;
+    transform: none;
+  }
+}
+.cape-dialog {
+  width: min(520px, calc(100vw - 32px));
+  padding: 0;
+  border: 0;
+  border-radius: 20px;
+  color: var(--text);
+  background: var(--card);
+  box-shadow: 0 40px 100px -30px rgba(0, 0, 0, 0.9), inset 0 0 0 1px var(--line-strong);
+}
+.cape-dialog::backdrop {
+  background: rgba(4, 7, 11, 0.72);
+  backdrop-filter: blur(4px);
+}
+.cape-dialog-body {
+  padding: 16px;
+}
+.cape-dialog-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 2px 4px 0;
+}
+.cape-dialog .close {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 10px;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--text-soft);
+  background: rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+}
+.cape-dialog .cape-3d {
+  height: 420px;
+}
+
+/* The hall behind the Designs page's top, like the rest of the site's page tops. */
+.designs-hall {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 760px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: -1;
+}
+.stage:hover .view-3d {
+  opacity: 1;
+  transform: none;
 }

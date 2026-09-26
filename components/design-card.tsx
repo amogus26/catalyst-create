@@ -1,5 +1,6 @@
 import { designType } from "@/lib/design-types";
 import type { Submission } from "@/lib/store";
+import { View3DButton } from "./designs/cape-preview";
 import { TypeIcon } from "./type-icon";
 import { VoteButton } from "./vote-button";
 
@@ -35,6 +36,7 @@ export function DesignCard({
         {typeof rank === "number" && <span className="rank">#{rank}</span>}
         {leading && <span className="leading-tag">Leading</span>}
         {size === "normal" && submission.featured && <span className="round-tag">In the round</span>}
+        {submission.designType === "cape" && <View3DButton id={submission.id} label={`Cape by ${submission.displayName}`} />}
       </div>
       <div className="design-card-body">
         {/* The count lives on the button only: printed twice, the two would disagree after a vote. */}
