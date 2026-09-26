@@ -2,8 +2,9 @@
 
 A small public site where players submit cosmetic designs for Catalyst Client - capes, wings, hats,
 backpacks - and other players vote on them. Designs can be uploaded as a PNG or drawn in the
-browser. It also holds the Terms of Service and Privacy Policy for all of Catalyst, and the code
-server the launcher redeems codes with. Next.js + Supabase.
+browser. It also holds the Terms of Service and Privacy Policy for all of Catalyst, the code
+server the launcher redeems codes with, and the CurseForge relay behind the launcher's mod browser.
+Next.js + Supabase.
 
 ## The rule this site is built around
 
@@ -111,6 +112,7 @@ That verifies the tables, the function, that the bucket exists and is private, a
 | `SUPABASE_SERVICE_ROLE_KEY` | production | The service-role/secret key. **Server only.** |
 | `SUPABASE_BUCKET` | optional | Defaults to `submissions`. |
 | `SUPABASE_ANON_KEY` | optional | Only used by `npm run check:supabase` for its RLS check. |
+| `CURSEFORGE_API_KEY` | optional | Turns on the launcher's CurseForge browsing (`/api/mods/curseforge/*`). **Server only.** Without it those routes answer 503 and the launcher shows Modrinth only. |
 
 None of these may be prefixed `NEXT_PUBLIC_` - that would publish them to every visitor.
 
@@ -150,6 +152,16 @@ Codes for the launcher - gift cards, giveaways, stream codes - are made on **`/a
   names in `lib/rewards.ts` must match the launcher's shop (`CosmeticsPage.kt`).
 - No rate limit: 31^12 codes make guessing one by asking hopeless.
 
+## Mod browser (Modrinth + CurseForge)
+
+The launcher searches, installs, updates and removes mods itself. That code is the Kotlin module in
+**`launcher-mods/`**, and the design is in **[`docs/mod-browser.md`](docs/mod-browser.md)**. This
+site's part is the CurseForge relay (`lib/curseforge.ts`, `app/api/mods/curseforge/*`). CurseForge
+needs a private key on every request, so the key lives here and never in the launcher. Set
+`CURSEFORGE_API_KEY` to turn it on, and check it with `npm run check:curseforge`. File downloads
+through the relay are deliberately switched off until CurseForge confirms they are allowed; the
+reason is in the design doc.
+
 ## Legal pages
 
 `/terms` (Terms of Service) and `/privacy` (Privacy Policy) cover all of Catalyst - launcher,
@@ -173,7 +185,8 @@ works, and `/admin/codes` to check the codes tables exist.
 - **No rewards for submitting.** Picking winners is something you do by looking at the gallery.
 - **No user accounts.** A display name is a label anyone can type, not an identity. It is reviewed
   along with the image, because it is shown publicly too.
-- **The launcher talks to this site in one place only:** redeeming a code.
+- **The launcher talks to this site in two places only:** redeeming a code, and browsing CurseForge
+  through the relay (see "Mod browser" below).
 
 ## Known limits, stated plainly
 
@@ -205,6 +218,7 @@ app/
   api/votes/                          POST: one vote per browser
   api/images/[id]/                    GET: the only way an image leaves the server
   api/codes/redeem/                   POST: the launcher redeems a code
+  api/mods/curseforge/                GET: the launcher's CurseForge relay (search, mods, files)
   api/admin/login/                    POST/DELETE: open and close an admin session
   api/admin/review/                   POST: approve, reject, or send back to pending
   api/admin/feature/                  POST: put an approved design in the round, or take it out
@@ -218,13 +232,17 @@ components/
   type-icon.tsx, feature-toggle.tsx   a pixel mark per kind; the reviewer's round picker
 lib/
   codes.ts, rewards.ts                code format and fingerprint; rewards in the launcher's grammar
+  curseforge.ts                       the CurseForge relay: validation, key, cache, reduced answers
   legal.ts                            operator, contact, country and ages for the legal pages
   validation.ts, design-types.ts      PNG and size rules; the kinds of design
   admin-session.ts, voter.ts          password check and session cookie; the voter cookie
   store/                              types.ts, index.ts (picks a driver), supabase.ts, local.ts
 supabase/migrations/                  0001 tables, RLS, cast_vote, bucket; 0002 featured;
                                       0003 design_type; 0004 redeem codes
-scripts/                              check-supabase.mjs, check-codes.mjs, remove-submissions.mjs
+scripts/                              check-supabase.mjs, check-codes.mjs, check-curseforge.mjs,
+                                      remove-submissions.mjs
+launcher-mods/                        the launcher's mod browser and installer (Kotlin module)
+docs/mod-browser.md                   its design, security boundaries and platform limits
 ```
 
 ## Look and feel

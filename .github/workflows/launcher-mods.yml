@@ -1,0 +1,58 @@
+name: Mod browser
+
+on:
+  push:
+    paths: ["launcher-mods/**", "lib/curseforge.ts", "app/api/mods/**", "scripts/check-curseforge.mjs", ".github/workflows/launcher-mods.yml"]
+  pull_request:
+    paths: ["launcher-mods/**", "lib/curseforge.ts", "app/api/mods/**", "scripts/check-curseforge.mjs", ".github/workflows/launcher-mods.yml"]
+
+permissions:
+  contents: read
+
+jobs:
+  launcher-mods:
+    name: launcher-mods on ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: Linux, os: ubuntu-latest }
+          - { name: Windows, os: windows-latest }
+          - { name: macOS Apple Silicon, os: macos-latest }
+          - { name: macOS Intel, os: macos-15-intel }
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: launcher-mods
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.14.3"
+      - name: Unit tests, plus the end-to-end test against the real Modrinth API
+        run: gradle test --no-daemon
+        env:
+          MODRINTH_LIVE: "1"
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report-${{ matrix.os }}
+          path: launcher-mods/build/reports/tests/test
+
+  site:
+    name: CurseForge relay
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run check:curseforge
+      - run: npm run check:codes
