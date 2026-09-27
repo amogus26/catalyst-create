@@ -55,6 +55,13 @@ export default function PrivacyPage() {
           as the code exists.
         </p>
         <p>
+          <strong>Catalyst Bot</strong> on Home: a question you type is sent, with your last few
+          questions and answers, through our server to Anthropic (Claude) to answer it. Not your name,
+          not your account - and neither we nor the bot keep it after answering. Anthropic does not use it
+          to train its models. The quick questions under the bot are answered on your computer and sent
+          nowhere. Basis: providing what you asked for (Article 6(1)(b)).
+        </p>
+        <p>
           <strong>Mods from Modrinth:</strong> when you browse or install mods, the launcher talks to
           Modrinth&apos;s servers directly, so Modrinth sees your IP address. Its own privacy policy
           applies; we receive nothing.
@@ -66,7 +73,11 @@ export default function PrivacyPage() {
             <strong>Designs you submit</strong>: the image, the display name you type, the kind of design
             and the date. Used to review and show it. Basis: providing the service (Article 6(1)(b)).
             Kept until you ask us to remove it or we take it down; rejected designs are kept so a
-            review mistake can be undone, and removed when we clear the queue or you ask.
+            review mistake can be undone, and removed when we clear the queue or you ask. Before it is
+            saved, the image and display name are checked automatically by Anthropic (Claude) for
+            content that isn&apos;t allowed; a design that fails is refused and not stored, and every
+            design that passes is still reviewed by a person. Basis: our legitimate interest in keeping
+            the site safe (Article 6(1)(f)).
           </li>
           <li>
             <strong>Votes</strong>: a random ID in a cookie and which designs it voted for - never your
@@ -104,6 +115,7 @@ export default function PrivacyPage() {
         <ul>
           <li><strong>Netlify</strong> - hosts this website (United States).</li>
           <li><strong>Supabase</strong> - stores submissions, votes and redeem codes (servers in Frankfurt, Germany).</li>
+          <li><strong>Anthropic</strong> - checks submitted designs and answers Catalyst Bot questions (United States); keeps nothing for training.</li>
           <li><strong>A payment provider</strong> - once payments open, it will process payments; we will name it here first.</li>
         </ul>
         <p>

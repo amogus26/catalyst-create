@@ -2,9 +2,10 @@ import { NextResponse } from "next/server";
 import { getStore } from "@/lib/store";
 import { DEFAULT_DESIGN_TYPE, isDesignTypeId } from "@/lib/design-types";
 import { MAX_IMAGE_BYTES, validateDisplayName, validateImage } from "@/lib/validation";
+import { screenDesign, serverDeps, withinBudget } from "@/lib/claude";
 
 /**
- * Takes a submission and puts it in the queue. It cannot do anything else: the store's
+ * Takes a submission, has Claude screen it, and puts it in the queue. It cannot do anything else: the store's
  * `createSubmission` has no status to pass, so what this route creates is always pending.
  *
  * Everything the browser checked is checked again here. The form's validation is a courtesy to
@@ -49,6 +50,22 @@ export async function POST(request: Request) {
   const checked = validateImage(image.name, bytes.byteLength, bytes, typeId);
   if (!checked.ok) {
     return NextResponse.json({ error: checked.message }, { status: 400 });
+  }
+
+  // Claude looks at it before it is stored (lib/claude.ts). A design it refuses is never saved; one it
+  // passes - or one it could not look at - still waits for a person on /admin like every other.
+  if (!withinBudget(request, 6)) {
+    return NextResponse.json({ error: "Too many designs at once. Try again in a minute." }, { status: 429 });
+  }
+  const screening = await screenDesign(bytes, name.value, serverDeps());
+  if (screening.verdict === "block") {
+    return NextResponse.json(
+      { error: `This design can't be accepted: ${screening.reason}. Designs must be safe for everyone - no sexual content, hate symbols, violence, or real places, addresses or coordinates.` },
+      { status: 422 },
+    );
+  }
+  if (screening.verdict === "unavailable") {
+    console.warn("[catalyst-create] design not screened by Claude - a reviewer will see it unscreened");
   }
 
   try {

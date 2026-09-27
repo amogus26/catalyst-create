@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "check:supabase": "node scripts/check-supabase.mjs",
     "check:codes": "node --no-warnings scripts/check-codes.mjs",
-    "check:curseforge": "node --no-warnings scripts/check-curseforge.mjs"
+    "check:curseforge": "node --no-warnings scripts/check-curseforge.mjs",
+    "check:claude": "node --no-warnings scripts/check-claude.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.9",

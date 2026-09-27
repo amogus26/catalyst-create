@@ -127,6 +127,17 @@ Row-level security is on for both tables with **no policies at all**, so the ano
 key a browser could ever hold - can read and write nothing. Every query goes through this app's
 server.
 
+### Claude screens every design first
+
+Before a submission is stored, `app/api/submissions` sends the image (enlarged, pixel for pixel) and the
+display name to Claude (`lib/claude.ts`, `screenDesign`). It refuses sexual content, hate and extremist
+symbols (swastikas in any form, SS runes...), glorified war and violence, real-world locating details
+(coordinates, street names, addresses, phone numbers, URLs, QR codes), slurs and anything illegal. A
+refused design is **not stored** and the player is told why. A design Claude passes - or one it could
+not look at (no `ANTHROPIC_API_KEY`, Claude down, an unclear answer) - is stored **pending** as before,
+so the human review above still decides everything that is shown. `npm run check:claude` tests this
+against a fake Claude.
+
 ## Kinds of design, and the size rules
 
 The type names come from the launcher rather than being invented here: its `ShopKind` is
@@ -208,6 +219,7 @@ That verifies the tables, the function, that the bucket exists and is private, a
 | `SUPABASE_SERVICE_ROLE_KEY` | production | The service-role/secret key. **Server only.** |
 | `SUPABASE_BUCKET` | optional | Defaults to `submissions`. |
 | `SUPABASE_ANON_KEY` | optional | Only used by `npm run check:supabase` for its RLS check. |
+| `ANTHROPIC_API_KEY` | optional | Claude: screens designs before review and answers the launcher's bot. **Server only.** |
 | `CURSEFORGE_API_KEY` | optional | Turns on the CurseForge relay. **Server only.** Without it the relay answers 503. |
 
 None of these may be prefixed `NEXT_PUBLIC_` - that would publish them to every visitor.
@@ -255,6 +267,14 @@ Codes for the launcher - gift cards, giveaways, stream codes - are made on **`/a
   names in `lib/rewards.ts` must match the launcher's shop (`CosmeticsPage.kt`).
 - No rate limit: 31^12 codes make guessing one by asking hopeless.
 
+## Catalyst Bot relay
+
+The launcher's Catalyst Bot sends typed questions to `/api/bot` (`{ question, history }` ->
+`{ answer }`), which asks Claude with instructions to answer questions about Catalyst and Minecraft only
+and to refuse everything else, including attempts to change those rules. 12 questions a minute per
+address. With no `ANTHROPIC_API_KEY` it answers 503 and the launcher uses its own fixed answers. Nothing
+is stored. The key is server-only, like the CurseForge key.
+
 ## CurseForge relay
 
 The launcher's mod browser searches Modrinth itself, but CurseForge needs a private key on every
@@ -294,6 +314,7 @@ npm run typecheck
 npm run build
 npm run check:codes        # this site and the launcher hash codes the same way
 npm run check:curseforge   # the relay, against a fake CurseForge
+npm run check:claude       # design screening and the bot, against a fake Claude
 ```
 
 ## What this version deliberately does not have
@@ -302,8 +323,8 @@ npm run check:curseforge   # the relay, against a fake CurseForge
 - **No rewards for submitting.** Picking winners is something you do by looking at the gallery.
 - **No user accounts.** A display name is a label anyone can type, not an identity. It is reviewed
   along with the image, because it is shown publicly too.
-- **The launcher talks to this site in two places only:** redeeming a code, and CurseForge searches
-  through the relay.
+- **The launcher talks to this site in three places only:** redeeming a code, CurseForge searches
+  through the relay, and Catalyst Bot questions.
 - **No payments, no accounts, no web redeem form** - see No real payments yet.
 
 ## Known limits, stated plainly
