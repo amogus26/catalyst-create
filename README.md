@@ -48,8 +48,10 @@ launcher and client. **The launcher's are drawn by the launcher itself** at 2.25
 run `WEBSITE_SHOTS=1 ./gradlew test --tests '*WebsiteShots*'` in the launcher repo and convert
 `build/website-shots/*.png` to WebP into `assets/screens/`. They are shown at no more than 1440px
 wide, so one pixel per screen pixel on Retina, and served as they are (`unoptimized`), never
-re-compressed. The Store tab is left out on purpose: it shows the daily reward cards. The client's
-three are the team's screenshots, lossless. The mods panel's icons come straight from
+re-compressed. The Store tab is left out on purpose: it shows the daily reward cards. The client's module menu is a video (`public/video/modules.mp4`, from the team's recording: the still
+start and end cut, played at 2x, 30 fps, a keyframe every 6 frames so scrolling can seek it smoothly).
+On a wide screen it is pinned and the page's scroll plays it; on a phone it loops; with reduced motion
+it stays still with controls. The mods panel's icons come straight from
 Modrinth's CDN, as the launcher shows them - they are the mod authors', not ours to copy.
 
 - **Daily rewards stay a surprise.** The site says what the calendar is worth in coins, never which

@@ -1,9 +1,8 @@
 "use client";
 
-import Image, { type StaticImageData } from "next/image";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useReducedMotionAfterMount } from "@/components/site/motion";
 import styles from "@/app/home.module.css";
-import { ScreenshotZoom, ZoomHit, type Shot } from "./screenshot-zoom";
 import { CLIENT_MODULES, MODULE_CATEGORIES } from "@/lib/catalyst";
 
 const CATEGORY_COLOUR: Record<string, string> = {
@@ -14,57 +13,83 @@ const CATEGORY_COLOUR: Record<string, string> = {
   Misc: "#F0B429",
 };
 
+/** Where the video's frames are: the module menu scrolling from Damage Numbers down to Shulker Preview. */
+const VIDEO = "/video/modules.mp4";
+const POSTER = "/video/modules-poster.webp";
+
 /**
- * The client in three screenshots - the title screen, the Right Shift menu and the HUD editor - one at
- * a time and big enough to read, on a blur of itself. The tabs switch between them.
+ * The Right Shift menu, filmed scrolling through every module. On a wide screen the video is pinned
+ * and the page's scroll drives it - scroll down and the menu scrolls down, scroll back and it goes
+ * back. On a phone it simply plays on a loop; with reduced motion it stays still and has controls.
  */
-export function ClientViews({ shots }: { shots: { image: StaticImageData; alt: string; label: string }[] }) {
-  const [index, setIndex] = useState(0);
-  const [zoom, setZoom] = useState<Shot | null>(null);
+export function ModuleVideo() {
+  const outer = useRef<HTMLDivElement>(null);
+  const video = useRef<HTMLVideoElement>(null);
+  const reduced = useReducedMotionAfterMount();
+  const [mode, setMode] = useState<"scrub" | "loop" | "still">("still");
+
+  useEffect(() => {
+    if (reduced) return setMode("still");
+    const query = window.matchMedia("(min-width: 901px)");
+    const update = () => setMode(query.matches ? "scrub" : "loop");
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, [reduced]);
+
+  // Scrub: the pinned stretch of page maps onto the video, start to end.
+  useEffect(() => {
+    const el = outer.current;
+    const v = video.current;
+    if (mode !== "scrub" || !el || !v) return;
+    v.pause();
+    let frame = 0;
+    const seek = () => {
+      frame = 0;
+      if (!v.duration) return;
+      const rect = el.getBoundingClientRect();
+      const travel = el.offsetHeight - window.innerHeight;
+      const progress = Math.min(1, Math.max(0, -rect.top / travel));
+      v.currentTime = progress * (v.duration - 0.05);
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(seek);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    v.addEventListener("loadedmetadata", seek);
+    seek();
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+      v.removeEventListener("loadedmetadata", seek);
+    };
+  }, [mode]);
+
+  useEffect(() => {
+    const v = video.current;
+    if (mode === "loop" && v) v.play().catch(() => {});
+  }, [mode]);
+
   return (
-    <div className={styles.views}>
-      <div className={styles.viewTabs} role="tablist" aria-label="The client">
-        {shots.map((shot, i) => (
-          <button
-            key={shot.label}
-            type="button"
-            role="tab"
-            id={`client-tab-${i}`}
-            aria-selected={i === index}
-            aria-controls="client-view"
-            className={i === index ? styles.pillOn : styles.pill}
-            onClick={() => setIndex(i)}
-          >
-            {shot.label}
-          </button>
-        ))}
-      </div>
-      <div className={styles.viewStage} id="client-view" role="tabpanel" aria-labelledby={`client-tab-${index}`}>
-        {shots.map((shot, i) => (
-          <div
-            key={shot.label}
-            className={styles.ambient}
-            data-on={i === index}
-            style={{ backgroundImage: `url(${shot.image.blurDataURL})` }}
-            aria-hidden="true"
+    <div ref={outer} className={mode === "scrub" ? styles.videoPin : styles.videoPlain}>
+      <div className={styles.videoSticky}>
+        <div className={styles.videoStage}>
+          <div className={styles.ambient} data-on="true" style={{ backgroundImage: `url(${POSTER})` }} aria-hidden="true" />
+          <video
+            ref={video}
+            className={styles.video}
+            src={VIDEO}
+            poster={POSTER}
+            muted
+            playsInline
+            loop={mode === "loop"}
+            preload={mode === "scrub" ? "auto" : "metadata"}
+            controls={mode === "still"}
+            aria-label={`The Right Shift menu scrolling through all ${CLIENT_MODULES.length} modules - Damage Numbers, CPS, FPS, Zoom, Minimap, Custom Sky and the rest`}
           />
-        ))}
-        <div className={styles.viewFrame} style={{ aspectRatio: `${shots[index].image.width} / ${shots[index].image.height}` }}>
-          {shots.map((shot, i) => (
-            <Image
-              key={shot.label}
-              src={shot.image}
-              alt={i === index ? shot.alt : ""}
-              aria-hidden={i !== index}
-              data-on={i === index}
-              unoptimized
-              placeholder="blur"
-            />
-          ))}
-          <ZoomHit label={shots[index].alt} onOpen={() => setZoom(shots[index])} />
         </div>
+        {mode === "scrub" && <p className={styles.videoHint}>Keep scrolling - that&apos;s every module</p>}
       </div>
-      <ScreenshotZoom shot={zoom} onClose={() => setZoom(null)} />
     </div>
   );
 }

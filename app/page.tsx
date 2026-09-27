@@ -1,12 +1,9 @@
 import Link from "next/link";
-import clientHud from "@/assets/screens/client-hud.webp";
-import clientModules from "@/assets/screens/client-modules.webp";
-import clientTitle from "@/assets/screens/client-title.webp";
 import launcherControls from "@/assets/screens/launcher-controls.webp";
 import launcherHome from "@/assets/screens/launcher-home.webp";
 import launcherMods from "@/assets/screens/launcher-mods.webp";
 import launcherPass from "@/assets/screens/launcher-pass.webp";
-import { ClientViews, ModuleMarquee } from "@/components/home/client-showcase";
+import { ModuleMarquee, ModuleVideo } from "@/components/home/client-showcase";
 import { HeroStage } from "@/components/home/hero-stage";
 import { Tour, type Chapter } from "@/components/home/tour";
 import { CapeArt, WingsArt } from "@/components/site/cosmetic-art";
@@ -326,18 +323,12 @@ export default function HomePage() {
               {CLIENT_MODULES.length} modules, one Right Shift away.
             </h2>
             <p className="lede">
-              A title screen of your own, a module menu you can search, and a HUD you drag into place - the client
-              is part of the game, not a window on top of it.
+              Press Right Shift in game and every module is there - search them, star them, switch them on. Scroll
+              down and see them all.
             </p>
           </Reveal>
-          <ClientViews
-            shots={[
-              { image: clientTitle, alt: "The client's title screen with Quick Play, Singleplayer, Multiplayer, Realms, Mods and Favourite servers", label: "Title screen" },
-              { image: clientModules, alt: "The client's module menu: cards for Damage Numbers, CPS, Playtime, FPS, Ping and Coordinates, each with Settings", label: "Module menu" },
-              { image: clientHud, alt: "Edit HUD: CPS, coordinates, FPS and cooldowns placed over the game, with drag, scroll and snapping hints", label: "HUD editor" },
-            ]}
-          />
         </div>
+        <ModuleVideo />
         <ModuleMarquee />
       </section>
 

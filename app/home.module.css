@@ -305,8 +305,7 @@
   opacity: 0.6;
 }
 /* No box around a screenshot: its edges fade into the page, over a blur of itself (.ambient). */
-.windowFrame,
-.viewFrame {
+.windowFrame {
   position: relative;
   z-index: 1;
   -webkit-mask-image: linear-gradient(to right, transparent, #000 4%, #000 96%, transparent), linear-gradient(to bottom, transparent, #000 5%, #000 95%, transparent);
@@ -595,42 +594,9 @@
 
 /* ------------------------------------------------------------------ the client */
 
+/* clip, not hidden: hidden would stop the module video's sticky pin (overflow-x only is enough). */
 .clientBand {
-  overflow: hidden;
-}
-.views {
-  display: grid;
-  justify-items: center;
-  gap: 1.75rem;
-  margin: 0.75rem 0 3rem;
-}
-.viewTabs {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.5rem;
-}
-.viewStage {
-  position: relative;
-  width: 100%;
-  max-width: 930px;
-}
-.viewFrame {
-  transition: aspect-ratio 0.4s var(--ease);
-}
-.viewFrame img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0;
-  transition: opacity 0.45s var(--ease);
-}
-.viewFrame img[data-on="true"] {
-  opacity: 1;
+  overflow-x: clip;
 }
 .marquee {
   display: grid;
@@ -1062,4 +1028,46 @@
 .tourItem {
   display: grid;
   gap: 1.375rem;
+}
+
+/* ------------------------------------------------------------------ the module menu, on video */
+
+/* Pinned while the page scrolls ~1.6 screens past it; the scroll plays the video (client-showcase.tsx). */
+.videoPin {
+  position: relative;
+  height: 260vh;
+}
+.videoPlain {
+  position: relative;
+  margin-bottom: 3rem;
+}
+.videoPin .videoSticky {
+  position: sticky;
+  top: var(--header-h);
+  height: calc(100vh - var(--header-h));
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 1rem;
+}
+.videoStage {
+  position: relative;
+  width: min(calc(100vw - 2 * var(--gutter)), calc((100vh - var(--header-h) - 5rem) * 16 / 9), 1440px);
+  margin: 0 auto;
+}
+.video {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 0.75rem;
+  background: #0b1018;
+}
+.videoHint {
+  font-family: var(--font-label), monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
