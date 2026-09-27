@@ -13,7 +13,7 @@ const grotesk = Space_Grotesk({ subsets: ["latin"], weight: ["500", "600", "700"
 const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["500", "600"], display: "swap", variable: "--font-label" });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://catalyst-client.netlify.app"),
+  metadataBase: new URL("https://catalystclient.net"),
   title: {
     default: "Catalyst Client - Minecraft, set up for you",
     template: "%s · Catalyst Client",

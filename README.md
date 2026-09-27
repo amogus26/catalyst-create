@@ -228,7 +228,7 @@ None of these may be prefixed `NEXT_PUBLIC_` - that would publish them to every 
 
 | | |
 | --- | --- |
-| Site | https://catalyst-client.netlify.app |
+| Site | **https://catalystclient.net** (bought through Netlify, DNS managed by Netlify) - also https://catalyst-client.netlify.app |
 | Netlify project | `catalyst-client` (site id `c43726a8-24a2-4187-97e1-48568ad88731`) |
 | Old address | https://catalyst-create.netlify.app - its own small Netlify project, see below |
 | Supabase project | `catalyst-create` (ref `ekmqfqdwnktbaufjkufx`, eu-central-1) |

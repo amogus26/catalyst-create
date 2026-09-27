@@ -146,7 +146,7 @@ Facts about Catalyst:
 - Store: daily reward cards on the Shop tab (one a day), cosmetics (wings ${SHOP_ITEMS.filter((i) => i.kind === "wings").map((i) => `${i.name} ${i.price}`).join(", ")} coins; capes coming), Coins tab with coin packs and Redeem code. Payments aren't live yet.
 - Battle pass: Season ${SEASON.number} ${SEASON.name}, ${SEASON.levels} levels, XP from daily quests (play 1 hour, play 2 sessions, claim daily reward), ${SEASON.headline} at level ${SEASON.levels}.
 - Redeem codes (CATL-XXXX-XXXX-XXXX): Store, Coins tab, Redeem code. Each works once per install.
-- Community cape designs: catalyst-client.netlify.app/designs - draw or upload, a person reviews, players vote.
+- Community cape designs: catalystclient.net/designs - draw or upload, a person reviews, players vote.
 - Microsoft sign-in is on the Add account page.`;
 
 /** The bot's answer, or null if Claude can't be asked (the launcher then answers from its own list). */
