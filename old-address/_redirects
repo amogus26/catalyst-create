@@ -1,0 +1,6 @@
+# catalyst-create.netlify.app - the site's old address, kept so old links and older launchers work.
+# The API is passed through (200) rather than redirected: older launchers post codes to it and look up
+# CurseForge through it, and their mod client does not follow redirects. Everything else moves to the
+# same page at the new address.
+/api/*  https://catalyst-client.netlify.app/api/:splat  200!
+/*      https://catalyst-client.netlify.app/:splat      301!

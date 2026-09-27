@@ -16,7 +16,7 @@ const silkscreen = Silkscreen({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://catalyst-create.netlify.app"),
+  metadataBase: new URL("https://catalyst-client.netlify.app"),
   title: {
     default: "Catalyst Client - Minecraft, set up for you",
     template: "%s · Catalyst Client",

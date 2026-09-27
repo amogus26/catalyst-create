@@ -1,0 +1,4 @@
+# The old address is a plain folder: no build, no Next.js - just _redirects.
+[build]
+  command = ""
+  publish = "."

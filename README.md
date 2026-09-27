@@ -198,9 +198,16 @@ None of these may be prefixed `NEXT_PUBLIC_` - that would publish them to every 
 
 | | |
 | --- | --- |
-| Site | https://catalyst-create.netlify.app |
-| Netlify project | `catalyst-create` (site id `c43726a8-24a2-4187-97e1-48568ad88731`) |
+| Site | https://catalyst-client.netlify.app |
+| Netlify project | `catalyst-client` (site id `c43726a8-24a2-4187-97e1-48568ad88731`) |
+| Old address | https://catalyst-create.netlify.app - its own small Netlify project, see below |
 | Supabase project | `catalyst-create` (ref `ekmqfqdwnktbaufjkufx`, eu-central-1) |
+
+**The old address still works.** The site was called `catalyst-create` until it became the official
+site. That name is now held by a second, tiny Netlify project deployed from **`old-address/`**: it
+sends every page on to the same path at the new address, and passes `/api/*` straight through, so
+launchers built before the move can still redeem codes and search CurseForge. Keep that project -
+if it were deleted, anyone could take the old name and receive those launchers' requests.
 
 **`netlify.toml` matters here.** Netlify installs its Next.js runtime automatically only for builds
 from a linked Git repository; a deploy uploaded as a zip gets no runtime, publishes the static
