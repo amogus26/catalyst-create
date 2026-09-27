@@ -255,7 +255,7 @@ export default function HomePage() {
             </h2>
           </Reveal>
         </div>
-        <Tour id="launcher-tour" chapters={LAUNCHER_CHAPTERS} />
+        <Tour id="launcher-tour" chapters={LAUNCHER_CHAPTERS} label="Launcher pages" />
       </section>
 
       {/* ------------------------------------------------------------------ features */}

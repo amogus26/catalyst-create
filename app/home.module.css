@@ -996,35 +996,70 @@
   line-height: 1;
 }
 
-/* ------------------------------------------------------------------ the launcher, page by page */
+/* ------------------------------------------------------------------ the launcher tour, pinned */
 
-.chapters {
-  display: grid;
-  gap: clamp(5rem, 10vw, 9rem);
-}
-.chapter {
-  display: grid;
-  gap: clamp(1.75rem, 3vw, 2.75rem);
-}
-.chapterHead {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 1.25rem 4rem;
-  align-items: end;
-}
-.chapterHead > div {
-  display: grid;
-  gap: 1rem;
-}
-/* 1440px at most - half the launcher's 2880px render, so one screenshot pixel per screen pixel on Retina. */
-.shotWrap {
+.tour {
   position: relative;
-  width: calc(100% - 2 * var(--gutter));
-  max-width: 1440px;
-  margin: 0 auto;
 }
-@media (max-width: 900px) {
-  .chapterHead {
-    grid-template-columns: 1fr;
-  }
+.tourSticky {
+  position: sticky;
+  top: var(--header-h);
+  height: calc(100vh - var(--header-h));
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+/* Wider than the page's other sections, so the screenshots show near their real size - sharp. */
+.tourWide {
+  width: 100%;
+  max-width: 105rem;
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+.tourGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 18.75rem) minmax(0, 1fr);
+  gap: clamp(1.75rem, 4vw, 4rem);
+  align-items: center;
+}
+.tourCopy {
+  display: grid;
+  gap: 1.75rem;
+}
+.tourNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.tourMeter {
+  height: 0.1875rem;
+  border-radius: 0.1875rem;
+  background: var(--line);
+  overflow: hidden;
+  max-width: 22.5rem;
+}
+.tourMeter span {
+  display: block;
+  height: 100%;
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, var(--teal), var(--blue));
+}
+.window {
+  position: relative;
+  width: 100%;
+  /* The launcher's renders are 2880px wide: sharp at any size up to 1440px, even on Retina. */
+  justify-self: stretch;
+}
+.windowShot {
+  position: absolute;
+  inset: 0;
+}
+.tourList {
+  display: grid;
+  gap: 4rem;
+  padding-bottom: 1.5rem;
+}
+.tourItem {
+  display: grid;
+  gap: 1.375rem;
 }
