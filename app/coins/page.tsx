@@ -16,8 +16,6 @@ import {
   FREE_LANE_TOTAL,
   PREMIUM_LANE_TOTAL,
   SEASON,
-  SHOP_ITEMS,
-  YEAR_GIFT,
   coinsPerDollar,
   packBonus,
   usd,
@@ -32,7 +30,6 @@ export const metadata: Metadata = {
 const fmt = (n: number) => n.toLocaleString("en-US");
 
 export default function CoinsPage() {
-  const wingPrices = SHOP_ITEMS.filter((i) => i.kind === "wings" && i.price !== null).map((i) => i.price!);
   return (
     <>
       <section className={`page-top ${styles.top}`}>
@@ -40,7 +37,7 @@ export default function CoinsPage() {
         <div className={`wide ${styles.topGrid}`}>
           <Reveal className="band-head" amount={0}>
             <span className="kicker gold">Coins</span>
-            <h1 className="display" style={{ fontSize: "clamp(46px, 7vw, 96px)" }}>
+            <h1 className="display" style={{ fontSize: "clamp(2.875rem, 7vw, 6rem)" }}>
               <span className="gold-text">Coins.</span>
               <br />
               Earn them, spend them.
@@ -109,9 +106,9 @@ export default function CoinsPage() {
                 <span className={styles.earnIcon}>
                   <SparkIcon />
                 </span>
-                <b className={styles.earnAmount}>{fmt(YEAR_GIFT.coins)}</b>
-                <h3>The year gift</h3>
-                <p>Open every card of all twelve months and the {YEAR_GIFT.name} is yours: {YEAR_GIFT.contents}.</p>
+                <b className={styles.earnAmount}>A year gift</b>
+                <h3>For opening every card</h3>
+                <p>Open every card of all twelve months and a gift is yours. What&apos;s in it stays a surprise.</p>
               </Tilt>
             </StaggerItem>
             <StaggerItem>
@@ -128,37 +125,6 @@ export default function CoinsPage() {
               </Tilt>
             </StaggerItem>
           </Stagger>
-        </div>
-      </section>
-
-      <section className="band tight" aria-labelledby="spend-title">
-        <div className="wide">
-          <Reveal className={`panel ${styles.spend}`}>
-            <div>
-              <span className="kicker blue">Spend</span>
-              <h2 className="headline" id="spend-title">
-                What coins buy.
-              </h2>
-              <p className="lede">
-                Wings are the store&apos;s premium item, from {fmt(Math.min(...wingPrices))} to {fmt(Math.max(...wingPrices))} coins.
-                Capes are coming - their prices aren&apos;t out yet.
-              </p>
-              <Link className="btn" href="/cosmetics">
-                See the cosmetics in 3D
-              </Link>
-            </div>
-            <ul className={styles.spendList}>
-              {SHOP_ITEMS.filter((i) => i.kind === "wings").map((item) => (
-                <li key={item.id}>
-                  <span>{item.name}</span>
-                  <span className="coin-price">
-                    <CoinMark size={15} />
-                    {fmt(item.price!)}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </Reveal>
         </div>
       </section>
 

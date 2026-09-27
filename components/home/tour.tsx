@@ -5,6 +5,9 @@ import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScro
 import { useEffect, useRef, useState } from "react";
 import styles from "@/app/home.module.css";
 
+/** Screenshots are text people read, so they are served sharper than photos would be. */
+export const SHOT_QUALITY = 90;
+
 export interface Chapter {
   key: string;
   kicker: string;
@@ -25,7 +28,7 @@ export function Tour({ id, chapters, label }: { id: string; chapters: Chapter[];
   const reduced = useReducedMotion();
   const [pinned, setPinned] = useState(false);
   useEffect(() => {
-    const query = window.matchMedia("(min-width: 1000px)");
+    const query = window.matchMedia("(min-width: 901px)");
     const update = () => setPinned(query.matches && !reduced);
     update();
     query.addEventListener("change", update);
@@ -41,8 +44,8 @@ function PinnedTour({ id, chapters, label }: { id: string; chapters: Chapter[]; 
   useMotionValueEvent(scrollYProgress, "change", (value) => {
     setIndex(Math.min(chapters.length - 1, Math.max(0, Math.floor(value * chapters.length))));
   });
-  // The window leans back as it arrives and straightens out while you read.
-  const tilt = useTransform(scrollYProgress, [0, 0.12], [10, 0]);
+  // The window rises into place as it arrives. Flat on purpose: anything in a 3D transform is drawn
+  // soft, and these are screenshots people read.
   const lift = useTransform(scrollYProgress, [0, 0.12], [60, 0]);
   const fill = useTransform(scrollYProgress, [0, 1], [0, 1]);
 
@@ -97,7 +100,7 @@ function PinnedTour({ id, chapters, label }: { id: string; chapters: Chapter[]; 
               <motion.span style={{ scaleX: fill }} />
             </div>
           </div>
-          <motion.div className={styles.window} style={{ rotateX: tilt, y: lift }}>
+          <motion.div className={styles.window} style={{ y: lift }}>
             <div className={styles.windowGlow} aria-hidden="true" />
             <div className={styles.windowFrame}>
               {chapters.map((c, i) => (
@@ -109,7 +112,7 @@ function PinnedTour({ id, chapters, label }: { id: string; chapters: Chapter[]; 
                   transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
                   aria-hidden={i !== index}
                 >
-                  <Image src={c.image} alt={c.alt} sizes="(min-width: 1000px) 58vw, 100vw" placeholder="blur" />
+                  <Image src={c.image} alt={c.alt} sizes="(min-width: 901px) 58vw, 100vw" quality={SHOT_QUALITY} placeholder="blur" />
                 </motion.div>
               ))}
             </div>
@@ -136,7 +139,7 @@ function ListedTour({ id, chapters }: { id: string; chapters: Chapter[] }) {
             </ul>
           </div>
           <div className={styles.windowFrame}>
-            <Image src={c.image} alt={c.alt} sizes="100vw" placeholder="blur" />
+            <Image src={c.image} alt={c.alt} sizes="100vw" quality={SHOT_QUALITY} placeholder="blur" />
           </div>
         </article>
       ))}

@@ -61,11 +61,11 @@ export function Hall({
         const size = 2 + Math.round(random() * 3);
         const style = {
           left: `${(random() * 100).toFixed(2)}%`,
-          "--s": `${size}px`,
+          "--s": `${size / 16}rem`,
           "--d": `${(11 + random() * 12).toFixed(1)}s`,
           "--delay": `${(-random() * 20).toFixed(1)}s`,
-          "--x": `${Math.round((random() - 0.5) * 120)}px`,
-          "--h": `${Math.round(height * (0.6 + random() * 0.5))}px`,
+          "--x": `${Math.round((random() - 0.5) * 120) / 16}rem`,
+          "--h": `${Math.round(height * (0.6 + random() * 0.5)) / 16}rem`,
           background: colours[2],
           color: colours[2],
         } as React.CSSProperties;

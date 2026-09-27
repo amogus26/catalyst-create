@@ -19,7 +19,7 @@ const LINKS = [
 /**
  * The bar over every page: the logo, the pages, and Download. It is clear over the top of a page and
  * turns to frosted glass once the page moves under it, with a thin line along its foot that fills as
- * you read. Below 980px the links fold into a menu.
+ * you read. At 900px and under the links fold into a menu.
  */
 export function SiteHeader() {
   const pathname = usePathname();

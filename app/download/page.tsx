@@ -21,7 +21,7 @@ export default function DownloadPage() {
         <div className="wide" style={{ position: "relative", zIndex: 1 }}>
           <Reveal className="band-head center" amount={0}>
             <span className="kicker">Download</span>
-            <h1 className="display" style={{ fontSize: "clamp(44px, 6.6vw, 88px)" }}>
+            <h1 className="display" style={{ fontSize: "clamp(2.75rem, 6.6vw, 5.5rem)" }}>
               Get <span className="shine-text">Catalyst.</span>
             </h1>
             <p className="lede">

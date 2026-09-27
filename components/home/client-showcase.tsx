@@ -5,6 +5,7 @@ import { motion, useScroll, useTransform } from "motion/react";
 import { useReducedMotionAfterMount } from "@/components/site/motion";
 import { useRef } from "react";
 import styles from "@/app/home.module.css";
+import { SHOT_QUALITY } from "./tour";
 import { CLIENT_MODULES, MODULE_CATEGORIES } from "@/lib/catalyst";
 
 const CATEGORY_COLOUR: Record<string, string> = {
@@ -32,7 +33,7 @@ export function ClientFan({ shots }: { shots: { image: StaticImageData; alt: str
     <div ref={ref} className={styles.fan}>
       {shots.map((shot, i) => (
         <motion.figure key={shot.label} className={styles.fanCard} style={poses[i]} data-pos={i}>
-          <Image src={shot.image} alt={shot.alt} sizes="(min-width: 900px) 46vw, 90vw" placeholder="blur" />
+          <Image src={shot.image} alt={shot.alt} sizes="(min-width: 900px) 46vw, 90vw" quality={SHOT_QUALITY} placeholder="blur" />
           <figcaption>{shot.label}</figcaption>
         </motion.figure>
       ))}

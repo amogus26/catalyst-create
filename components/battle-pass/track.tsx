@@ -79,7 +79,7 @@ export function PassTrack() {
   const reduced = useReducedMotion();
   const [pinned, setPinned] = useState(false);
   useEffect(() => {
-    const query = window.matchMedia("(min-width: 900px)");
+    const query = window.matchMedia("(min-width: 901px)");
     const update = () => setPinned(query.matches && !reduced);
     update();
     query.addEventListener("change", update);

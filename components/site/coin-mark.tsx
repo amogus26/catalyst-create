@@ -2,9 +2,11 @@
  * The launcher's struck coin (its drawMintedCoin): a gold disc with a bevelled rim, a recessed field
  * and a raised mint mark, drawn small next to a price.
  */
+import { remSize } from "./icons";
+
 export function CoinMark({ size = 16 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+    <svg className="sized" width={size} height={size} style={remSize(size, size)} viewBox="0 0 32 32" aria-hidden="true" focusable="false">
       <defs>
         <radialGradient id="coin-rim" cx="35%" cy="30%" r="75%">
           <stop offset="0" stopColor="#FFE9A3" />

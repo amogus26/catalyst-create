@@ -26,7 +26,7 @@ export default function RedeemPage() {
         <div className={`wide ${styles.top}`}>
           <Reveal className="band-head" amount={0}>
             <span className="kicker gold">Redeem codes</span>
-            <h1 className="display" style={{ fontSize: "clamp(44px, 6.6vw, 88px)" }}>
+            <h1 className="display" style={{ fontSize: "clamp(2.75rem, 6.6vw, 5.5rem)" }}>
               Got a <span className="gold-text">code?</span>
             </h1>
             <p className="lede">
@@ -174,7 +174,7 @@ export default function RedeemPage() {
       <section className="band tight" aria-labelledby="rules-title">
         <div className="wide">
           <Reveal className={`panel ${styles.rules}`}>
-            <h2 className="headline" id="rules-title" style={{ fontSize: "clamp(26px, 3vw, 38px)" }}>
+            <h2 className="headline" id="rules-title" style={{ fontSize: "clamp(1.625rem, 3vw, 2.375rem)" }}>
               The small print.
             </h2>
             <ul>

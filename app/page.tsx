@@ -1,11 +1,11 @@
 import Link from "next/link";
-import clientHud from "@/assets/screens/client-hud.jpg";
-import clientModules from "@/assets/screens/client-modules.jpg";
-import clientTitle from "@/assets/screens/client-title.jpg";
-import launcherControls from "@/assets/screens/launcher-controls.jpg";
-import launcherHome from "@/assets/screens/launcher-home.jpg";
-import launcherMods from "@/assets/screens/launcher-mods.jpg";
-import launcherShop from "@/assets/screens/launcher-shop.jpg";
+import clientHud from "@/assets/screens/client-hud.webp";
+import clientModules from "@/assets/screens/client-modules.webp";
+import clientTitle from "@/assets/screens/client-title.webp";
+import launcherControls from "@/assets/screens/launcher-controls.webp";
+import launcherHome from "@/assets/screens/launcher-home.webp";
+import launcherMods from "@/assets/screens/launcher-mods.webp";
+import launcherShop from "@/assets/screens/launcher-shop.webp";
 import { ClientFan, ModuleMarquee } from "@/components/home/client-showcase";
 import { HeroStage } from "@/components/home/hero-stage";
 import { Tour, type Chapter } from "@/components/home/tour";
@@ -13,12 +13,11 @@ import { CapeArt, WingsArt } from "@/components/site/cosmetic-art";
 import { DownloadButton } from "@/components/site/download-button";
 import { Hall } from "@/components/site/hall";
 import { HashRedirect } from "@/components/site/hash-redirect";
+import { ModInstall } from "@/components/home/mod-install";
 import {
   ArrowIcon,
-  BannerIcon,
   BoltIcon,
   BoxIcon,
-  CalendarIcon,
   ChatIcon,
   GridIcon,
   LayersIcon,
@@ -26,18 +25,15 @@ import {
   SlidersIcon,
   SoundIcon,
   SparkIcon,
-  TicketIcon,
 } from "@/components/site/icons";
-import { Counter, Reveal, Stagger, StaggerItem, Tilt } from "@/components/site/motion";
+import { Reveal, Stagger, StaggerItem, Tilt } from "@/components/site/motion";
 import { PixelSprite } from "@/components/site/pixel-sprite";
 import {
   CLIENT_MODULES,
   COIN_PACKS,
-  DAILY_MONTH_COINS,
   GAME_VERSION,
   LOADER,
   PREINSTALLED_MODS,
-  QUEST_XP_PER_DAY,
   SEASON,
   SHOP_ITEMS,
   THEME_PRESETS,
@@ -85,6 +81,46 @@ const LAUNCHER_CHAPTERS: Chapter[] = [
 ];
 
 const PROFILE_MODS = ["Sodium", "Iris Shaders", "Cloth Config API", "Entity Culling", "FerriteCore", "Mod Menu"];
+
+/** The six features under the mods panel - what the launcher does besides mods, one line each. */
+const FEATURES = [
+  {
+    title: "Fast from the first launch",
+    text: `${PREINSTALLED_MODS.join(", ").replace(/, ([^,]*)$/, " and $1")} come installed, and stay on their newest build.`,
+    Icon: BoltIcon,
+    colour: "#f0b429",
+  },
+  {
+    title: "Profiles that keep mods apart",
+    text: "Each profile has its own mods. A mod that doesn't fit says why - and offers to make a profile it does fit.",
+    Icon: LayersIcon,
+    colour: "#8cc8f2",
+  },
+  {
+    title: "Your colours",
+    text: `${THEME_PRESETS.length} colour schemes - or one built from any colour. The client's menu follows.`,
+    Icon: PaletteIcon,
+    colour: "#fa86b6",
+  },
+  {
+    title: "Your sounds",
+    text: "Your own hit and block sounds, and a picture behind your inventory - set in the launcher, heard in game.",
+    Icon: SoundIcon,
+    colour: "#4fa8e8",
+  },
+  {
+    title: "Help, built in",
+    text: "Catalyst Bot answers the usual questions - mods, crashes, the menu, rewards - right on Home.",
+    Icon: ChatIcon,
+    colour: "#37d3c4",
+  },
+  {
+    title: "Memory and Java, sorted",
+    text: "Give the game 2 to 16 GB, pick a Java or let Catalyst find one, and choose the game's window size.",
+    Icon: SlidersIcon,
+    colour: "#b9c0cc",
+  },
+];
 
 /**
  * The home page: what Catalyst is, what it looks like, what it does and how to start - in that order,
@@ -222,185 +258,51 @@ export default function HomePage() {
             </h2>
             <p className="lede">No extra downloads, no folders to find. What Catalyst does, as it does it today.</p>
           </Reveal>
-          <Stagger className={styles.bento}>
-            <StaggerItem className={styles.spanWide}>
-              <Tilt className={`panel ${styles.tile} ${styles.tileMods}`} max={4}>
-                <div className={styles.tileHead}>
-                  <span className={styles.tileIcon}>
-                    <BoxIcon />
-                  </span>
-                  <h3>Mods, one click away</h3>
-                </div>
+          <Reveal>
+            <div className={`panel ${styles.modsPanel}`}>
+              <div className={styles.modsCopy}>
+                <span className={styles.tileIcon}>
+                  <BoxIcon />
+                </span>
+                <h3>Mods, one click away</h3>
                 <p>
-                  Search Modrinth without leaving the launcher. Each install is checked against your profile, brings the
-                  mods it needs and verifies every file. CurseForge joins once it&apos;s switched on.
+                  Search Modrinth without leaving the launcher. Every install is checked against your profile, brings the
+                  mods it needs and verifies each file. CurseForge joins once it&apos;s switched on.
                 </p>
-                <ul className={styles.modList} aria-label="Mods on Modrinth">
-                  {PROFILE_MODS.map((mod, i) => (
-                    <li key={mod}>
-                      <span className={styles.modDot} style={{ background: `hsl(${150 + i * 36} 55% 55%)` }} />
-                      <b>{mod}</b>
-                      <em>Modrinth · {LOADER}</em>
-                      <span className={i < 1 ? styles.modInstalled : styles.modInstall}>{i < 1 ? "Installed" : "Install"}</span>
-                    </li>
-                  ))}
+                <ul className={styles.modsPoints}>
+                  <li>Checked against your version and loader first</li>
+                  <li>The mods it needs come along</li>
+                  <li>Updates in one click</li>
                 </ul>
-              </Tilt>
-            </StaggerItem>
-            <StaggerItem>
-              <Tilt className={`panel ${styles.tile}`}>
-                <div className={styles.tileHead}>
-                  <span className={styles.tileIcon} style={{ color: "#f0b429" }}>
-                    <BoltIcon />
-                  </span>
-                  <h3>Fast from the first launch</h3>
-                </div>
-                <p>{PREINSTALLED_MODS.join(", ").replace(/, ([^,]*)$/, " and $1")} come installed, and stay on their newest build.</p>
-                <div className={styles.chips}>
-                  {PREINSTALLED_MODS.map((mod) => (
-                    <span key={mod}>{mod}</span>
-                  ))}
-                </div>
-              </Tilt>
-            </StaggerItem>
-            <StaggerItem>
-              <Tilt className={`panel ${styles.tile}`}>
-                <div className={styles.tileHead}>
-                  <span className={styles.tileIcon} style={{ color: "#37d3c4" }}>
-                    <GridIcon />
-                  </span>
-                  <h3>
-                    <Counter to={CLIENT_MODULES.length} /> modules
-                  </h3>
-                </div>
-                <p>HUD, visual, PvP and world modules in one menu - search them, star them, drag the HUD where you want it.</p>
-              </Tilt>
-            </StaggerItem>
-            <StaggerItem>
-              <Tilt className={`panel ${styles.tile}`}>
-                <div className={styles.tileHead}>
-                  <span className={styles.tileIcon} style={{ color: "#8cc8f2" }}>
-                    <LayersIcon />
-                  </span>
-                  <h3>Profiles that keep mods apart</h3>
-                </div>
-                <p>
-                  Each profile has its own mods. A mod that doesn&apos;t fit says why - and offers to make a profile it does
-                  fit.
-                </p>
-              </Tilt>
-            </StaggerItem>
-            <StaggerItem>
-              <Tilt className={`panel ${styles.tile}`}>
-                <div className={styles.tileHead}>
-                  <span className={styles.tileIcon} style={{ color: "#b36bff" }}>
-                    <SparkIcon />
-                  </span>
-                  <h3>Wings and capes</h3>
-                </div>
-                <div className={styles.tileArt}>
-                  <WingsArt colors={wings[0].colors} id="tile-prism" />
-                  <CapeArt colors={SHOP_ITEMS.find((i) => i.id === "sculk-cape")!.colors} id="tile-sculk" />
-                </div>
-                <Link className={styles.tileLink} href="/cosmetics">
-                  See them in 3D <ArrowIcon size={16} />
-                </Link>
-              </Tilt>
-            </StaggerItem>
-            <StaggerItem>
-              <Tilt className={`panel ${styles.tile}`}>
-                <div className={styles.tileHead}>
-                  <span className={styles.tileIcon} style={{ color: "#d98a5a" }}>
-                    <BannerIcon />
-                  </span>
-                  <h3>A battle pass that plays along</h3>
-                </div>
-                <p>
-                  {SEASON.levels} levels, earned through daily quests worth up to {QUEST_XP_PER_DAY} XP a day. Season{" "}
-                  {SEASON.number}: {SEASON.name}.
-                </p>
-                <Link className={styles.tileLink} href="/battle-pass">
-                  See the rewards <ArrowIcon size={16} />
-                </Link>
-              </Tilt>
-            </StaggerItem>
-            <StaggerItem>
-              <Tilt className={`panel ${styles.tile}`}>
-                <div className={styles.tileHead}>
-                  <span className={styles.tileIcon} style={{ color: "#5fbf87" }}>
-                    <CalendarIcon />
-                  </span>
-                  <h3>Something every day</h3>
-                </div>
-                <p>
-                  A 30-day calendar of coins and cosmetics - {DAILY_MONTH_COINS.toLocaleString("en-US")} coins a month, and
-                  lucky days pay double.
-                </p>
-              </Tilt>
-            </StaggerItem>
-            <StaggerItem>
-              <Tilt className={`panel ${styles.tile}`}>
-                <div className={styles.tileHead}>
-                  <span className={styles.tileIcon} style={{ color: "#f0b429" }}>
-                    <TicketIcon />
-                  </span>
-                  <h3>Redeem codes</h3>
-                </div>
-                <p>Codes from giveaways and events give coins, a sale, an item or an exclusive - redeemed in the launcher.</p>
-                <Link className={styles.tileLink} href="/redeem">
-                  How codes work <ArrowIcon size={16} />
-                </Link>
-              </Tilt>
-            </StaggerItem>
-            <StaggerItem>
-              <Tilt className={`panel ${styles.tile}`}>
-                <div className={styles.tileHead}>
-                  <span className={styles.tileIcon} style={{ color: "#fa86b6" }}>
-                    <PaletteIcon />
-                  </span>
-                  <h3>Your colours</h3>
-                </div>
-                <p>{THEME_PRESETS.length} colour schemes - or one built from any colour. The client&apos;s menu follows.</p>
-                <div className={styles.swatches} aria-label="Colour schemes">
-                  {THEME_PRESETS.map((preset) => (
-                    <span key={preset.name} title={preset.name} style={{ background: preset.accent }} />
-                  ))}
-                </div>
-              </Tilt>
-            </StaggerItem>
-            <StaggerItem>
-              <Tilt className={`panel ${styles.tile}`}>
-                <div className={styles.tileHead}>
-                  <span className={styles.tileIcon} style={{ color: "#4fa8e8" }}>
-                    <SoundIcon />
-                  </span>
-                  <h3>Your sounds</h3>
-                </div>
-                <p>Your own hit and block sounds, and a picture behind your inventory - set in the launcher, heard in game.</p>
-              </Tilt>
-            </StaggerItem>
-            <StaggerItem>
-              <Tilt className={`panel ${styles.tile}`}>
-                <div className={styles.tileHead}>
-                  <span className={styles.tileIcon} style={{ color: "#37d3c4" }}>
-                    <ChatIcon />
-                  </span>
-                  <h3>Help, built in</h3>
-                </div>
-                <p>Catalyst Bot answers the usual questions - mods, crashes, the menu, rewards - right on Home.</p>
-              </Tilt>
-            </StaggerItem>
-            <StaggerItem>
-              <Tilt className={`panel ${styles.tile}`}>
-                <div className={styles.tileHead}>
-                  <span className={styles.tileIcon} style={{ color: "#b9c0cc" }}>
-                    <SlidersIcon />
-                  </span>
-                  <h3>Memory and Java, sorted</h3>
-                </div>
-                <p>Give the game 2 to 16 GB, pick a Java or let Catalyst find one, and choose the game&apos;s window size.</p>
-              </Tilt>
-            </StaggerItem>
+                <p className={styles.modsTry}>Go on, press Install.</p>
+              </div>
+              <ModInstall mods={PROFILE_MODS} source={`${GAME_VERSION} ${LOADER}`} />
+            </div>
+          </Reveal>
+          <Stagger className={styles.featureGrid}>
+            {FEATURES.map((feature) => (
+              <StaggerItem key={feature.title} className={`panel ${styles.feature}`}>
+                <span className={styles.tileIcon} style={{ color: feature.colour }}>
+                  <feature.Icon />
+                </span>
+                <h3>{feature.title}</h3>
+                <p>{feature.text}</p>
+                {feature.title === "Fast from the first launch" && (
+                  <div className={styles.chips}>
+                    {PREINSTALLED_MODS.map((mod) => (
+                      <span key={mod}>{mod}</span>
+                    ))}
+                  </div>
+                )}
+                {feature.title === "Your colours" && (
+                  <div className={styles.swatches} role="img" aria-label={`${THEME_PRESETS.length} colour schemes`}>
+                    {THEME_PRESETS.map((preset) => (
+                      <span key={preset.name} title={preset.name} style={{ background: preset.accent }} />
+                    ))}
+                  </div>
+                )}
+              </StaggerItem>
+            ))}
           </Stagger>
         </div>
       </section>
@@ -574,7 +476,7 @@ export default function HomePage() {
         <div className="wide">
           <Reveal className="band-head center">
             <span className="kicker">Ready when you are</span>
-            <h2 className="display" id="final-title" style={{ fontSize: "clamp(40px, 6vw, 80px)" }}>
+            <h2 className="display" id="final-title" style={{ fontSize: "clamp(2.5rem, 6vw, 5rem)" }}>
               Play <span className="shine-text">better.</span>
             </h2>
             <p className="lede">Free to play, on Windows and macOS. Your mods, your modules and your look - in one launcher.</p>

@@ -35,7 +35,7 @@ export default function BattlePassPage() {
             <span className="kicker" style={{ color: "#ffb27a" }}>
               Battle pass · Season {SEASON.number}
             </span>
-            <h1 className="display" style={{ fontSize: "clamp(46px, 7vw, 96px)" }}>
+            <h1 className="display" style={{ fontSize: "clamp(2.875rem, 7vw, 6rem)" }}>
               <span className={styles.emberText}>{SEASON.name}.</span>
             </h1>
             <p className="lede">

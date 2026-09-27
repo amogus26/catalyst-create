@@ -1,3 +1,4 @@
+import { remSize } from "@/components/site/icons";
 import { LOGO_SHAPES } from "./logo-shapes";
 
 /**
@@ -8,9 +9,10 @@ import { LOGO_SHAPES } from "./logo-shapes";
 export function Logo({ size = 30 }: { size?: number }) {
   return (
     <svg
-      className="logo"
+      className="sized logo"
       width={Math.round(size * 0.858)}
       height={size}
+      style={remSize(size * 0.858, size)}
       viewBox="0 0 858 1000"
       aria-hidden="true"
       focusable="false"

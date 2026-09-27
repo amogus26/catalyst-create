@@ -6,7 +6,7 @@ import { Hall } from "@/components/site/hall";
 import { LockIcon } from "@/components/site/icons";
 import { Reveal, Stagger, StaggerItem, Tilt } from "@/components/site/motion";
 import { PixelSprite } from "@/components/site/pixel-sprite";
-import { CATALYST_PLUS, DAILY_REWARDS, PASS_TIERS, SEASON, SHOP_ITEMS } from "@/lib/catalyst";
+import { CATALYST_PLUS, PASS_TIERS, SEASON, SHOP_ITEMS } from "@/lib/catalyst";
 import styles from "./cosmetics.module.css";
 
 export const metadata: Metadata = {
@@ -16,7 +16,10 @@ export const metadata: Metadata = {
 
 type Earned = { name: string; from: string; art: { kind: "wings" | "cape"; colors: string[] } | { kind: "sprite" } };
 
-/** What the battle pass, the daily calendar and Catalyst Plus give - never sold in the shop. */
+/**
+ * What the battle pass and Catalyst Plus give - never sold in the shop. The daily calendar's cosmetics
+ * are left out on purpose: finding out what a card holds is the point of opening it.
+ */
 function earned(): Earned[] {
   const pass: Earned[] = PASS_TIERS.flatMap<Earned>((tier) => {
     const r = tier.premium;
@@ -24,13 +27,8 @@ function earned(): Earned[] {
     if (r.kind === "choice") return r.options.map((option) => ({ name: option, from: `Battle pass · level ${tier.level} pick`, art: { kind: "sprite" as const } }));
     return [{ name: r.name, from: `Battle pass · level ${tier.level}`, art: { kind: r.kind, colors: r.colors } }];
   });
-  const daily: Earned[] = DAILY_REWARDS.filter((r) => r.kind === "cosmetic").map((r) => ({
-    name: r.name.replace(/^(Weekly|Fortnight|Third week): /, ""),
-    from: `Daily reward · day ${r.day}`,
-    art: { kind: "sprite" },
-  }));
   const plus: Earned[] = ["Plus hat", "Plus gauntlet", "Plus name tag badge"].map((name) => ({ name, from: CATALYST_PLUS.name, art: { kind: "sprite" } }));
-  return [...pass, ...daily, ...plus];
+  return [...pass, ...plus];
 }
 
 export default function CosmeticsPage() {
@@ -42,7 +40,7 @@ export default function CosmeticsPage() {
         <div className="wide" style={{ position: "relative", zIndex: 1 }}>
           <Reveal className="band-head" amount={0}>
             <span className="kicker blue">Cosmetics</span>
-            <h1 className="display" style={{ fontSize: "clamp(42px, 6vw, 80px)" }}>
+            <h1 className="display" style={{ fontSize: "clamp(2.625rem, 6vw, 5rem)" }}>
               Wear something <span className="shine-text">rare.</span>
             </h1>
             <p className="lede">
@@ -69,8 +67,8 @@ export default function CosmeticsPage() {
               Some things can&apos;t be bought.
             </h2>
             <p className="lede">
-              These come from playing: the Season {SEASON.number} battle pass, the daily calendar and {CATALYST_PLUS.name}.
-              None of them are in the shop.
+              These come from playing: the Season {SEASON.number} battle pass and {CATALYST_PLUS.name}. None of them are
+              in the shop - and the daily calendar has more, which you find by opening its cards.
             </p>
           </Reveal>
           <Stagger className={styles.earnGrid}>

@@ -1,7 +1,7 @@
 /* The coins page: gold, lit from the top, with the struck coin turning in the hero. */
 
 .top {
-  padding-bottom: 20px;
+  padding-bottom: 1.25rem;
 }
 .topGrid {
   position: relative;
@@ -9,22 +9,22 @@
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
   align-items: center;
-  gap: 24px;
+  gap: 1.5rem;
 }
 .topFacts {
   display: flex;
   flex-wrap: wrap;
-  gap: 14px 32px;
-  margin-top: 6px;
+  gap: 0.875rem 2rem;
+  margin-top: 0.375rem;
 }
 .topFacts > span {
   display: grid;
   gap: 2px;
   color: var(--muted);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .topFacts b {
-  font-size: 30px;
+  font-size: 1.875rem;
   font-weight: 850;
   letter-spacing: -0.03em;
   color: var(--gold-soft);
@@ -33,7 +33,7 @@
   position: relative;
   aspect-ratio: 1;
   width: 100%;
-  max-width: 520px;
+  max-width: 32.5rem;
   justify-self: center;
 }
 .coinStage::before {
@@ -42,7 +42,7 @@
   inset: 14%;
   border-radius: 50%;
   background: radial-gradient(closest-side, rgba(240, 180, 41, 0.3), rgba(240, 180, 41, 0.06) 60%, transparent);
-  filter: blur(24px);
+  filter: blur(1.5rem);
 }
 .coinCanvas,
 .poster {
@@ -58,7 +58,7 @@
     grid-template-columns: 1fr;
   }
   .coinStage {
-    max-width: 360px;
+    max-width: 22.5rem;
     order: -1;
   }
 }
@@ -68,36 +68,36 @@
 .earnGrid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
+  gap: 0.875rem;
 }
 .earn {
   height: 100%;
-  padding: 24px 22px;
+  padding: 1.5rem 1.375rem;
   display: grid;
   align-content: start;
-  gap: 8px;
+  gap: 0.5rem;
 }
 .earn h3 {
-  font-size: 18px;
+  font-size: 1.125rem;
 }
 .earn p {
   color: var(--text-soft);
-  font-size: 14.5px;
+  font-size: 0.9062rem;
   line-height: 1.55;
 }
 .earnIcon {
-  width: 42px;
-  height: 42px;
+  width: 2.625rem;
+  height: 2.625rem;
   display: grid;
   place-items: center;
-  border-radius: 12px;
+  border-radius: 0.75rem;
   color: var(--gold-soft);
   background: rgba(240, 180, 41, 0.08);
   box-shadow: inset 0 0 0 1px rgba(240, 180, 41, 0.25);
-  margin-bottom: 6px;
+  margin-bottom: 0.375rem;
 }
 .earnAmount {
-  font-size: 34px;
+  font-size: 2.125rem;
   font-weight: 850;
   letter-spacing: -0.035em;
   line-height: 1;
@@ -106,7 +106,7 @@
   background-clip: text;
   color: transparent;
 }
-@media (max-width: 1000px) {
+@media (max-width: 900px) {
   .earnGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -117,50 +117,12 @@
   }
 }
 
-/* ------------------------------------------------------------------ spend */
-
-.spend {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
-  gap: 28px;
-  align-items: center;
-  padding: clamp(24px, 4vw, 44px);
-}
-.spend > div {
-  display: grid;
-  gap: 16px;
-  justify-items: start;
-}
-.spendList {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 8px;
-}
-.spendList li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.03);
-  box-shadow: inset 0 0 0 1px var(--line);
-  font-weight: 650;
-}
-@media (max-width: 760px) {
-  .spend {
-    grid-template-columns: 1fr;
-  }
-}
-
 /* ------------------------------------------------------------------ packs */
 
 .packs {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
+  gap: 1rem;
 }
 .pack {
   position: relative;
@@ -168,14 +130,14 @@
   display: grid;
   justify-items: center;
   text-align: center;
-  gap: 6px;
-  padding: 26px 20px 22px;
-  border-radius: 20px;
+  gap: 0.375rem;
+  padding: 1.625rem 1.25rem 1.375rem;
+  border-radius: 1.25rem;
   overflow: hidden;
   background:
     radial-gradient(80% 60% at 50% 20%, rgba(240, 180, 41, 0.14), transparent 70%),
     linear-gradient(180deg, rgba(26, 30, 36, 0.95), rgba(14, 17, 22, 0.95));
-  box-shadow: inset 0 0 0 1px rgba(240, 180, 41, 0.18), 0 24px 50px -30px rgba(0, 0, 0, 0.8);
+  box-shadow: inset 0 0 0 1px rgba(240, 180, 41, 0.18), 0 1.5rem 3.125rem -1.875rem rgba(0, 0, 0, 0.8);
 }
 /* The coin "shine": a band of light that sweeps across under the pointer. */
 .pack::before {
@@ -191,38 +153,38 @@
   transform: translateX(60%);
 }
 .packBest {
-  box-shadow: inset 0 0 0 2px var(--gold), 0 24px 60px -24px rgba(240, 180, 41, 0.7);
+  box-shadow: inset 0 0 0 2px var(--gold), 0 1.5rem 3.75rem -1.5rem rgba(240, 180, 41, 0.7);
 }
 .bestBadge {
   position: absolute;
-  top: 14px;
-  right: 14px;
-  padding: 4px 9px 3px;
-  border-radius: 7px;
+  top: 0.875rem;
+  right: 0.875rem;
+  padding: 0.25rem 0.5625rem 0.1875rem;
+  border-radius: 0.4375rem;
   font-family: var(--font-pixel), monospace;
-  font-size: 9.5px;
+  font-size: 0.5938rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: #2a1a00;
   background: var(--gold);
 }
 .packArt {
-  height: 118px;
+  height: 7.375rem;
   width: 100%;
   display: grid;
   place-items: center;
-  margin-bottom: 4px;
-  filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.5));
+  margin-bottom: 0.25rem;
+  filter: drop-shadow(0 0.75rem 1.25rem rgba(0, 0, 0, 0.5));
   transition: transform 0.5s var(--ease);
 }
 .pack:hover .packArt {
-  transform: translateY(-4px) scale(1.04);
+  transform: translateY(-0.25rem) scale(1.04);
 }
 .packCoins {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  font-size: 30px;
+  gap: 0.5rem;
+  font-size: 1.875rem;
   font-weight: 850;
   letter-spacing: -0.03em;
   color: var(--gold-soft);
@@ -230,23 +192,23 @@
 .packBonus {
   color: var(--green);
   font-weight: 650;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .packRate {
   color: var(--muted);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .packPrice {
-  margin-top: 6px;
-  font-size: 22px;
+  margin-top: 0.375rem;
+  font-size: 1.375rem;
   font-weight: 800;
 }
 .soon {
   display: inline-flex;
-  margin-top: 8px;
-  padding: 10px 16px;
-  border-radius: 11px;
-  font-size: 14px;
+  margin-top: 0.5rem;
+  padding: 0.625rem 1rem;
+  border-radius: 0.6875rem;
+  font-size: 0.875rem;
   font-weight: 700;
   color: var(--muted);
   background: rgba(255, 255, 255, 0.04);
@@ -269,10 +231,10 @@
 .plus {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 28px;
+  gap: 1.75rem;
   align-items: center;
-  padding: clamp(26px, 4vw, 48px);
-  border-radius: 24px;
+  padding: clamp(1.625rem, 4vw, 3rem);
+  border-radius: 1.5rem;
   background:
     radial-gradient(70% 90% at 0% 0%, rgba(179, 107, 255, 0.24), transparent 60%),
     radial-gradient(60% 80% at 100% 100%, rgba(79, 168, 232, 0.14), transparent 60%),
@@ -281,15 +243,15 @@
 }
 .plus > div {
   display: grid;
-  gap: 12px;
+  gap: 0.75rem;
   justify-items: start;
 }
 .plusPrice {
   color: var(--text-soft);
-  font-size: 17px;
+  font-size: 1.0625rem;
 }
 .plusPrice b {
-  font-size: 34px;
+  font-size: 2.125rem;
   font-weight: 850;
   color: var(--text);
   letter-spacing: -0.03em;
@@ -299,14 +261,14 @@
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 10px;
+  gap: 0.625rem;
 }
 .plusList li {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  border-radius: 14px;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border-radius: 0.875rem;
   background: rgba(255, 255, 255, 0.04);
   box-shadow: inset 0 0 0 1px rgba(179, 107, 255, 0.2);
   font-weight: 650;

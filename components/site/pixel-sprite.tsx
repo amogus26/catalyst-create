@@ -1,4 +1,5 @@
 import { REWARD_PALETTE, spriteFor } from "@/lib/sprites";
+import { remSize } from "./icons";
 
 /**
  * A 16x16 prize icon from the launcher (lib/sprites.ts), drawn as crisp SVG squares - each run of one
@@ -32,9 +33,10 @@ export function PixelSprite({
   });
   return (
     <svg
-      className="pixel-art"
+      className="sized pixel-art"
       width={size}
       height={size}
+      style={remSize(size, size)}
       viewBox="0 0 16 16"
       role={label ? "img" : undefined}
       aria-label={label}

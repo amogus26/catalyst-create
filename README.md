@@ -44,8 +44,11 @@ from the launcher and client source (each block names the Kotlin file it came fr
 changes, change it there and every page follows. `lib/sprites.ts` holds the reward icons,
 generated from the launcher's `RewardIcons.kt`, and `components/site/cosmetic-art.tsx` draws capes
 and wings the way `CosmeticArt.kt` does. The screenshots in `assets/screens/` are of the real
-launcher and client.
+launcher and client, as **lossless** WebP: keep new ones lossless (PNG or lossless WebP), because
+the site compresses them once itself and small UI text goes soft if it is compressed twice.
 
+- **Daily rewards stay a surprise.** The site says what the calendar is worth in coins, never which
+  cosmetics are on which day or what the year gift holds - opening the card is the point.
 - **Sample data is labelled.** The daily rewards and the season are the launcher's own sample data
   until there is a server, and the pages mark them *Preview*.
 - **No numbers are made up.** There are no player counts, downloads or ratings anywhere, because
@@ -67,6 +70,14 @@ on `/cosmetics`, the coins on `/coins` and the cape preview on `/designs`. Scrol
 - **Reduced motion** (`prefers-reduced-motion`): nothing turns or floats, a scene draws one still
   frame, the pinned scroll sections become plain lists, and everything that would fade in is simply
   there. The markup is the same with and without it, so nothing re-renders on load.
+- **The page scales with the window.** All sizes are in rem, and between 900px and 1440px wide the
+  root size follows the window (`html` in `app/site.css`), so a smaller window shows the same page
+  smaller - as the launcher does - rather than a squeezed one. At 900px and under, the phone layout
+  takes over at full size. Write new sizes in rem, and keep breakpoints at 900px and under.
+- **The background answers the pointer**, like the launcher's Home: a fog trail after the mouse and a
+  bloom where you click (`components/site/pointer-light.tsx`, the launcher's `HallBackdrop.kt`
+  numbers). One canvas behind the page, drawn only while there is light to draw, off with reduced
+  motion.
 - The character, capes and wings are drawn in code (`components/three/textures.ts`) - our own skin,
   no Mojang assets.
 

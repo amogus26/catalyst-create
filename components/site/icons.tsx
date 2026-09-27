@@ -5,12 +5,21 @@
 
 type IconProps = { size?: number; className?: string };
 
+/**
+ * An SVG's size in rem, so it scales with the page (see html in site.css) - applied by the zero-weight
+ * `.sized` rule, so any CSS that sizes an SVG itself still wins.
+ */
+export function remSize(width: number, height: number): React.CSSProperties {
+  return { ["--w" as string]: `${width / 16}rem`, ["--h" as string]: `${height / 16}rem` };
+}
+
 function Svg({ size = 24, className, children }: IconProps & { children: React.ReactNode }) {
   return (
     <svg
-      className={className}
+      className={className ? `sized ${className}` : "sized"}
       width={size}
       height={size}
+      style={remSize(size, size)}
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"

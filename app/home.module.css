@@ -5,12 +5,12 @@
 .hero {
   position: relative;
   overflow: hidden;
-  min-height: min(920px, calc(100svh - var(--header-h)));
+  min-height: min(57.5rem, calc(100svh - var(--header-h)));
   display: flex;
   align-items: center;
-  padding: 40px 0 72px;
+  padding: 2.5rem 0 4.5rem;
   margin-top: calc(-1 * var(--header-h));
-  padding-top: calc(var(--header-h) + 24px);
+  padding-top: calc(var(--header-h) + 1.5rem);
 }
 .heroGrid {
   position: relative;
@@ -18,16 +18,16 @@
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
   align-items: center;
-  gap: 24px;
+  gap: 1.5rem;
 }
 .heroCopy {
   display: grid;
-  gap: 24px;
+  gap: 1.5rem;
   justify-items: start;
 }
 .heroCopy h1 {
-  margin-top: 4px;
-  font-size: clamp(46px, 6.3vw, 88px);
+  margin-top: 0.25rem;
+  font-size: clamp(2.875rem, 6.3vw, 5.5rem);
 }
 .heroCopy h1 span {
   white-space: nowrap;
@@ -35,39 +35,45 @@
 .actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 6px;
+  gap: 0.75rem;
+  margin-top: 0.375rem;
 }
 .facts {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 18px;
+  gap: 0.5rem 1.125rem;
   color: var(--muted);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .facts span {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
 }
 .facts span::before {
   content: "";
-  width: 5px;
-  height: 5px;
+  width: 0.3125rem;
+  height: 0.3125rem;
   background: var(--teal);
-  box-shadow: 0 0 8px var(--teal);
+  box-shadow: 0 0 0.5rem var(--teal);
 }
 .stageWrap {
   position: relative;
   aspect-ratio: 36 / 41;
   width: 100%;
-  max-width: 620px;
+  max-width: 38.75rem;
   justify-self: center;
 }
 .scene,
 .poster {
   position: absolute;
   inset: 0;
+  /* The floor's glow is wider than the canvas; fading the canvas's sides and foot keeps its edge from
+     showing as a box. */
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 9%, #000 91%, transparent), linear-gradient(to bottom, #000 80%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to right, transparent, #000 9%, #000 91%, transparent), linear-gradient(to bottom, #000 80%, transparent);
+  mask-composite: intersect;
 }
 .poster img {
   width: 100%;
@@ -80,19 +86,19 @@
   inset: 12% 8% 4%;
   border-radius: 50%;
   background: radial-gradient(closest-side, rgba(55, 211, 196, 0.22), rgba(79, 168, 232, 0.08) 60%, transparent);
-  filter: blur(20px);
+  filter: blur(1.25rem);
 }
 .floatTag {
   position: absolute;
   display: grid;
   gap: 2px;
-  padding: 10px 14px;
-  border-radius: 14px;
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.875rem;
   background: rgba(12, 18, 27, 0.72);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 0 0 1px var(--line-strong), 0 18px 40px -20px rgba(0, 0, 0, 0.8);
-  font-size: 13px;
+  backdrop-filter: blur(0.625rem);
+  -webkit-backdrop-filter: blur(0.625rem);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 0 0 1px var(--line-strong), 0 1.125rem 2.5rem -1.25rem rgba(0, 0, 0, 0.8);
+  font-size: 0.8125rem;
   animation: float-tag 7s ease-in-out infinite;
   pointer-events: none;
 }
@@ -102,41 +108,41 @@
 .floatTag em {
   font-style: normal;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .tagCape {
   left: 0;
   top: 58%;
-  border-left: 3px solid #1e9aa1;
+  border-left: 0.1875rem solid #1e9aa1;
 }
 .tagWings {
   right: 0;
   top: 20%;
-  border-left: 3px solid #d98a5a;
+  border-left: 0.1875rem solid #d98a5a;
   animation-delay: -3.5s;
 }
 @keyframes float-tag {
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-0.625rem);
   }
 }
 .scrollCue {
   position: absolute;
   left: 50%;
-  bottom: 22px;
+  bottom: 1.375rem;
   z-index: 1;
   transform: translateX(-50%);
   display: grid;
   justify-items: center;
-  gap: 8px;
+  gap: 0.5rem;
   color: var(--muted);
   font-family: var(--font-pixel), monospace;
-  font-size: 10px;
+  font-size: 0.625rem;
   letter-spacing: 0.18em;
 }
 .scrollCue i {
   width: 2px;
-  height: 34px;
+  height: 2.125rem;
   background: linear-gradient(var(--teal), transparent);
   animation: cue 2.2s ease-in-out infinite;
 }
@@ -163,9 +169,9 @@
     grid-template-columns: 1fr;
   }
   .stageWrap {
-    max-width: 460px;
+    max-width: 28.75rem;
     order: -1;
-    margin-bottom: -40px;
+    margin-bottom: -2.5rem;
   }
   .tagCape,
   .tagWings {
@@ -181,34 +187,34 @@
 .pillars {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
+  gap: 1rem;
 }
 .pillar {
   height: 100%;
-  padding: 26px 24px 28px;
+  padding: 1.625rem 1.5rem 1.75rem;
   display: grid;
   align-content: start;
-  gap: 12px;
+  gap: 0.75rem;
 }
 .pillar h3 {
-  font-size: 19px;
+  font-size: 1.1875rem;
   letter-spacing: -0.02em;
 }
 .pillar p {
   color: var(--text-soft);
-  font-size: 15px;
+  font-size: 0.9375rem;
   line-height: 1.55;
 }
 .pillarIcon {
-  width: 48px;
-  height: 48px;
+  width: 3rem;
+  height: 3rem;
   display: grid;
   place-items: center;
-  border-radius: 14px;
+  border-radius: 0.875rem;
   background: rgba(255, 255, 255, 0.04);
-  box-shadow: inset 0 0 0 1px var(--line-strong), 0 0 30px -8px currentColor;
+  box-shadow: inset 0 0 0 1px var(--line-strong), 0 0 1.875rem -0.5rem currentColor;
 }
-@media (max-width: 1000px) {
+@media (max-width: 900px) {
   .pillars {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -223,7 +229,7 @@
 
 .tourBand {
   position: relative;
-  padding-top: clamp(40px, 6vw, 80px);
+  padding-top: clamp(2.5rem, 6vw, 5rem);
 }
 .tour {
   position: relative;
@@ -239,56 +245,56 @@
 .tourGrid {
   display: grid;
   grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.45fr);
-  gap: clamp(28px, 4vw, 64px);
+  gap: clamp(1.75rem, 4vw, 4rem);
   align-items: center;
 }
 .tourCopy {
   display: grid;
-  gap: 28px;
+  gap: 1.75rem;
 }
 .tourText {
   display: grid;
-  gap: 16px;
+  gap: 1rem;
   justify-items: start;
 }
 .tourText .headline {
-  font-size: clamp(30px, 3.4vw, 46px);
+  font-size: clamp(1.875rem, 3.4vw, 2.875rem);
 }
 .tourPoints {
   list-style: none;
-  margin: 4px 0 0;
+  margin: 0.25rem 0 0;
   padding: 0;
   display: grid;
-  gap: 10px;
+  gap: 0.625rem;
 }
 .tourPoints li {
   display: flex;
-  gap: 10px;
+  gap: 0.625rem;
   align-items: baseline;
   color: var(--text-soft);
-  font-size: 15.5px;
+  font-size: 0.9688rem;
 }
 .tourPoints li::before {
   content: "";
   flex: none;
-  width: 7px;
-  height: 7px;
+  width: 0.4375rem;
+  height: 0.4375rem;
   transform: translateY(-2px);
   background: var(--teal);
-  box-shadow: 0 0 10px var(--teal);
+  box-shadow: 0 0 0.625rem var(--teal);
 }
 .tourNav {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 0.5rem;
 }
 .pill,
 .pillOn {
   font: inherit;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 650;
-  padding: 8px 14px;
-  border-radius: 999px;
+  padding: 0.5rem 0.875rem;
+  border-radius: 62.4375rem;
   border: 0;
   cursor: pointer;
   color: var(--text-soft);
@@ -303,14 +309,14 @@
 .pillOn {
   color: #04121d;
   background: var(--teal);
-  box-shadow: 0 0 24px -4px rgba(55, 211, 196, 0.8);
+  box-shadow: 0 0 1.5rem -0.25rem rgba(55, 211, 196, 0.8);
 }
 .tourMeter {
-  height: 3px;
-  border-radius: 3px;
+  height: 0.1875rem;
+  border-radius: 0.1875rem;
   background: var(--line);
   overflow: hidden;
-  max-width: 360px;
+  max-width: 22.5rem;
 }
 .tourMeter span {
   display: block;
@@ -320,24 +326,22 @@
 }
 .window {
   position: relative;
-  perspective: 1400px;
-  transform-style: preserve-3d;
 }
 .windowGlow {
   position: absolute;
   inset: 6% 4% -8%;
   background: radial-gradient(closest-side, rgba(55, 211, 196, 0.28), rgba(79, 168, 232, 0.12) 55%, transparent);
-  filter: blur(30px);
+  filter: blur(1.875rem);
   z-index: 0;
 }
 .windowFrame {
   position: relative;
   z-index: 1;
   aspect-ratio: 1933 / 1238;
-  border-radius: 18px;
+  border-radius: 1.125rem;
   overflow: hidden;
   background: #0b1018;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 40px 90px -30px rgba(0, 0, 0, 0.9), 0 0 0 10px rgba(255, 255, 255, 0.025);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 2.5rem 5.625rem -1.875rem rgba(0, 0, 0, 0.9), 0 0 0 0.625rem rgba(255, 255, 255, 0.025);
 }
 .windowFrame img {
   width: 100%;
@@ -352,56 +356,23 @@
 }
 .tourList {
   display: grid;
-  gap: 64px;
-  padding-bottom: 24px;
+  gap: 4rem;
+  padding-bottom: 1.5rem;
 }
 .tourItem {
   display: grid;
-  gap: 22px;
+  gap: 1.375rem;
 }
 
 /* ------------------------------------------------------------------ features */
 
-.bento {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
-}
-.bento > * {
-  min-width: 0;
-}
-.spanWide {
-  grid-column: span 2;
-  grid-row: span 2;
-}
-.tile {
-  height: 100%;
-  padding: 24px;
-  display: grid;
-  align-content: start;
-  gap: 12px;
-}
-.tile p {
-  color: var(--text-soft);
-  font-size: 14.5px;
-  line-height: 1.55;
-}
-.tileHead {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.tileHead h3 {
-  font-size: 17.5px;
-  letter-spacing: -0.015em;
-}
 .tileIcon {
   flex: none;
-  width: 40px;
-  height: 40px;
+  width: 2.5rem;
+  height: 2.5rem;
   display: grid;
   place-items: center;
-  border-radius: 12px;
+  border-radius: 0.75rem;
   color: var(--blue-soft);
   background: rgba(255, 255, 255, 0.04);
   box-shadow: inset 0 0 0 1px var(--line-strong);
@@ -409,36 +380,109 @@
 .tileLink {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  margin-top: 4px;
+  gap: 0.375rem;
+  margin-top: 0.25rem;
   font-weight: 700;
-  font-size: 14.5px;
+  font-size: 0.9062rem;
   color: var(--blue-soft);
 }
 .tileLink:hover {
   text-decoration: none;
-  gap: 10px;
+  gap: 0.625rem;
 }
-.tileMods {
-  gap: 16px;
+
+/* The mods panel: what the Mods page does, and a list to try it on. */
+.modsPanel {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 2.75rem;
+  align-items: center;
+  padding: 2.25rem;
+  margin-bottom: 1rem;
+}
+.modsCopy {
+  display: grid;
+  gap: 0.875rem;
+  align-content: start;
+}
+.modsCopy h3 {
+  font-size: 1.75rem;
+  letter-spacing: -0.02em;
+}
+.modsCopy p {
+  color: var(--text-soft);
+  font-size: 0.9688rem;
+  line-height: 1.6;
+}
+.modsPoints {
+  list-style: none;
+  margin: 2px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5625rem;
+}
+.modsPoints li {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-size: 0.9062rem;
+  font-weight: 600;
+}
+.modsPoints li::before {
+  content: "";
+  width: 0.4375rem;
+  height: 0.4375rem;
+  flex: none;
+  background: var(--teal, #37d3c4);
+  box-shadow: 0 0 0.625rem rgba(55, 211, 196, 0.6);
+}
+.modsCopy .modsTry {
+  margin-top: 0.375rem;
+  font-size: 0.8438rem;
+  font-weight: 700;
+  color: #5fbf87;
+}
+.modDemo {
+  padding: 0.875rem;
+  border-radius: 1rem;
+  background: rgba(6, 10, 16, 0.55);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.modDemoHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 2px 0.25rem 0.75rem;
+  font-size: 0.7812rem;
+  color: var(--text-soft);
+}
+.modDemoHead b {
+  color: #5fbf87;
+  font-weight: 700;
 }
 .modList {
   list-style: none;
-  margin: 6px 0 0;
+  margin: 0;
   padding: 0;
   display: grid;
-  gap: 8px;
+  gap: 0.5rem;
 }
 .modList li {
   display: grid;
   grid-template-columns: auto 1fr auto auto;
   align-items: center;
-  gap: 12px;
-  padding: 11px 12px;
-  border-radius: 12px;
+  gap: 0.75rem;
+  padding: 0.625rem 0.625rem 0.625rem 0.75rem;
+  border-radius: 0.75rem;
   background: rgba(255, 255, 255, 0.025);
   box-shadow: inset 0 0 0 1px var(--line);
-  font-size: 14px;
+  font-size: 0.875rem;
+  transition: background 0.4s var(--ease), box-shadow 0.4s var(--ease);
+}
+.modList li[data-state="installed"] {
+  background: rgba(95, 191, 135, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(95, 191, 135, 0.4);
 }
 .modList b {
   font-weight: 700;
@@ -449,87 +493,150 @@
 .modList em {
   font-style: normal;
   color: #1bd96a;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 650;
 }
 .modDot {
-  width: 26px;
-  height: 26px;
-  border-radius: 7px;
+  width: 1.625rem;
+  height: 1.625rem;
+  border-radius: 0.4375rem;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
 }
-.modInstall,
-.modInstalled {
-  font-size: 12.5px;
+.modButton,
+.modDone {
+  min-width: 6.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.4375rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.7812rem;
   font-weight: 750;
-  padding: 6px 12px;
-  border-radius: 8px;
 }
-.modInstall {
+.modButton {
+  position: relative;
+  overflow: hidden;
+  border: 0;
   color: #0c191e;
   background: #5fbf87;
+  cursor: pointer;
+  transition: background 0.2s var(--ease);
 }
-.modInstalled {
-  color: #5fbf87;
+.modButton:hover {
+  background: #7ad6a0;
+}
+.modButton span {
+  position: relative;
+  z-index: 1;
+}
+/* While installing: the button dims and fills from the left, like the launcher's progress bar. */
+.modButton i {
+  position: absolute;
+  inset: 0;
+  background: #5fbf87;
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.modButton:disabled {
+  cursor: progress;
+  color: #d6f5e2;
+  background: rgba(95, 191, 135, 0.2);
+}
+.modButton:disabled i {
+  animation: modFill linear forwards;
+}
+.modDone {
+  color: #7ad6a0;
+  background: rgba(95, 191, 135, 0.14);
+  animation: modPop 0.45s var(--ease);
+}
+@keyframes modFill {
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes modPop {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+}
+
+/* Six features under it, all the same shape. */
+.featureGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+.feature {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.625rem;
+  transition: background 0.3s var(--ease), box-shadow 0.3s var(--ease);
+}
+.feature:hover {
+  background: rgba(22, 31, 45, 0.8);
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+}
+.feature h3 {
+  font-size: 1.0938rem;
+  letter-spacing: -0.015em;
+}
+.feature p {
+  color: var(--text-soft);
+  font-size: 0.9062rem;
+  line-height: 1.55;
+}
+.feature .chips,
+.feature .swatches {
+  margin-top: auto;
+  padding-top: 0.25rem;
 }
 .chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 0.375rem;
 }
 .chips span {
-  font-size: 12.5px;
+  font-size: 0.7812rem;
   font-weight: 650;
-  padding: 5px 10px;
-  border-radius: 999px;
+  padding: 0.3125rem 0.625rem;
+  border-radius: 62.4375rem;
   color: var(--text-soft);
   background: rgba(255, 255, 255, 0.05);
   box-shadow: inset 0 0 0 1px var(--line);
 }
-.tileArt {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  height: 120px;
-}
-.tileArt svg {
-  width: 100%;
-  height: 100%;
-  filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.45));
-  transition: transform 0.5s var(--ease);
-}
-.tile:hover .tileArt svg:first-child {
-  transform: translateY(-4px) scale(1.04);
-}
-.tile:hover .tileArt svg:last-child {
-  transform: translateY(-4px) rotate(3deg);
-}
 .swatches {
   display: flex;
-  gap: 6px;
+  gap: 0.375rem;
 }
 .swatches span {
-  width: 22px;
-  height: 22px;
-  border-radius: 7px;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25), 0 0 16px -4px currentColor;
-  transition: transform 0.2s var(--ease);
+  width: 1.375rem;
+  height: 1.375rem;
+  border-radius: 0.4375rem;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
 }
-.swatches span:hover {
-  transform: translateY(-3px);
-}
-@media (max-width: 1100px) {
-  .bento {
+@media (max-width: 900px) {
+  .modsPanel {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+    padding: 1.5rem;
+  }
+  .featureGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 @media (max-width: 620px) {
-  .bento {
+  .featureGrid {
     grid-template-columns: 1fr;
   }
-  .spanWide {
-    grid-column: auto;
-    grid-row: auto;
+  .modList li {
+    grid-template-columns: auto 1fr auto;
+  }
+  .modList em {
+    display: none;
   }
 }
 
@@ -540,19 +647,19 @@
 }
 .fan {
   position: relative;
-  height: clamp(260px, 36vw, 470px);
-  margin: 12px auto 40px;
-  max-width: 1000px;
+  height: clamp(16.25rem, 36vw, 29.375rem);
+  margin: 0.75rem auto 2.5rem;
+  max-width: 62.5rem;
 }
 .fanCard {
   position: absolute;
   left: 50%;
   top: 0;
-  width: min(62%, 620px);
-  margin: 0 0 0 calc(min(62%, 620px) / -2);
-  border-radius: 16px;
+  width: min(62%, 38.75rem);
+  margin: 0 0 0 calc(min(62%, 38.75rem) / -2);
+  border-radius: 1rem;
   overflow: hidden;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 30px 70px -25px rgba(0, 0, 0, 0.9);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 1.875rem 4.375rem -1.5625rem rgba(0, 0, 0, 0.9);
   background: #0b1018;
 }
 .fanCard[data-pos="1"] {
@@ -565,20 +672,20 @@
 }
 .fanCard figcaption {
   position: absolute;
-  left: 12px;
-  bottom: 12px;
-  padding: 5px 10px;
-  border-radius: 8px;
+  left: 0.75rem;
+  bottom: 0.75rem;
+  padding: 0.3125rem 0.625rem;
+  border-radius: 0.5rem;
   background: rgba(8, 12, 18, 0.8);
   font-family: var(--font-pixel), monospace;
-  font-size: 10px;
+  font-size: 0.625rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 .marquee {
   display: grid;
-  gap: 12px;
-  margin-top: 8px;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
   mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
 }
@@ -590,7 +697,7 @@
   margin: 0;
   padding: 0;
   display: flex;
-  gap: 10px;
+  gap: 0.625rem;
   width: max-content;
   animation: marquee 60s linear infinite;
 }
@@ -604,20 +711,20 @@
 .marqueeTrack li {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
-  padding: 10px 16px;
-  border-radius: 12px;
+  gap: 0.5625rem;
+  padding: 0.625rem 1rem;
+  border-radius: 0.75rem;
   font-weight: 650;
-  font-size: 15px;
+  font-size: 0.9375rem;
   white-space: nowrap;
   background: rgba(255, 255, 255, 0.035);
   box-shadow: inset 0 0 0 1px var(--line);
 }
 .marqueeTrack li i,
 .legend i {
-  width: 8px;
-  height: 8px;
-  box-shadow: 0 0 10px currentColor;
+  width: 0.5rem;
+  height: 0.5rem;
+  box-shadow: 0 0 0.625rem currentColor;
 }
 @keyframes marquee {
   to {
@@ -628,16 +735,16 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 8px 22px;
-  margin-top: 16px;
+  gap: 0.5rem 1.375rem;
+  margin-top: 1rem;
   color: var(--muted);
-  font-size: 13.5px;
+  font-size: 0.8438rem;
   mask-image: none;
 }
 .legend span {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
 }
 @media (prefers-reduced-motion: reduce) {
   .marqueeTrack {
@@ -658,29 +765,29 @@
   padding: 0;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
+  gap: 1rem;
   counter-reset: none;
 }
 .step {
-  padding: 28px 26px 30px;
+  padding: 1.75rem 1.625rem 1.875rem;
   display: grid;
-  gap: 10px;
+  gap: 0.625rem;
   align-content: start;
 }
 .step h3 {
-  font-size: 20px;
+  font-size: 1.25rem;
 }
 .step p {
   color: var(--text-soft);
-  font-size: 15px;
+  font-size: 0.9375rem;
   line-height: 1.55;
 }
 .stepNo {
   font-family: var(--font-pixel), monospace;
-  font-size: 28px;
+  font-size: 1.75rem;
   line-height: 1;
   color: var(--teal);
-  text-shadow: 0 0 22px rgba(55, 211, 196, 0.55);
+  text-shadow: 0 0 1.375rem rgba(55, 211, 196, 0.55);
 }
 @media (max-width: 860px) {
   .steps {
@@ -693,7 +800,7 @@
 .storeGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
+  gap: 1rem;
 }
 .storeCard {
   display: block;
@@ -705,25 +812,25 @@
 }
 .storeInner {
   height: 100%;
-  padding: 24px;
+  padding: 1.5rem;
   display: grid;
-  gap: 10px;
+  gap: 0.625rem;
   align-content: start;
   overflow: hidden;
 }
 .storeInner h3 {
-  font-size: 22px;
+  font-size: 1.375rem;
 }
 .storeInner p {
   color: var(--text-soft);
-  font-size: 15px;
+  font-size: 0.9375rem;
 }
 .storeArt {
-  height: 150px;
+  height: 9.375rem;
   display: grid;
   place-items: center;
-  margin: -6px -6px 8px;
-  border-radius: 14px;
+  margin: -0.375rem -0.375rem 0.5rem;
+  border-radius: 0.875rem;
   background: radial-gradient(closest-side, rgba(79, 168, 232, 0.2), transparent);
 }
 .storeArt svg {
@@ -733,7 +840,7 @@
   transition: transform 0.6s var(--ease);
 }
 .storeCard:hover .storeArt svg {
-  transform: translateY(-6px) scale(1.05);
+  transform: translateY(-0.375rem) scale(1.05);
 }
 .storeGold .storeArt {
   background: radial-gradient(closest-side, rgba(240, 180, 41, 0.26), transparent);
@@ -752,43 +859,43 @@
 .designs {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-  gap: 32px;
+  gap: 2rem;
   align-items: center;
-  padding: clamp(28px, 4vw, 48px);
+  padding: clamp(1.75rem, 4vw, 3rem);
   overflow: hidden;
 }
 .designs > div:first-child {
   display: grid;
-  gap: 16px;
+  gap: 1rem;
   justify-items: start;
 }
 .designArt {
   position: relative;
-  height: 280px;
+  height: 17.5rem;
 }
 .designCape {
   position: absolute;
   top: 0;
-  left: calc(50% - 90px + (var(--i) - 1) * 120px);
-  width: 180px;
-  height: 260px;
-  transform: rotate(calc((var(--i) - 1) * 8deg)) translateY(calc(var(--i) * 6px));
+  left: calc(50% - 5.625rem + (var(--i) - 1) * 7.5rem);
+  width: 11.25rem;
+  height: 16.25rem;
+  transform: rotate(calc((var(--i) - 1) * 8deg)) translateY(calc(var(--i) * 0.375rem));
   transition: transform 0.6s var(--ease);
 }
 .designs:hover .designCape {
-  transform: rotate(calc((var(--i) - 1) * 12deg)) translateY(calc((var(--i) - 1) * -8px));
+  transform: rotate(calc((var(--i) - 1) * 12deg)) translateY(calc((var(--i) - 1) * -0.5rem));
 }
 .designCape svg {
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 16px 30px rgba(0, 0, 0, 0.5));
+  filter: drop-shadow(0 1rem 1.875rem rgba(0, 0, 0, 0.5));
 }
 @media (max-width: 860px) {
   .designs {
     grid-template-columns: 1fr;
   }
   .designArt {
-    height: 220px;
+    height: 13.75rem;
   }
 }
 
@@ -797,7 +904,7 @@
 .final {
   position: relative;
   overflow: hidden;
-  padding: clamp(72px, 10vw, 130px) 0 clamp(48px, 6vw, 80px);
+  padding: clamp(4.5rem, 10vw, 8.125rem) 0 clamp(3rem, 6vw, 5rem);
   text-align: center;
 }
 .final :global(.wide) {

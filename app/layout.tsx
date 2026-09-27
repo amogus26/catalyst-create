@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Silkscreen } from "next/font/google";
 import { SiteFooter } from "@/components/site/footer";
 import { SiteHeader } from "@/components/site/header";
+import { PointerLight } from "@/components/site/pointer-light";
 import { usingDevStore } from "@/lib/store";
 import "./globals.css";
 import "./site.css";
@@ -50,6 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </noscript>
       </head>
       <body>
+        <PointerLight />
         <a className="skip-link" href="#main">
           Skip to content
         </a>
