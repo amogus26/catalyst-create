@@ -9,7 +9,7 @@ function Poster() {
   return (
     <div className={styles.poster} aria-hidden="true">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/stills/hero.webp" alt="" width={720} height={820} decoding="async" />
+      <img src="/stills/hero.webp" alt="" width={1094} height={1246} decoding="async" />
     </div>
   );
 }

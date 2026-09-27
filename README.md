@@ -44,10 +44,12 @@ from the launcher and client source (each block names the Kotlin file it came fr
 changes, change it there and every page follows. `lib/sprites.ts` holds the reward icons,
 generated from the launcher's `RewardIcons.kt`, and `components/site/cosmetic-art.tsx` draws capes
 and wings the way `CosmeticArt.kt` does. The screenshots in `assets/screens/` are of the real
-launcher and client, as **lossless** WebP: keep new ones lossless (PNG or lossless WebP), because
-the site compresses them once itself and small UI text goes soft if it is compressed twice. They are shown
-near half their width (the pinned tour window, the tabbed client view), so on a Retina screen each
-pixel of the screenshot is one pixel of the screen. The mods panel's icons come straight from
+launcher and client. **The launcher's are drawn by the launcher itself** at 2.25x (2880x1800) -
+run `WEBSITE_SHOTS=1 ./gradlew test --tests '*WebsiteShots*'` in the launcher repo and convert
+`build/website-shots/*.png` to WebP into `assets/screens/`. They are shown at no more than 1440px
+wide, so one pixel per screen pixel on Retina, and served as they are (`unoptimized`), never
+re-compressed. The Store tab is left out on purpose: it shows the daily reward cards. The client's
+three are the team's screenshots, lossless. The mods panel's icons come straight from
 Modrinth's CDN, as the launcher shows them - they are the mod authors', not ours to copy.
 
 - **Daily rewards stay a surprise.** The site says what the calendar is worth in coins, never which
@@ -68,7 +70,7 @@ on `/cosmetics`, the coins on `/coins` and the cape preview on `/designs`. Scrol
 
 - The 3D is its own chunk, loaded after the page has painted (`next/dynamic` with `ssr: false`,
   mounted when the browser is idle), so it never holds up the first view.
-- The pixel ratio is capped at 1.75, and a scene stops drawing while it is off screen.
+- The pixel ratio is capped at 2, and a scene stops drawing while it is off screen.
 - A still picture stands in while the 3D loads, without WebGL, and if the scene throws.
 - **Reduced motion** (`prefers-reduced-motion`): nothing turns or floats, a scene draws one still
   frame, the pinned scroll sections become plain lists, and everything that would fade in is simply
@@ -367,6 +369,5 @@ Dark, like the launcher: its navy ground, its sky blue for actions, its sculk te
 coin gold for anything you can earn or buy. Pages open on a "hall" - soft pools of teal light with
 ribbons and specks drifting up, drawn in CSS - and sections rise in as they are reached. Wide screens
 get pinned scroll sections (the launcher tour on the home page, the battle pass track); phones get the
-same content as plain lists. Inter for text; the pixel face only labels things, as the launcher's
-does. Buttons have the launcher's stepped pixel corners. The logo is the launcher's own traced logo
+same content as plain lists. Inter for text, Space Grotesk for headings and JetBrains Mono for small labels - no pixel font. Buttons have the launcher's stepped pixel corners. The logo is the launcher's own traced logo
 as an SVG, never the raster artwork. Every page says it is not affiliated with Mojang or Microsoft.

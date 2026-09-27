@@ -5,7 +5,7 @@ import clientTitle from "@/assets/screens/client-title.webp";
 import launcherControls from "@/assets/screens/launcher-controls.webp";
 import launcherHome from "@/assets/screens/launcher-home.webp";
 import launcherMods from "@/assets/screens/launcher-mods.webp";
-import launcherShop from "@/assets/screens/launcher-shop.webp";
+import launcherPass from "@/assets/screens/launcher-pass.webp";
 import { ClientViews, ModuleMarquee } from "@/components/home/client-showcase";
 import { HeroStage } from "@/components/home/hero-stage";
 import { Tour, type Chapter } from "@/components/home/tour";
@@ -24,6 +24,8 @@ import {
   PaletteIcon,
   SlidersIcon,
   SoundIcon,
+  WindowsIcon,
+  AppleIcon,
   SparkIcon,
 } from "@/components/site/icons";
 import { Reveal, Stagger, StaggerItem, Tilt } from "@/components/site/motion";
@@ -70,13 +72,13 @@ const LAUNCHER_CHAPTERS: Chapter[] = [
     alt: "The launcher's Controls page with custom sound slots and ready-made sounds",
   },
   {
-    key: "store",
-    kicker: "Store",
-    title: "Something new every day.",
-    text: "Open a daily reward card, level up the battle pass with daily quests, and find the community's cape designs - all in the Store.",
-    points: ["A 30-day calendar with lucky days", `Battle pass Season ${SEASON.number}: ${SEASON.name}`, "Wings and capes in Cosmetics"],
-    image: launcherShop,
-    alt: "The launcher's Store with the battle pass banner and a row of daily reward cards",
+    key: "pass",
+    kicker: "Battle pass",
+    title: "Level up as you play.",
+    text: "Daily quests fill the bar - play an hour, play two sessions, open your daily card - and every level has something on the free lane or the pass.",
+    points: [`Season ${SEASON.number}: ${SEASON.name}, ${SEASON.levels} levels`, "Up to 275 XP a day from quests", `The ${SEASON.headline} at level ${SEASON.levels}`],
+    image: launcherPass,
+    alt: "The launcher's Battle Pass page: the Season 4 Emberfall bar, the free and premium reward lanes, and three daily quests",
   },
 ];
 
@@ -253,7 +255,7 @@ export default function HomePage() {
             </h2>
           </Reveal>
         </div>
-        <Tour id="launcher-tour" chapters={LAUNCHER_CHAPTERS} label="Launcher pages" />
+        <Tour id="launcher-tour" chapters={LAUNCHER_CHAPTERS} />
       </section>
 
       {/* ------------------------------------------------------------------ features */}
@@ -442,58 +444,89 @@ export default function HomePage() {
       </section>
 
       {/* ------------------------------------------------------------------ community */}
-      <section className="band tight" aria-labelledby="designs-title">
-        <div className="wide">
-          <Reveal>
-            <div className={`panel ${styles.designs}`}>
-              <div>
-                <span className="kicker">Catalyst Designs</span>
-                <h2 className="headline" id="designs-title">
-                  Made by players.
-                </h2>
-                <p className="lede">
-                  Draw a cape right in your browser or upload one. A person checks every design, players vote, and the
-                  winners become cosmetics.
-                </p>
-                <div className={styles.actions}>
-                  <Link className="btn primary" href="/designs#submit">
-                    Design a cape
-                  </Link>
-                  <Link className="btn" href="/designs#vote">
-                    Vote on the round
-                  </Link>
-                </div>
-              </div>
-              <div className={styles.designArt} aria-hidden="true">
-                {SHOP_ITEMS.filter((i) => i.kind === "cape")
-                  .slice(0, 3)
-                  .map((cape, i) => (
-                    <div key={cape.id} className={styles.designCape} style={{ ["--i" as string]: i }}>
-                      <CapeArt colors={cape.colors} id={`community-${cape.id}`} />
-                    </div>
-                  ))}
-              </div>
+      <section className="band" aria-labelledby="designs-title">
+        <div className={`wide ${styles.designs}`}>
+          <Reveal className={styles.designsCopy}>
+            <span className="kicker">Catalyst Designs</span>
+            <h2 className="display" id="designs-title">
+              Made by <span className="shine-text">players.</span>
+            </h2>
+            <p className="lede">
+              Draw a cape right in your browser or upload one. A person checks every design, players vote, and the
+              winners become cosmetics.
+            </p>
+            <ol className={styles.designSteps}>
+              <li>
+                <b>Draw or upload</b> a 64×32 cape
+              </li>
+              <li>
+                <b>A person checks it</b> - nothing is shown before
+              </li>
+              <li>
+                <b>Players vote</b> - the winners go into the game
+              </li>
+            </ol>
+            <div className={styles.actions}>
+              <Link className="btn primary" href="/designs#submit">
+                Design a cape
+              </Link>
+              <Link className="btn" href="/designs#vote">
+                Vote on the round
+              </Link>
             </div>
+          </Reveal>
+          <Reveal from="scale" className={styles.designArt}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- a still rendered from the site's own 3D players */}
+            <img
+              src="/stills/designs-trio.webp"
+              alt="Three players seen from behind, wearing the Emberfall, Sculk and Aurora capes"
+              width={1356}
+              height={905}
+              loading="lazy"
+              decoding="async"
+            />
           </Reveal>
         </div>
       </section>
 
       {/* ------------------------------------------------------------------ download */}
       <section className={styles.final} aria-labelledby="final-title">
-        <Hall souls={18} ribbons={false} height={520} fade />
-        <div className="wide">
-          <Reveal className="band-head center">
+        <Hall souls={18} ribbons={false} height={620} fade />
+        <div className={`wide ${styles.finalGrid}`}>
+          <Reveal className={styles.finalCopy}>
             <span className="kicker">Ready when you are</span>
-            <h2 className="display" id="final-title" style={{ fontSize: "clamp(2.5rem, 6vw, 5rem)" }}>
+            <h2 className="display" id="final-title">
               Play <span className="shine-text">better.</span>
             </h2>
-            <p className="lede">Free to play, on Windows and macOS. Your mods, your modules and your look - in one launcher.</p>
-            <div className={styles.actions} style={{ justifyContent: "center" }}>
+            <p className="lede">Your mods, your modules and your look - in one launcher. Free to play.</p>
+            <div className={styles.actions}>
               <DownloadButton size="big" />
               <Link className="btn big" href="/download#notes">
                 Release notes
               </Link>
             </div>
+            <p className={styles.platforms}>
+              <span>
+                <WindowsIcon size={18} /> Windows
+              </span>
+              <span>
+                <AppleIcon size={18} /> macOS
+              </span>
+              <span>
+                Minecraft {GAME_VERSION} with {LOADER}
+              </span>
+            </p>
+          </Reveal>
+          <Reveal from="scale" className={styles.finalArt}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- a still rendered from the site's own 3D player */}
+            <img
+              src="/stills/cta-wave.webp"
+              alt="A player in the Sculk Cape and Prism Wings, waving"
+              width={1184}
+              height={979}
+              loading="lazy"
+              decoding="async"
+            />
           </Reveal>
         </div>
       </section>

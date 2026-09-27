@@ -120,7 +120,7 @@
   line-height: 1.4;
 }
 .questNo {
-  font-family: var(--font-pixel), monospace;
+  font-family: var(--font-label), monospace;
   font-size: 0.75rem;
   color: #ffb27a;
   letter-spacing: 0.1em;
@@ -296,7 +296,7 @@
   .laneLabels span {
     display: grid;
     align-items: center;
-    font-family: var(--font-pixel), monospace;
+    font-family: var(--font-label), monospace;
     font-size: 0.625rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -343,7 +343,7 @@
 }
 .pickArt em {
   font-style: normal;
-  font-family: var(--font-pixel), monospace;
+  font-family: var(--font-label), monospace;
   color: var(--muted);
 }
 @media (max-width: 760px) {

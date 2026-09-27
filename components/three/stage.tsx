@@ -80,7 +80,7 @@ export function Stage({
           <Canvas
             // No tone mapping: the launcher's colours (lib/catalyst.ts) come out as they are, not washed out.
             flat
-            dpr={[1, 1.75]}
+            dpr={[1, 2]}
             camera={camera}
             frameloop={!visible ? "never" : reduced ? "demand" : "always"}
             gl={{ antialias: true, alpha: true, powerPreference: "high-performance", preserveDrawingBuffer: keep }}

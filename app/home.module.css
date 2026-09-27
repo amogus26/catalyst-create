@@ -136,7 +136,7 @@
   justify-items: center;
   gap: 0.5rem;
   color: var(--muted);
-  font-family: var(--font-pixel), monospace;
+  font-family: var(--font-label), monospace;
   font-size: 0.625rem;
   letter-spacing: 0.18em;
 }
@@ -229,34 +229,6 @@
   position: relative;
   padding-top: clamp(2.5rem, 6vw, 5rem);
 }
-.tour {
-  position: relative;
-}
-.tourSticky {
-  position: sticky;
-  top: var(--header-h);
-  height: calc(100vh - var(--header-h));
-  display: flex;
-  align-items: center;
-  overflow: hidden;
-}
-/* Wider than the page's other sections, so the screenshots show near their real size - sharp. */
-.tourWide {
-  width: 100%;
-  max-width: 90rem;
-  margin: 0 auto;
-  padding: 0 var(--gutter);
-}
-.tourGrid {
-  display: grid;
-  grid-template-columns: minmax(0, 18.75rem) minmax(0, 1fr);
-  gap: clamp(1.75rem, 4vw, 4rem);
-  align-items: center;
-}
-.tourCopy {
-  display: grid;
-  gap: 1.75rem;
-}
 .tourText {
   display: grid;
   gap: 1rem;
@@ -288,11 +260,6 @@
   background: var(--teal);
   box-shadow: 0 0 0.625rem var(--teal);
 }
-.tourNav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
 .pill,
 .pillOn {
   font: inherit;
@@ -318,30 +285,11 @@
   background: var(--teal);
   box-shadow: 0 0 1.5rem -0.25rem rgba(55, 211, 196, 0.8);
 }
-.tourMeter {
-  height: 0.1875rem;
-  border-radius: 0.1875rem;
-  background: var(--line);
-  overflow: hidden;
-  max-width: 22.5rem;
-}
-.tourMeter span {
-  display: block;
-  height: 100%;
-  transform-origin: 0 50%;
-  background: linear-gradient(90deg, var(--teal), var(--blue));
-}
 /*
  * Screenshots are served as they are (lossless, never re-compressed) and shown at exactly half their
  * width, in px so the page's scaling doesn't touch it: on a Retina screen that is one screenshot pixel
  * to one screen pixel - the app at its real size.
  */
-.window {
-  position: relative;
-  width: 100%;
-  max-width: 967px;
-  justify-self: center;
-}
 .ambient {
   position: absolute;
   inset: -4% -3%;
@@ -367,7 +315,7 @@
   mask-composite: intersect;
 }
 .windowFrame {
-  aspect-ratio: 1933 / 1238;
+  aspect-ratio: 16 / 10;
 }
 .windowFrame img {
   width: 100%;
@@ -375,19 +323,6 @@
   object-fit: cover;
   object-position: top left;
   display: block;
-}
-.windowShot {
-  position: absolute;
-  inset: 0;
-}
-.tourList {
-  display: grid;
-  gap: 4rem;
-  padding-bottom: 1.5rem;
-}
-.tourItem {
-  display: grid;
-  gap: 1.375rem;
 }
 
 /* ------------------------------------------------------------------ features */
@@ -798,7 +733,7 @@
   line-height: 1.55;
 }
 .stepNo {
-  font-family: var(--font-pixel), monospace;
+  font-family: var(--font-label), monospace;
   font-size: 1.75rem;
   line-height: 1;
   color: var(--teal);
@@ -873,44 +808,65 @@
 
 .designs {
   display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-  gap: 2rem;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: 3rem;
   align-items: center;
-  padding: clamp(1.75rem, 4vw, 3rem);
-  overflow: hidden;
 }
-.designs > div:first-child {
+.designsCopy {
   display: grid;
-  gap: 1rem;
+  gap: 1.25rem;
   justify-items: start;
+}
+.designsCopy :global(.display),
+.finalCopy :global(.display) {
+  font-size: clamp(2.75rem, 5.4vw, 5rem);
+}
+.designSteps {
+  list-style: none;
+  counter-reset: step;
+  margin: 0.25rem 0 0.5rem;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+.designSteps li {
+  counter-increment: step;
+  display: flex;
+  align-items: baseline;
+  gap: 0.875rem;
+  color: var(--text-soft);
+}
+.designSteps li::before {
+  content: "0" counter(step);
+  font-family: var(--font-label), monospace;
+  font-size: 0.75rem;
+  color: var(--teal);
+}
+.designSteps b {
+  color: var(--text);
+  font-weight: 650;
 }
 .designArt {
   position: relative;
-  height: 17.5rem;
 }
-.designCape {
+.designArt::before,
+.finalArt::before {
+  content: "";
   position: absolute;
-  top: 0;
-  left: calc(50% - 5.625rem + (var(--i) - 1) * 7.5rem);
-  width: 11.25rem;
-  height: 16.25rem;
-  transform: rotate(calc((var(--i) - 1) * 8deg)) translateY(calc(var(--i) * 0.375rem));
-  transition: transform 0.6s var(--ease);
+  inset: 10% 8%;
+  background: radial-gradient(closest-side, rgba(55, 211, 196, 0.2), transparent);
+  pointer-events: none;
 }
-.designs:hover .designCape {
-  transform: rotate(calc((var(--i) - 1) * 12deg)) translateY(calc((var(--i) - 1) * -0.5rem));
-}
-.designCape svg {
+.designArt img,
+.finalArt img {
+  position: relative;
+  display: block;
   width: 100%;
-  height: 100%;
-  filter: drop-shadow(0 1rem 1.875rem rgba(0, 0, 0, 0.5));
+  height: auto;
 }
-@media (max-width: 860px) {
+@media (max-width: 900px) {
   .designs {
     grid-template-columns: 1fr;
-  }
-  .designArt {
-    height: 13.75rem;
   }
 }
 
@@ -920,7 +876,40 @@
   position: relative;
   overflow: hidden;
   padding: clamp(4.5rem, 10vw, 8.125rem) 0 clamp(3rem, 6vw, 5rem);
-  text-align: center;
+}
+.finalGrid {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 2rem;
+  align-items: center;
+}
+.finalCopy {
+  display: grid;
+  gap: 1.25rem;
+  justify-items: start;
+}
+.finalArt {
+  position: relative;
+  max-width: 32rem;
+  justify-self: center;
+}
+.platforms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+.platforms span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+@media (max-width: 900px) {
+  .finalGrid {
+    grid-template-columns: 1fr;
+  }
 }
 .final :global(.wide) {
   position: relative;
@@ -1005,4 +994,37 @@
   padding: 0;
   font-size: 1.5rem;
   line-height: 1;
+}
+
+/* ------------------------------------------------------------------ the launcher, page by page */
+
+.chapters {
+  display: grid;
+  gap: clamp(5rem, 10vw, 9rem);
+}
+.chapter {
+  display: grid;
+  gap: clamp(1.75rem, 3vw, 2.75rem);
+}
+.chapterHead {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1.25rem 4rem;
+  align-items: end;
+}
+.chapterHead > div {
+  display: grid;
+  gap: 1rem;
+}
+/* 1440px at most - half the launcher's 2880px render, so one screenshot pixel per screen pixel on Retina. */
+.shotWrap {
+  position: relative;
+  width: calc(100% - 2 * var(--gutter));
+  max-width: 1440px;
+  margin: 0 auto;
+}
+@media (max-width: 900px) {
+  .chapterHead {
+    grid-template-columns: 1fr;
+  }
 }

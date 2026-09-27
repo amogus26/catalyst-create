@@ -158,7 +158,7 @@
   right: 0.875rem;
   padding: 0.25rem 0.5625rem 0.1875rem;
   border-radius: 0.4375rem;
-  font-family: var(--font-pixel), monospace;
+  font-family: var(--font-label), monospace;
   font-size: 0.5938rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;

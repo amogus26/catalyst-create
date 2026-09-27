@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Silkscreen } from "next/font/google";
+import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import { SiteFooter } from "@/components/site/footer";
 import { SiteHeader } from "@/components/site/header";
 import { PointerLight } from "@/components/site/pointer-light";
@@ -7,14 +7,10 @@ import { usingDevStore } from "@/lib/store";
 import "./globals.css";
 import "./site.css";
 
-/** Inter carries the text; the pixel face - the launcher's own voice - only labels things. */
+/** Inter carries the text, Space Grotesk the headings, and JetBrains Mono the small labels. */
 const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-sans" });
-const silkscreen = Silkscreen({
-  subsets: ["latin"],
-  weight: "400",
-  display: "swap",
-  variable: "--font-pixel",
-});
+const grotesk = Space_Grotesk({ subsets: ["latin"], weight: ["500", "600", "700"], display: "swap", variable: "--font-display" });
+const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["500", "600"], display: "swap", variable: "--font-label" });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://catalyst-client.netlify.app"),
@@ -43,7 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const devStore = usingDevStore();
 
   return (
-    <html lang="en" className={`${inter.variable} ${silkscreen.variable}`}>
+    <html lang="en" className={`${inter.variable} ${grotesk.variable} ${mono.variable}`}>
       <head>
         {/* Without JavaScript nothing fades in, so anything waiting to fade in is simply shown. */}
         <noscript>

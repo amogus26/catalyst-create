@@ -135,7 +135,7 @@ code {
 }
 
 .pixel {
-  font-family: var(--font-pixel), ui-monospace, monospace;
+  font-family: var(--font-label), ui-monospace, monospace;
   letter-spacing: 0.04em;
 }
 
@@ -433,7 +433,7 @@ button.small {
   border-left: 1px solid var(--line);
 }
 .steps .no {
-  font-family: var(--font-pixel), ui-monospace, monospace;
+  font-family: var(--font-label), ui-monospace, monospace;
   font-size: 0.9375rem;
   color: var(--teal);
 }
@@ -476,7 +476,7 @@ ol.steps {
 }
 .section-head .kicker {
   display: block;
-  font-family: var(--font-pixel), ui-monospace, monospace;
+  font-family: var(--font-label), ui-monospace, monospace;
   font-size: 0.8125rem;
   letter-spacing: 0.08em;
   color: var(--teal);
@@ -554,7 +554,7 @@ ol.steps {
   position: absolute;
   top: 0.75rem;
   left: 0.75rem;
-  font-family: var(--font-pixel), ui-monospace, monospace;
+  font-family: var(--font-label), ui-monospace, monospace;
   font-size: 0.875rem;
   color: var(--text-soft);
   background: rgba(8, 12, 18, 0.7);
