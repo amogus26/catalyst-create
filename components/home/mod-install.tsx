@@ -15,7 +15,7 @@ const INSTALL_MILLIS = 1100;
  * picture of the real thing - nothing is downloaded. The first mod starts installed, as Sodium comes
  * with every profile.
  */
-export function ModInstall({ mods, source }: { mods: readonly string[]; source: string }) {
+export function ModInstall({ mods, source }: { mods: readonly { name: string; icon: string }[]; source: string }) {
   const reduced = useReducedMotionAfterMount();
   const [states, setStates] = useState<State[]>(() => mods.map((_, i) => (i === 0 ? "installed" : "idle")));
   const [said, setSaid] = useState("");
@@ -28,15 +28,15 @@ export function ModInstall({ mods, source }: { mods: readonly string[]; source: 
     if (states[i] !== "idle") return;
     if (reduced) {
       set(i, "installed");
-      setSaid(`${mods[i]} installed`);
+      setSaid(`${mods[i].name} installed`);
       return;
     }
     set(i, "installing");
-    setSaid(`Installing ${mods[i]}`);
+    setSaid(`Installing ${mods[i].name}`);
     timers.current.push(
       window.setTimeout(() => {
         set(i, "installed");
-        setSaid(`${mods[i]} installed`);
+        setSaid(`${mods[i].name} installed`);
       }, INSTALL_MILLIS),
     );
   }
@@ -52,9 +52,10 @@ export function ModInstall({ mods, source }: { mods: readonly string[]; source: 
       </div>
       <ul className={styles.modList}>
         {mods.map((mod, i) => (
-          <li key={mod} data-state={states[i]}>
-            <span className={styles.modDot} style={{ background: `hsl(${150 + i * 36} 55% 55%)` }} />
-            <b>{mod}</b>
+          <li key={mod.name} data-state={states[i]}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- a 26px icon from Modrinth's CDN */}
+            <img className={styles.modIcon} src={mod.icon} alt="" width={26} height={26} loading="lazy" decoding="async" />
+            <b>{mod.name}</b>
             <em>Modrinth</em>
             {states[i] === "installed" ? (
               <span className={styles.modDone}>
@@ -67,7 +68,7 @@ export function ModInstall({ mods, source }: { mods: readonly string[]; source: 
                 className={styles.modButton}
                 onClick={() => install(i)}
                 disabled={states[i] === "installing"}
-                aria-label={`Install ${mod}`}
+                aria-label={`Install ${mod.name}`}
               >
                 <span>{states[i] === "installing" ? "Installing" : "Install"}</span>
                 <i style={{ animationDuration: `${INSTALL_MILLIS}ms` }} />

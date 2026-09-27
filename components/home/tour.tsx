@@ -61,7 +61,7 @@ function PinnedTour({ id, chapters, label }: { id: string; chapters: Chapter[]; 
   return (
     <div ref={ref} id={id} className={styles.tour} style={{ height: `${chapters.length * 85 + 100}vh` }}>
       <div className={styles.tourSticky}>
-        <div className={`wide ${styles.tourGrid}`}>
+        <div className={`${styles.tourWide} ${styles.tourGrid}`}>
           <div className={styles.tourCopy}>
             <AnimatePresence mode="wait">
               <motion.div
@@ -101,7 +101,17 @@ function PinnedTour({ id, chapters, label }: { id: string; chapters: Chapter[]; 
             </div>
           </div>
           <motion.div className={styles.window} style={{ y: lift }}>
-            <div className={styles.windowGlow} aria-hidden="true" />
+            {/* The screenshot itself, blurred, as the light behind it - from the tiny blur placeholder,
+                so it costs nothing to load. */}
+            {chapters.map((c, i) => (
+              <div
+                key={c.key}
+                className={styles.ambient}
+                data-on={i === index}
+                style={{ backgroundImage: `url(${c.image.blurDataURL})` }}
+                aria-hidden="true"
+              />
+            ))}
             <div className={styles.windowFrame}>
               {chapters.map((c, i) => (
                 <motion.div
@@ -112,7 +122,7 @@ function PinnedTour({ id, chapters, label }: { id: string; chapters: Chapter[]; 
                   transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
                   aria-hidden={i !== index}
                 >
-                  <Image src={c.image} alt={c.alt} sizes="(min-width: 901px) 58vw, 100vw" quality={SHOT_QUALITY} placeholder="blur" />
+                  <Image src={c.image} alt={c.alt} sizes="(min-width: 901px) 72vw, 100vw" quality={SHOT_QUALITY} placeholder="blur" />
                 </motion.div>
               ))}
             </div>

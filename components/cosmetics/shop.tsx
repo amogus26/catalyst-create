@@ -45,19 +45,51 @@ export function Price({ item, big = false }: { item: ShopItem; big?: boolean }) 
 }
 
 /**
- * The shop, the way the launcher's Cosmetics tab lays it out: a filter, the items as cards in their
- * rarity's light, and - here - a 3D viewer that wears whichever card is picked. Buying happens in the
- * launcher; the button says so.
+ * The store: the picked item on a wide banner in its rarity's light, worn in 3D, and every item below
+ * on a clean grid - pick one and the banner wears it. Buying happens in the launcher; the button says
+ * so.
  */
 export function CosmeticsShop() {
   const [filter, setFilter] = useState<Filter>("all");
   const [picked, setPicked] = useState<ShopItem>(SHOP_ITEMS[0]);
   const items = SHOP_ITEMS.filter((item) => filter === "all" || item.kind === filter);
   const rarity = RARITY[picked.rarity];
+
+  function pick(item: ShopItem) {
+    setPicked(item);
+    // On a phone the banner is off screen by now: bring it back so the pick is seen.
+    const banner = document.getElementById("store-banner");
+    if (banner && banner.getBoundingClientRect().bottom < 80) banner.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   return (
-    <div className={styles.shop}>
-      <aside className={styles.viewerCol} aria-label="3D preview">
-        <div className={styles.viewer} style={{ ["--glow" as string]: rarity.color }}>
+    <div className={styles.store}>
+      <div id="store-banner" className={styles.banner} style={{ ["--glow" as string]: rarity.color }}>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={picked.id}
+            className={styles.bannerInfo}
+            initial={{ opacity: 0, x: -16 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 12 }}
+            transition={{ duration: 0.3 }}
+          >
+            <span className={styles.bannerTag} style={{ color: rarity.color }}>
+              {picked.tag?.kind === "deal" ? `${picked.tag.percentOff}% off · ` : picked.tag?.kind === "new" ? "New · " : ""}
+              {rarity.label} {picked.kind === "wings" ? "wings" : "cape"}
+            </span>
+            <h2>{picked.name}</h2>
+            <p className={styles.lore}>&ldquo;{picked.lore}&rdquo;</p>
+            <Price item={picked} big />
+            <div className={styles.bannerActions}>
+              <Link className="btn primary" href="/download">
+                Get it in the launcher
+              </Link>
+              <span className={styles.where}>Store → Cosmetics, with coins</span>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+        <div className={styles.viewer} aria-label="3D preview" role="img">
           <DeferredScene poster={<ViewerPoster item={picked} />}>
             <ViewerScene
               className={styles.viewerCanvas}
@@ -69,36 +101,9 @@ export function CosmeticsShop() {
             Drag to turn
           </span>
         </div>
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={picked.id}
-            className={`panel ${styles.detail}`}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.3 }}
-          >
-            <div className={styles.detailHead}>
-              <div>
-                <span className="tag" style={{ color: rarity.color }}>
-                  {rarity.label} {picked.kind === "wings" ? "wings" : "cape"}
-                </span>
-                <h2>{picked.name}</h2>
-              </div>
-              <Price item={picked} big />
-            </div>
-            <p className={styles.lore}>&ldquo;{picked.lore}&rdquo;</p>
-            <div className={styles.detailActions}>
-              <Link className="btn primary" href="/download">
-                Get it in the launcher
-              </Link>
-              <span className={styles.where}>Store → Cosmetics, with coins</span>
-            </div>
-          </motion.div>
-        </AnimatePresence>
-      </aside>
+      </div>
 
-      <div className={styles.gridCol}>
+      <div className={styles.toolbar}>
         <div className={styles.filters} role="group" aria-label="Show">
           {FILTERS.map((f) => {
             const count = SHOP_ITEMS.filter((item) => f.id === "all" || item.kind === f.id).length;
@@ -110,52 +115,46 @@ export function CosmeticsShop() {
             );
           })}
         </div>
-        <motion.ul layout className={styles.grid}>
-          <AnimatePresence initial={false}>
-            {items.map((item) => {
-              const r = RARITY[item.rarity];
-              const on = item.id === picked.id;
-              return (
-                <motion.li
-                  key={item.id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.94 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.94 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <button
-                    type="button"
-                    className={`${styles.card} ${on ? styles.cardOn : ""}`}
-                    style={{ ["--rarity" as string]: r.color }}
-                    aria-pressed={on}
-                    onClick={() => setPicked(item)}
-                  >
-                    <span className={styles.cardArt}>
-                      <Art item={item} id={`card-${item.id}`} />
-                    </span>
-                    <span className={styles.cardTags}>
-                      {item.tag?.kind === "new" && <span className="tag solid" style={{ background: "#37d3c4" }}>New</span>}
-                      {item.tag?.kind === "deal" && (
-                        <span className="tag solid" style={{ background: "#f0b429" }}>
-                          -{item.tag.percentOff}%
-                        </span>
-                      )}
-                      <span className="tag" style={{ color: r.color, marginLeft: "auto" }}>
-                        {r.label}
-                      </span>
-                    </span>
-                    <span className={styles.cardBody}>
-                      <b>{item.name}</b>
-                      <Price item={item} />
-                    </span>
-                  </button>
-                </motion.li>
-              );
-            })}
-          </AnimatePresence>
-        </motion.ul>
+        <span className={styles.toolbarNote}>Prices in coins · pick one to try it on</span>
       </div>
+
+      <motion.ul layout className={styles.grid}>
+        <AnimatePresence initial={false}>
+          {items.map((item) => {
+            const r = RARITY[item.rarity];
+            const on = item.id === picked.id;
+            return (
+              <motion.li
+                key={item.id}
+                layout
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.96 }}
+                transition={{ duration: 0.3 }}
+              >
+                <button
+                  type="button"
+                  className={`${styles.card} ${on ? styles.cardOn : ""}`}
+                  style={{ ["--rarity" as string]: r.color }}
+                  aria-pressed={on}
+                  onClick={() => pick(item)}
+                >
+                  <span className={styles.cardArt}>
+                    <Art item={item} id={`card-${item.id}`} />
+                    {item.tag?.kind === "new" && <span className={styles.badge}>New</span>}
+                    {item.tag?.kind === "deal" && <span className={`${styles.badge} ${styles.badgeDeal}`}>-{item.tag.percentOff}%</span>}
+                  </span>
+                  <span className={styles.cardBody}>
+                    <b>{item.name}</b>
+                    <span className={styles.cardRarity}>{r.label}</span>
+                    <Price item={item} />
+                  </span>
+                </button>
+              </motion.li>
+            );
+          })}
+        </AnimatePresence>
+      </motion.ul>
     </div>
   );
 }

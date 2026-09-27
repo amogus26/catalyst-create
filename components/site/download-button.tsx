@@ -29,9 +29,9 @@ export function useOs(): Os {
 export const OS_LABEL: Record<Os, string> = { macos: "macOS", windows: "Windows", other: "Windows or macOS" };
 
 /**
- * "Download for macOS" - named for the computer it is read on. Every download button goes through
- * here: straight to the installer once [DOWNLOAD_URLS] has one for this OS, and to the Download page
- * (which says what is and isn't out yet) until then.
+ * "Download for Windows & macOS". Every download button goes through here: straight to the installer
+ * for this computer once [DOWNLOAD_URLS] has one, and to the Download page (which says what is and
+ * isn't out yet) until then.
  */
 export function DownloadButton({
   className = "",
@@ -44,7 +44,8 @@ export function DownloadButton({
 }) {
   const os = useOs();
   const direct = os === "other" ? null : DOWNLOAD_URLS[os];
-  const label = compact ? "Download" : os === "other" ? "Download" : `Download for ${OS_LABEL[os]}`;
+  // Named for both: Catalyst is for Windows and macOS alike, whichever this page is read on.
+  const label = compact ? "Download" : "Download for Windows & macOS";
   const classes = `btn primary ${size === "normal" ? "" : size} ${className}`.trim();
   const icon = (
     <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false">

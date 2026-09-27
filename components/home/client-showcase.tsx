@@ -1,9 +1,7 @@
 "use client";
 
 import Image, { type StaticImageData } from "next/image";
-import { motion, useScroll, useTransform } from "motion/react";
-import { useReducedMotionAfterMount } from "@/components/site/motion";
-import { useRef } from "react";
+import { useState } from "react";
 import styles from "@/app/home.module.css";
 import { SHOT_QUALITY } from "./tour";
 import { CLIENT_MODULES, MODULE_CATEGORIES } from "@/lib/catalyst";
@@ -17,26 +15,54 @@ const CATEGORY_COLOUR: Record<string, string> = {
 };
 
 /**
- * The client in three screenshots - the title screen, the Right Shift menu and the HUD editor - that
- * fan out from a stack as the section scrolls into view.
+ * The client in three screenshots - the title screen, the Right Shift menu and the HUD editor - one at
+ * a time and big enough to read, on a blur of itself. The tabs switch between them.
  */
-export function ClientFan({ shots }: { shots: { image: StaticImageData; alt: string; label: string }[] }) {
-  const ref = useRef<HTMLDivElement>(null);
-  // With reduced motion the three are simply laid out fanned, and stay so.
-  const reduced = useReducedMotionAfterMount();
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "center center"] });
-  const spread = useTransform(scrollYProgress, [0, 1], reduced ? [1, 1] : [0, 1]);
-  const left = { x: useTransform(spread, [0, 1], ["0%", "-34%"]), rotate: useTransform(spread, [0, 1], [0, -7]), y: useTransform(spread, [0, 1], ["4%", "10%"]) };
-  const right = { x: useTransform(spread, [0, 1], ["0%", "34%"]), rotate: useTransform(spread, [0, 1], [0, 7]), y: useTransform(spread, [0, 1], ["4%", "10%"]) };
-  const poses = [left, { x: "0%", rotate: 0, y: "0%" }, right];
+export function ClientViews({ shots }: { shots: { image: StaticImageData; alt: string; label: string }[] }) {
+  const [index, setIndex] = useState(0);
   return (
-    <div ref={ref} className={styles.fan}>
-      {shots.map((shot, i) => (
-        <motion.figure key={shot.label} className={styles.fanCard} style={poses[i]} data-pos={i}>
-          <Image src={shot.image} alt={shot.alt} sizes="(min-width: 900px) 46vw, 90vw" quality={SHOT_QUALITY} placeholder="blur" />
-          <figcaption>{shot.label}</figcaption>
-        </motion.figure>
-      ))}
+    <div className={styles.views}>
+      <div className={styles.viewTabs} role="tablist" aria-label="The client">
+        {shots.map((shot, i) => (
+          <button
+            key={shot.label}
+            type="button"
+            role="tab"
+            id={`client-tab-${i}`}
+            aria-selected={i === index}
+            aria-controls="client-view"
+            className={i === index ? styles.pillOn : styles.pill}
+            onClick={() => setIndex(i)}
+          >
+            {shot.label}
+          </button>
+        ))}
+      </div>
+      <div className={styles.viewStage} id="client-view" role="tabpanel" aria-labelledby={`client-tab-${index}`}>
+        {shots.map((shot, i) => (
+          <div
+            key={shot.label}
+            className={styles.ambient}
+            data-on={i === index}
+            style={{ backgroundImage: `url(${shot.image.blurDataURL})` }}
+            aria-hidden="true"
+          />
+        ))}
+        <div className={styles.viewFrame} style={{ aspectRatio: `${shots[index].image.width} / ${shots[index].image.height}` }}>
+          {shots.map((shot, i) => (
+            <Image
+              key={shot.label}
+              src={shot.image}
+              alt={i === index ? shot.alt : ""}
+              aria-hidden={i !== index}
+              data-on={i === index}
+              sizes="(min-width: 901px) 72rem, 100vw"
+              quality={SHOT_QUALITY}
+              placeholder="blur"
+            />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

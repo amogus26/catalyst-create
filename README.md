@@ -45,7 +45,10 @@ changes, change it there and every page follows. `lib/sprites.ts` holds the rewa
 generated from the launcher's `RewardIcons.kt`, and `components/site/cosmetic-art.tsx` draws capes
 and wings the way `CosmeticArt.kt` does. The screenshots in `assets/screens/` are of the real
 launcher and client, as **lossless** WebP: keep new ones lossless (PNG or lossless WebP), because
-the site compresses them once itself and small UI text goes soft if it is compressed twice.
+the site compresses them once itself and small UI text goes soft if it is compressed twice. They are shown
+near half their width (the pinned tour window, the tabbed client view), so on a Retina screen each
+pixel of the screenshot is one pixel of the screen. The mods panel's icons come straight from
+Modrinth's CDN, as the launcher shows them - they are the mod authors', not ours to copy.
 
 - **Daily rewards stay a surprise.** The site says what the calendar is worth in coins, never which
   cosmetics are on which day or what the year gift holds - opening the card is the point.

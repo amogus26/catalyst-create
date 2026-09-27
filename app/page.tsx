@@ -6,7 +6,7 @@ import launcherControls from "@/assets/screens/launcher-controls.webp";
 import launcherHome from "@/assets/screens/launcher-home.webp";
 import launcherMods from "@/assets/screens/launcher-mods.webp";
 import launcherShop from "@/assets/screens/launcher-shop.webp";
-import { ClientFan, ModuleMarquee } from "@/components/home/client-showcase";
+import { ClientViews, ModuleMarquee } from "@/components/home/client-showcase";
 import { HeroStage } from "@/components/home/hero-stage";
 import { Tour, type Chapter } from "@/components/home/tour";
 import { CapeArt, WingsArt } from "@/components/site/cosmetic-art";
@@ -80,7 +80,15 @@ const LAUNCHER_CHAPTERS: Chapter[] = [
   },
 ];
 
-const PROFILE_MODS = ["Sodium", "Iris Shaders", "Cloth Config API", "Entity Culling", "FerriteCore", "Mod Menu"];
+/** Mods on Modrinth, with their own icons from Modrinth's CDN - as the launcher's Mods page shows them. */
+const PROFILE_MODS = [
+  { name: "Sodium", icon: "https://cdn.modrinth.com/data/AANobbMI/295862f4724dc3f78df3447ad6072b2dcd3ef0c9_96.webp" },
+  { name: "Iris Shaders", icon: "https://cdn.modrinth.com/data/YL57xq9U/18d0e7f076d3d6ed5bedd472b853909aac5da202_96.webp" },
+  { name: "Cloth Config API", icon: "https://cdn.modrinth.com/data/9s6osm5g/ed8a2316cbb6f4fc5f510e8e13a59a85cbbbff4d_96.webp" },
+  { name: "Entity Culling", icon: "https://cdn.modrinth.com/data/NNAgCjsB/7873452d6cede4daed12da3d7d8c193ab88b4fd6_96.webp" },
+  { name: "FerriteCore", icon: "https://cdn.modrinth.com/data/uXXizFIs/222a126f26f8f9ae1eb339f3b767677f18bff31f_96.webp" },
+  { name: "Mod Menu", icon: "https://cdn.modrinth.com/data/mOgUt4GM/5a20ed1450a0e1e79a1fe04e61bb4e5878bf1d20.png" },
+];
 
 /** The six features under the mods panel - what the launcher does besides mods, one line each. */
 const FEATURES = [
@@ -320,7 +328,7 @@ export default function HomePage() {
               is part of the game, not a window on top of it.
             </p>
           </Reveal>
-          <ClientFan
+          <ClientViews
             shots={[
               { image: clientTitle, alt: "The client's title screen with Quick Play, Singleplayer, Multiplayer, Realms, Mods and Favourite servers", label: "Title screen" },
               { image: clientModules, alt: "The client's module menu: cards for Damage Numbers, CPS, Playtime, FPS, Ping and Coordinates, each with Settings", label: "Module menu" },
