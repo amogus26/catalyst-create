@@ -3,7 +3,7 @@
 import Image, { type StaticImageData } from "next/image";
 import { useState } from "react";
 import styles from "@/app/home.module.css";
-import { SHOT_QUALITY } from "./tour";
+import { SHOT_QUALITY, ScreenshotZoom, ZoomHit, type Shot } from "./screenshot-zoom";
 import { CLIENT_MODULES, MODULE_CATEGORIES } from "@/lib/catalyst";
 
 const CATEGORY_COLOUR: Record<string, string> = {
@@ -20,6 +20,7 @@ const CATEGORY_COLOUR: Record<string, string> = {
  */
 export function ClientViews({ shots }: { shots: { image: StaticImageData; alt: string; label: string }[] }) {
   const [index, setIndex] = useState(0);
+  const [zoom, setZoom] = useState<Shot | null>(null);
   return (
     <div className={styles.views}>
       <div className={styles.viewTabs} role="tablist" aria-label="The client">
@@ -61,8 +62,10 @@ export function ClientViews({ shots }: { shots: { image: StaticImageData; alt: s
               placeholder="blur"
             />
           ))}
+          <ZoomHit label={shots[index].alt} onOpen={() => setZoom(shots[index])} />
         </div>
       </div>
+      <ScreenshotZoom shot={zoom} onClose={() => setZoom(null)} />
     </div>
   );
 }

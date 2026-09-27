@@ -350,14 +350,18 @@
 .ambient[data-on="true"] {
   opacity: 0.6;
 }
-.windowFrame {
+/* No box around a screenshot: its edges fade into the page, over a blur of itself (.ambient). */
+.windowFrame,
+.viewFrame {
   position: relative;
   z-index: 1;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 4%, #000 96%, transparent), linear-gradient(to bottom, transparent, #000 5%, #000 95%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to right, transparent, #000 4%, #000 96%, transparent), linear-gradient(to bottom, transparent, #000 5%, #000 95%, transparent);
+  mask-composite: intersect;
+}
+.windowFrame {
   aspect-ratio: 1933 / 1238;
-  border-radius: 1.125rem;
-  overflow: hidden;
-  background: #0b1018;
-  box-shadow: 0 2rem 5rem -2rem rgba(0, 0, 0, 0.85);
 }
 .windowFrame img {
   width: 100%;
@@ -682,12 +686,6 @@
   max-width: 72rem;
 }
 .viewFrame {
-  position: relative;
-  z-index: 1;
-  border-radius: 0.875rem;
-  overflow: hidden;
-  background: #0b1018;
-  box-shadow: 0 2rem 5rem -2rem rgba(0, 0, 0, 0.85);
   transition: aspect-ratio 0.4s var(--ease);
 }
 .viewFrame img {
@@ -930,4 +928,84 @@
 .final :global(.wide) {
   position: relative;
   z-index: 1;
+}
+
+/* ------------------------------------------------------------------ screenshots, full size */
+
+.zoomHit {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  width: 100%;
+  padding: 2.75rem;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  cursor: zoom-in;
+}
+.zoomHit:hover,
+.zoomHit:active {
+  background: transparent;
+  transform: none;
+}
+.zoomHit span {
+  padding: 0.4375rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(6, 10, 16, 0.78);
+  color: var(--text);
+  font-size: 0.8125rem;
+  font-weight: 650;
+  opacity: 0;
+  transform: translateY(0.375rem);
+  transition: opacity 0.25s var(--ease), transform 0.25s var(--ease);
+}
+.zoomHit:hover span,
+.zoomHit:focus-visible span {
+  opacity: 1;
+  transform: none;
+}
+.zoom {
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 2rem;
+  border: 0;
+  background: transparent;
+  place-items: center;
+}
+.zoom[open] {
+  display: grid;
+}
+.zoom::backdrop {
+  background: rgba(4, 7, 12, 0.86);
+  backdrop-filter: blur(0.5rem);
+}
+/* At the app's real size: one screenshot pixel to one screen pixel on Retina, and never past the window. */
+.zoom img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 0.75rem;
+  box-shadow: 0 2rem 6rem rgba(0, 0, 0, 0.6);
+}
+@media (min-resolution: 2dppx) {
+  .zoom img {
+    max-width: min(100%, 968px);
+  }
+}
+.zoomClose {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  font-size: 1.5rem;
+  line-height: 1;
 }

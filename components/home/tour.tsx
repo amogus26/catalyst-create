@@ -4,9 +4,7 @@ import Image, { type StaticImageData } from "next/image";
 import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import styles from "@/app/home.module.css";
-
-/** Screenshots are text people read, so they are served sharper than photos would be. */
-export const SHOT_QUALITY = 90;
+import { SHOT_QUALITY, ScreenshotZoom, ZoomHit, type Shot } from "./screenshot-zoom";
 
 export interface Chapter {
   key: string;
@@ -40,6 +38,7 @@ export function Tour({ id, chapters, label }: { id: string; chapters: Chapter[];
 function PinnedTour({ id, chapters, label }: { id: string; chapters: Chapter[]; label: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
+  const [zoom, setZoom] = useState<Shot | null>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
   useMotionValueEvent(scrollYProgress, "change", (value) => {
     setIndex(Math.min(chapters.length - 1, Math.max(0, Math.floor(value * chapters.length))));
@@ -125,8 +124,10 @@ function PinnedTour({ id, chapters, label }: { id: string; chapters: Chapter[]; 
                   <Image src={c.image} alt={c.alt} sizes="(min-width: 901px) 72vw, 100vw" quality={SHOT_QUALITY} placeholder="blur" />
                 </motion.div>
               ))}
+              <ZoomHit label={chapter.alt} onOpen={() => setZoom(chapter)} />
             </div>
           </motion.div>
+          <ScreenshotZoom shot={zoom} onClose={() => setZoom(null)} />
         </div>
       </div>
     </div>
@@ -134,6 +135,7 @@ function PinnedTour({ id, chapters, label }: { id: string; chapters: Chapter[]; 
 }
 
 function ListedTour({ id, chapters }: { id: string; chapters: Chapter[] }) {
+  const [zoom, setZoom] = useState<Shot | null>(null);
   return (
     <div id={id} className={`wide ${styles.tourList}`}>
       {chapters.map((c) => (
@@ -150,9 +152,11 @@ function ListedTour({ id, chapters }: { id: string; chapters: Chapter[] }) {
           </div>
           <div className={styles.windowFrame}>
             <Image src={c.image} alt={c.alt} sizes="100vw" quality={SHOT_QUALITY} placeholder="blur" />
+            <ZoomHit label={c.alt} onOpen={() => setZoom(c)} />
           </div>
         </article>
       ))}
+      <ScreenshotZoom shot={zoom} onClose={() => setZoom(null)} />
     </div>
   );
 }
