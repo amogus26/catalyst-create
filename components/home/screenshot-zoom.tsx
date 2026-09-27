@@ -4,9 +4,6 @@ import Image, { type StaticImageData } from "next/image";
 import { useEffect, useRef } from "react";
 import styles from "@/app/home.module.css";
 
-/** Screenshots are text people read, so they are served sharper than photos would be. */
-export const SHOT_QUALITY = 90;
-
 export type Shot = { image: StaticImageData; alt: string };
 
 /**
@@ -29,7 +26,7 @@ export function ScreenshotZoom({ shot, onClose }: { shot: Shot | null; onClose: 
       onClick={(event) => event.target === event.currentTarget && ref.current?.close()}
       aria-label={shot.alt}
     >
-      <Image src={shot.image} alt={shot.alt} sizes="100vw" quality={SHOT_QUALITY} />
+      <Image src={shot.image} alt={shot.alt} unoptimized />
       <button type="button" className={styles.zoomClose} onClick={() => ref.current?.close()} aria-label="Close">
         ×
       </button>

@@ -141,44 +141,13 @@ export function Counter({ to, suffix = "", className, format = true }: { to: num
 }
 
 /**
- * A card that leans towards the pointer, with a soft light where the pointer is. Off for touch and
- * reduced motion; [max] is the most it tips, in degrees.
+ * A plain wrapper. It used to lean cards towards the pointer, but that draws text through a 3D transform,
+ * which renders it soft - and the cards have no boxes to lean any more. Kept so call sites stay simple.
  */
-export function Tilt({ children, className = "", style, max = 7, as = "div" }: { children: ReactNode; className?: string; style?: CSSProperties; max?: number; as?: "div" | "article" | "li" }) {
-  const ref = useRef<HTMLElement>(null);
-  const reduced = useReducedMotionAfterMount();
-  const [active, setActive] = useState(false);
+export function Tilt({ children, className = "", style, as = "div" }: { children: ReactNode; className?: string; style?: CSSProperties; max?: number; as?: "div" | "article" | "li" }) {
   const Tag = as;
-
-  function onMove(event: React.PointerEvent) {
-    if (reduced || event.pointerType !== "mouse") return;
-    const el = ref.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const px = (event.clientX - rect.left) / rect.width;
-    const py = (event.clientY - rect.top) / rect.height;
-    el.style.setProperty("--ry", `${(px - 0.5) * 2 * max}deg`);
-    el.style.setProperty("--rx", `${(0.5 - py) * 2 * max}deg`);
-    el.style.setProperty("--mx", `${px * 100}%`);
-    el.style.setProperty("--my", `${py * 100}%`);
-    if (!active) setActive(true);
-  }
-  function onLeave() {
-    const el = ref.current;
-    if (!el) return;
-    el.style.setProperty("--rx", "0deg");
-    el.style.setProperty("--ry", "0deg");
-    setActive(false);
-  }
-
   return (
-    <Tag
-      ref={ref as never}
-      className={`tilt ${active ? "active" : ""} ${className}`.trim()}
-      style={style}
-      onPointerMove={onMove}
-      onPointerLeave={onLeave}
-    >
+    <Tag className={className || undefined} style={style}>
       {children}
     </Tag>
   );

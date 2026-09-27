@@ -5,9 +5,6 @@ const nextConfig = {
   // expose a bucket. See README: "How the moderation gate is enforced".
   reactStrictMode: true,
 
-  // 90 is for the app's screenshots (components/home/tour.tsx): small UI text goes soft at 75.
-  images: { qualities: [75, 90] },
-
   // Catalyst Designs lives at /designs now (the home page is the Catalyst site). The old paths land
   // on the right section rather than a 404; the old "/#vote"-style links are sent on by the home page
   // itself (components/site/hash-redirect.tsx), since a #fragment never reaches the server.

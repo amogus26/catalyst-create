@@ -3,7 +3,7 @@
 import Image, { type StaticImageData } from "next/image";
 import { useState } from "react";
 import styles from "@/app/home.module.css";
-import { SHOT_QUALITY, ScreenshotZoom, ZoomHit, type Shot } from "./screenshot-zoom";
+import { ScreenshotZoom, ZoomHit, type Shot } from "./screenshot-zoom";
 import { CLIENT_MODULES, MODULE_CATEGORIES } from "@/lib/catalyst";
 
 const CATEGORY_COLOUR: Record<string, string> = {
@@ -57,8 +57,7 @@ export function ClientViews({ shots }: { shots: { image: StaticImageData; alt: s
               alt={i === index ? shot.alt : ""}
               aria-hidden={i !== index}
               data-on={i === index}
-              sizes="(min-width: 901px) 72rem, 100vw"
-              quality={SHOT_QUALITY}
+              unoptimized
               placeholder="blur"
             />
           ))}

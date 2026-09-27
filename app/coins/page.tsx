@@ -10,8 +10,6 @@ import {
   BEST_VALUE_PACK,
   CATALYST_PLUS,
   COIN_PACKS,
-  DAILY_MONTH_COINS,
-  DAILY_MONTH_MAX_COINS,
   ECONOMY,
   FREE_LANE_TOTAL,
   PREMIUM_LANE_TOTAL,
@@ -49,9 +47,9 @@ export default function CoinsPage() {
             <div className={styles.topFacts}>
               <span>
                 <b>
-                  <Counter to={DAILY_MONTH_COINS} />
+                  <Counter to={COIN_PACKS.length} />
                 </b>
-                coins a month from daily rewards
+                coin packs, from {fmt(COIN_PACKS[0].coins)} coins
               </span>
               <span>
                 <b>
@@ -80,12 +78,9 @@ export default function CoinsPage() {
                 <span className={styles.earnIcon}>
                   <CalendarIcon />
                 </span>
-                <b className={styles.earnAmount}>{fmt(DAILY_MONTH_COINS)}</b>
+                <b className={styles.earnAmount}>Every day</b>
                 <h3>Daily rewards</h3>
-                <p>
-                  Open a card every day. A month of cards pays {fmt(DAILY_MONTH_COINS)} coins - up to{" "}
-                  {fmt(DAILY_MONTH_MAX_COINS)} when the three lucky days land on the best days.
-                </p>
+                <p>Open a card every day for coins - and now and then something more. What&apos;s in each card is a surprise.</p>
               </Tilt>
             </StaggerItem>
             <StaggerItem>
@@ -106,9 +101,9 @@ export default function CoinsPage() {
                 <span className={styles.earnIcon}>
                   <SparkIcon />
                 </span>
-                <b className={styles.earnAmount}>A year gift</b>
-                <h3>For opening every card</h3>
-                <p>Open every card of all twelve months and a gift is yours. What&apos;s in it stays a surprise.</p>
+                <b className={styles.earnAmount}>Special wings</b>
+                <h3>For opening every card of the year</h3>
+                <p>Open every daily card of all twelve months and you get special wings - only for players who open them all.</p>
               </Tilt>
             </StaggerItem>
             <StaggerItem>

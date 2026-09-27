@@ -198,12 +198,9 @@
   height: 3rem;
   display: grid;
   place-items: center;
-  border-radius: 0.875rem;
   font-weight: 900;
   font-size: 1.375rem;
   color: var(--gold-soft);
-  background: rgba(240, 180, 41, 0.08);
-  box-shadow: inset 0 0 0 1px rgba(240, 180, 41, 0.28);
 }
 @media (max-width: 900px) {
   .gives {

@@ -4,7 +4,7 @@ import Image, { type StaticImageData } from "next/image";
 import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import styles from "@/app/home.module.css";
-import { SHOT_QUALITY, ScreenshotZoom, ZoomHit, type Shot } from "./screenshot-zoom";
+import { ScreenshotZoom, ZoomHit, type Shot } from "./screenshot-zoom";
 
 export interface Chapter {
   key: string;
@@ -121,7 +121,7 @@ function PinnedTour({ id, chapters, label }: { id: string; chapters: Chapter[]; 
                   transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
                   aria-hidden={i !== index}
                 >
-                  <Image src={c.image} alt={c.alt} sizes="(min-width: 901px) 72vw, 100vw" quality={SHOT_QUALITY} placeholder="blur" />
+                  <Image src={c.image} alt={c.alt} unoptimized placeholder="blur" />
                 </motion.div>
               ))}
               <ZoomHit label={chapter.alt} onOpen={() => setZoom(chapter)} />
@@ -151,7 +151,7 @@ function ListedTour({ id, chapters }: { id: string; chapters: Chapter[] }) {
             </ul>
           </div>
           <div className={styles.windowFrame}>
-            <Image src={c.image} alt={c.alt} sizes="100vw" quality={SHOT_QUALITY} placeholder="blur" />
+            <Image src={c.image} alt={c.alt} unoptimized placeholder="blur" />
             <ZoomHit label={c.alt} onOpen={() => setZoom(c)} />
           </div>
         </article>

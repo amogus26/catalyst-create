@@ -509,39 +509,14 @@ html {
 
 /* ------------------------------------------------------------------ panels, cards and tilt */
 
+/* No boxes: a "panel" is a group of content on the page itself, set off by a hairline above it. */
 .panel {
   position: relative;
-  border-radius: 1.25rem;
-  background: linear-gradient(180deg, rgba(22, 31, 45, 0.8), rgba(13, 19, 28, 0.82));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07), inset 0 0 0 1px var(--line), 0 1.5rem 3.75rem -1.875rem rgba(0, 0, 0, 0.7);
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
-.tilt {
-  --rx: 0deg;
-  --ry: 0deg;
-  --mx: 50%;
-  --my: 50%;
-  transform: perspective(56.25rem) rotateX(var(--rx)) rotateY(var(--ry));
-  transition: transform 0.45s var(--ease), box-shadow 0.3s;
-  transform-style: preserve-3d;
-  will-change: transform;
-}
-.tilt.active {
-  transition: transform 0.08s linear, box-shadow 0.3s;
-}
-.tilt::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  background: radial-gradient(26.25rem circle at var(--mx) var(--my), rgba(255, 255, 255, 0.09), transparent 45%);
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-.tilt.active::after {
-  opacity: 1;
-}
-
 .tag {
   display: inline-flex;
   align-items: center;
