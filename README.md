@@ -10,7 +10,7 @@ launcher's mod browser. Next.js + Supabase, on Netlify.
 
 | Path | What it is |
 | --- | --- |
-| `/` | Home: a 3D hero, a tour of the real launcher, the features, the client's 46 modules, the store |
+| `/` | Home: a 3D hero, the figures, a tour of the real launcher, the features, the client's modules, Catalyst and Minecraft side by side, how to start, Microsoft sign-in, the store |
 | `/cosmetics` | The shop as the launcher has it - capes and wings in coins, a 3D viewer, rewards you earn |
 | `/coins` | Coin packs, what coins buy, Catalyst+ and the daily rewards calendar |
 | `/battle-pass` | The season: 50 levels on a scrolling track, the quests and the XP they give |
@@ -51,7 +51,17 @@ wide, so one pixel per screen pixel on Retina, and served as they are (`unoptimi
 re-compressed. The Store tab is left out on purpose: it shows the daily reward cards. The client's module menu is a video (`public/video/modules.mp4`, from the team's recording: the still
 start and end cut, played at 2x, 30 fps, a keyframe every 6 frames so scrolling can seek it smoothly).
 On a wide screen it is pinned and the page's scroll plays it; on a phone it loops; with reduced motion
-it stays still with controls. The mods panel's icons come straight from
+it stays still with controls. **The side-by-side pair** (`compare-catalyst.webp`, `compare-minecraft.webp`, the
+slider in `components/home/compare.tsx`) are the client's own `vz_shot=world` screenshots (its `DebugShots`), of
+the same spot at the same time: run `runClient` with `--width 1440 --height 810` (on a Retina Mac that is
+2880x1620) and its own `--gameDir` (an init script adding both to the run's args, so no saves or settings of
+the team's are touched), `-Dvz_world=<a copied save> -Dvz_config=<an empty folder> -Dvz_skin=steve
+-Dvz_command_tick=20 -Dvz_panorama_tick=220` and `-Dvz_commands="time set 1000;weather clear;item replace entity
+@s weapon.mainhand with diamond_sword;tp @s -940.67 79 241.5 0 -8"` (that save's snowy valley), the game's chat
+hidden and GUI scale 4 in that folder's options.txt. Minecraft: `-Dvz_disable=` every module that starts on.
+Catalyst: `-Dvz_enable=sky_shaders,minimap -Dvz_disable=fps` - the FPS readout is off because a dev run at that size,
+without the Sodium a real launch brings, says nothing true about speed. The chips under it list what is on. Then
+`vz_menu.png` from that folder's `screenshots/`, resized to 2560x1440 WebP (quality 90). The mods panel's icons come straight from
 Modrinth's CDN, as the launcher shows them - they are the mod authors', not ours to copy.
 
 - **Daily rewards stay a surprise.** The site says what the calendar is worth in coins, never which
@@ -394,3 +404,9 @@ ribbons and specks drifting up, drawn in CSS - and sections rise in as they are 
 get pinned scroll sections (the launcher tour on the home page, the battle pass track); phones get the
 same content as plain lists. Inter for text, Space Grotesk for headings and JetBrains Mono for small labels - no pixel font. Buttons have the launcher's stepped pixel corners. The logo is the launcher's own traced logo
 as an SVG, never the raster artwork. Every page says it is not affiliated with Mojang or Microsoft.
+
+**Microsoft sign-in is approved, and the site says exactly that much.** Mojang reviewed the launcher's Azure
+app and put it on the Minecraft sign-in allow list on 28 September 2026 (`SIGN_IN` in `lib/catalyst.ts`). The
+pages call it "approved for Minecraft sign-in" - never "official", "partner" or "endorsed" - and wherever it is
+claimed (the home page's sign-in section, the terms) they also say it is permission to sign players in, not
+an endorsement. No Microsoft, Xbox or Mojang logos.

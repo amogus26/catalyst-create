@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Platforms } from "@/components/download/platforms";
 import { Hall } from "@/components/site/hall";
 import { Reveal, Stagger, StaggerItem } from "@/components/site/motion";
@@ -58,6 +59,13 @@ export default function DownloadPage() {
               <b>Game</b>
               <span>
                 Minecraft: Java Edition {GAME_VERSION}, run with {LOADER} by the launcher.
+              </span>
+            </StaggerItem>
+            <StaggerItem className={`panel ${styles.need}`}>
+              <b>Account</b>
+              <span>
+                A Microsoft account that owns Minecraft: Java Edition. You sign in on Microsoft&apos;s own page - Catalyst
+                is <Link href="/#sign-in">approved for Minecraft sign-in</Link>.
               </span>
             </StaggerItem>
             <StaggerItem className={`panel ${styles.need}`}>

@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import { SiteFooter } from "@/components/site/footer";
 import { SiteHeader } from "@/components/site/header";
 import { PointerLight } from "@/components/site/pointer-light";
+import { CLIENT_MODULES } from "@/lib/catalyst";
 import { usingDevStore } from "@/lib/store";
 import "./globals.css";
 import "./site.css";
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
     template: "%s · Catalyst Client",
   },
   description:
-    "Catalyst is a Minecraft launcher and client in one: it installs your mods and keeps them updated, adds 46 modules, and brings cosmetics, a battle pass and daily rewards.",
+    `Catalyst is a Minecraft launcher and client in one: it installs your mods and keeps them updated, adds ${CLIENT_MODULES.length} modules, and brings cosmetics, a battle pass and daily rewards.`,
   openGraph: {
     type: "website",
     siteName: "Catalyst Client",

@@ -45,7 +45,9 @@ export default function PrivacyPage() {
         <p>
           <strong>Microsoft sign-in:</strong> you sign in on Microsoft&apos;s page. The launcher stores
           the resulting tokens and your Minecraft name and ID on your computer, and uses them only to
-          talk to Microsoft, Xbox and Mojang services. Microsoft&apos;s privacy statement applies to that.
+          talk to Microsoft, Xbox and Mojang services and to start the game as you - the game then uses
+          them to join servers, as it does from Minecraft&apos;s own launcher. They never reach us.
+          Microsoft&apos;s privacy statement applies to that.
         </p>
         <p>
           <strong>Redeeming a code</strong> sends the code and a random install ID (made by the launcher

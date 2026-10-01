@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SIGN_IN } from "@/lib/catalyst";
 import { contactText, LEGAL } from "@/lib/legal";
 
 export const metadata = {
@@ -46,7 +47,10 @@ export default function TermsPage() {
         <div className="summary">
           <b>The short version</b>
           <ul>
-            <li>Catalyst is a fan-made client for Minecraft. It is not made or approved by Mojang or Microsoft.</li>
+            <li>
+              Catalyst is a fan-made client for Minecraft. It is not made or endorsed by Mojang or Microsoft - Mojang has
+              approved it only to use Minecraft sign-in.
+            </li>
             <li>Play fair: follow the rules of every server you join.</li>
             <li>Coins and cosmetics are a licence to use them in Catalyst - they have no cash value.</li>
             <li>Designs you submit stay yours, but you let us show them and, if they win, turn them into cosmetics.</li>
@@ -87,8 +91,14 @@ export default function TermsPage() {
 
         <h2 id="minecraft">3. Minecraft, Mojang and Microsoft</h2>
         <p>
-          Catalyst is <strong>not an official Minecraft product</strong> and is not approved by or
+          Catalyst is <strong>not an official Minecraft product</strong> and is not endorsed by or
           associated with Mojang or Microsoft. &quot;Minecraft&quot; is a trademark of Mojang Synergies AB.
+        </p>
+        <p>
+          Mojang has approved the Catalyst launcher for Minecraft sign-in: on {SIGN_IN.approvedOn} it added
+          Catalyst&apos;s app to the list of apps Minecraft&apos;s services will sign players in for. That lets
+          the launcher sign you in with your Microsoft account. It is not an endorsement of Catalyst, and it
+          changes nothing else in these terms.
         </p>
         <p>
           To play you need your own genuine Minecraft: Java Edition account, and you must follow the{" "}
@@ -133,7 +143,9 @@ export default function TermsPage() {
         <h2 id="accounts">6. Accounts and security</h2>
         <p>
           You sign in to Minecraft through Microsoft&apos;s own sign-in page; we never see your
-          Microsoft password. The launcher keeps its sign-in tokens on your computer. Keep your
+          Microsoft password. The launcher keeps its sign-in tokens on your computer, and you can take
+          back its access at any time on <a href={SIGN_IN.manageUrl} rel="noreferrer">Microsoft&apos;s
+          account page</a>. Keep your
           computer and account secure - you are responsible for what happens through them. Tell us
           straight away if you think someone else is using your account or items.
         </p>

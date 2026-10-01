@@ -365,7 +365,7 @@ export type ModuleCategory = "HUD" | "Visual" | "PvP" | "World" | "Misc";
 /**
  * The client's modules as its Right Shift menu lists them (every `Module` subclass in the client's
  * source, name and description as written there). The Title Screen module is customised on the title
- * screen itself, so the menu - and this list - leaves it out: 46.
+ * screen itself, so the menu - and this list - leaves it out: 47.
  */
 export const CLIENT_MODULES: { name: string; category: ModuleCategory; description: string }[] = [
   { name: "Armour Status", category: "HUD", description: "Durability of each armour piece, with a warning before one breaks." },
@@ -399,6 +399,7 @@ export const CLIENT_MODULES: { name: string; category: ModuleCategory; descripti
   { name: "Ender Pearl Trail", category: "World", description: "A glowing trail behind ender pearls in flight." },
   { name: "Fog Customiser", category: "World", description: "Choose how far the fog sits, how soft it is and its colour - or turn it off." },
   { name: "Free Look", category: "World", description: "Hold a key to look around your player without turning them." },
+  { name: "Sky Shaders", category: "World", description: "Animated skies drawn by your graphics card: aurora, nebula, galaxy, End beams, caustics or a black hole - your screen only." },
   { name: "Fullbright", category: "World", description: "See in the dark - caves, nights and the Nether lit as if by day." },
   { name: "Time Changer", category: "World", description: "Locks the sky to a time of day you choose - your screen only." },
   { name: "Waypoints", category: "World", description: "Mark places with beams of light, and find your way back to where you died." },
@@ -417,6 +418,21 @@ export const CLIENT_MODULES: { name: string; category: ModuleCategory; descripti
 ];
 
 export const MODULE_CATEGORIES: ModuleCategory[] = ["HUD", "Visual", "PvP", "World", "Misc"];
+
+/** Sky Shaders' skies, as its Sky setting names them (client sky/SkyShader.java). */
+export const SKY_SHADERS = ["Aurora", "Nebula", "Galaxy", "End Beams", "Caustics", "Black Hole"] as const;
+
+/**
+ * Minecraft sign-in (launcher auth/MicrosoftAuth.kt): Microsoft's own page in the browser, then Xbox Live,
+ * then Minecraft's services - which only sign players in for launchers Mojang has put on its allow list.
+ * Mojang reviewed Catalyst's app and approved it on this date. That is permission to use Minecraft
+ * sign-in, not an endorsement of Catalyst, and the pages that mention it say so.
+ */
+export const SIGN_IN = {
+  approvedOn: "28 September 2026",
+  /** Microsoft's own page for seeing, and taking back, what an app may do with your account. */
+  manageUrl: "https://account.live.com/consent/Manage",
+} as const;
 
 /** The mods every player starts with, kept up to date (launcher mods/PreinstalledMods.kt). */
 export const PREINSTALLED_MODS = ["Sodium", "Lithium", "Dynamic FPS"] as const;
@@ -437,6 +453,19 @@ export const THEME_PRESETS = [
 
 /** The newest stories on the launcher's News page (ui/pages/NewsPage.kt `newsItems`), word for word. */
 export const RELEASE_NOTES: { title: string; date: string; tag: "Launcher" | "Client" | "Store"; excerpt: string; points: string[] }[] = [
+  {
+    title: "Sign in with Microsoft - approved for Minecraft",
+    date: "1 October 2026",
+    tag: "Launcher",
+    excerpt: "Mojang has approved Catalyst for Minecraft sign-in. Sign in once on Microsoft's own page, and Play starts the game as you.",
+    points: [
+      "Add account opens Microsoft's sign-in page in your browser - Catalyst never sees your email or password.",
+      "Microsoft asks which account to use, so you can pick the one that owns Minecraft.",
+      "Play starts the game as your account: your name, your skin, and online servers.",
+      "Your sign-in renews itself when it runs out, so you rarely have to sign in again.",
+      "Switch account signs in with another account; Sign out forgets it on this computer.",
+    ],
+  },
   {
     title: "Mods from Modrinth and CurseForge, into the profile you pick",
     date: "26 September 2026",

@@ -75,7 +75,7 @@
 
 .needs {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.75rem;
 }
 .need {
@@ -97,6 +97,9 @@
   color: var(--text-soft);
   font-size: 0.9062rem;
   line-height: 1.5;
+}
+.need span a {
+  color: var(--blue-soft);
 }
 @media (max-width: 900px) {
   .needs {

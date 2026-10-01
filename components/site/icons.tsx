@@ -132,6 +132,12 @@ export const CheckIcon = (p: IconProps) => (
     <path d="m4.5 12.5 5 5 10-11" />
   </Svg>
 );
+export const ShieldCheckIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M12 3 5 5.8v5.4c0 4.5 3 8.2 7 9.8 4-1.6 7-5.3 7-9.8V5.8L12 3z" />
+    <path d="m8.8 12.2 2.3 2.3 4.4-4.8" />
+  </Svg>
+);
 export const LockIcon = (p: IconProps) => (
   <Svg {...p}>
     <rect x="4.5" y="10.5" width="15" height="10" rx="2.5" />

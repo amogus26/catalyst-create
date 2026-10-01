@@ -21,7 +21,7 @@ export const LEGAL = {
   minimumAge: 13,
   consentAge: 16,
   /** Change whenever the wording of either page changes. */
-  lastUpdated: "25 September 2026",
+  lastUpdated: "1 October 2026",
 };
 
 /** How the pages give the contact address, whether or not there is one yet. */

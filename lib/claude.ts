@@ -4,7 +4,7 @@
  * launcher, never NEXT_PUBLIC_. Plain fetch to the Messages API; no SDK.
  */
 
-import { CLIENT_MODULES, GAME_VERSION, LOADER, PREINSTALLED_MODS, SEASON, SHOP_ITEMS, THEME_PRESETS } from "./catalyst.ts";
+import { CLIENT_MODULES, GAME_VERSION, LOADER, PREINSTALLED_MODS, SEASON, SHOP_ITEMS, SIGN_IN, THEME_PRESETS } from "./catalyst.ts";
 
 const API = "https://api.anthropic.com/v1/messages";
 /** Screening needs to see well; the bot needs to be quick and cheap. */
@@ -137,7 +137,7 @@ Answer in 1-3 short sentences, plain text, no markdown, in the player's language
 Facts about Catalyst:
 - Launcher for Windows and macOS; runs Minecraft ${GAME_VERSION} with ${LOADER}. Other versions show "Not yet".
 - Left bar pages: Home, Mods, Controls, News, Store (Shop, Cosmetics, Coins tabs), Battle Pass, Add account, Themes, Settings.
-- Mods page: search Modrinth (CurseForge coming), Install checks the mod against the profile and installs what it needs; Installed tab removes mods. If the game stops starting after adding a mod, remove the last one added.
+- Mods page: search Modrinth and CurseForge; Install checks the mod against the profile and installs what it needs (installing from CurseForge isn't switched on yet - its Install opens the mod's CurseForge page); Installed tab removes mods. If the game stops starting after adding a mod, remove the last one added.
 - ${PREINSTALLED_MODS.join(", ")} come installed and kept up to date.
 - In game, Right Shift opens the Catalyst menu with ${CLIENT_MODULES.length} modules (search, favourite, settings, Edit HUD to drag HUD elements). Modules include ${CLIENT_MODULES.slice(0, 18).map((m) => m.name).join(", ")} and more.
 - Controls page: custom hit, block place and block break sounds (.ogg only, under 2 MB), ready-made sounds, inventory background.
@@ -147,7 +147,7 @@ Facts about Catalyst:
 - Battle pass: Season ${SEASON.number} ${SEASON.name}, ${SEASON.levels} levels, XP from daily quests (play 1 hour, play 2 sessions, claim daily reward), ${SEASON.headline} at level ${SEASON.levels}.
 - Redeem codes (CATL-XXXX-XXXX-XXXX): Store, Coins tab, Redeem code. Each works once per install.
 - Community cape designs: catalystclient.net/designs - draw or upload, a person reviews, players vote.
-- Microsoft sign-in is on the Add account page.`;
+- Sign-in: Add account page, Sign in with Microsoft - it opens Microsoft's own sign-in page in the browser; Catalyst never sees the email or password. Mojang approved Catalyst for Minecraft sign-in on ${SIGN_IN.approvedOn} (that lets it sign players in; Catalyst is still not an official Minecraft product). Use the account that owns Minecraft: Java Edition. Signed in, Play starts the game as that account - name, skin and online servers. Switch account signs in with another; Sign out forgets it. "No Xbox profile yet": that account has never used Xbox or Minecraft - pick the right account in Microsoft's account picker, or sign in once at minecraft.net. "Doesn't own Minecraft": that account has no Java Edition.`;
 
 /** The bot's answer, or null if Claude can't be asked (the launcher then answers from its own list). */
 export async function answerQuestion(question: string, history: Turn[], deps: Deps): Promise<string | null> {

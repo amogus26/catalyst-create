@@ -1,9 +1,12 @@
 import Link from "next/link";
+import compareCatalyst from "@/assets/screens/compare-catalyst.webp";
+import compareMinecraft from "@/assets/screens/compare-minecraft.webp";
 import launcherControls from "@/assets/screens/launcher-controls.webp";
 import launcherHome from "@/assets/screens/launcher-home.webp";
 import launcherMods from "@/assets/screens/launcher-mods.webp";
 import launcherPass from "@/assets/screens/launcher-pass.webp";
 import { ModuleMarquee, ModuleVideo } from "@/components/home/client-showcase";
+import { Compare } from "@/components/home/compare";
 import { HeroStage } from "@/components/home/hero-stage";
 import { Tour, type Chapter } from "@/components/home/tour";
 import { CapeArt, WingsArt } from "@/components/site/cosmetic-art";
@@ -16,16 +19,21 @@ import {
   BoltIcon,
   BoxIcon,
   ChatIcon,
+  CheckIcon,
   GridIcon,
   LayersIcon,
+  LockIcon,
   PaletteIcon,
+  PlayIcon,
+  ShieldCheckIcon,
   SlidersIcon,
   SoundIcon,
+  UserIcon,
   WindowsIcon,
   AppleIcon,
   SparkIcon,
 } from "@/components/site/icons";
-import { Reveal, Stagger, StaggerItem, Tilt } from "@/components/site/motion";
+import { Counter, Reveal, Stagger, StaggerItem, Tilt } from "@/components/site/motion";
 import { PixelSprite } from "@/components/site/pixel-sprite";
 import {
   CLIENT_MODULES,
@@ -35,6 +43,8 @@ import {
   PREINSTALLED_MODS,
   SEASON,
   SHOP_ITEMS,
+  SIGN_IN,
+  SKY_SHADERS,
   THEME_PRESETS,
   usd,
 } from "@/lib/catalyst";
@@ -54,8 +64,8 @@ const LAUNCHER_CHAPTERS: Chapter[] = [
     key: "mods",
     kicker: "Mods",
     title: "Mods in one click.",
-    text: "Search Modrinth from inside the launcher. Every install is checked against your profile first and brings the mods it needs along with it.",
-    points: ["Search, sort and filter by category", "Dependencies installed for you, hashes checked", "Updates in one click - CurseForge is coming"],
+    text: "Search Modrinth and CurseForge from inside the launcher. Every install is checked against your profile first and brings the mods it needs along with it.",
+    points: ["Search, sort and filter by category", "Dependencies installed for you, hashes checked", "Updates in one click - installs from CurseForge are next"],
     image: launcherMods,
     alt: "The launcher's Mods page listing Modrinth mods such as Fabric API, Sodium and Iris Shaders, with Install buttons",
   },
@@ -129,6 +139,21 @@ const FEATURES = [
   },
 ];
 
+/** Catalyst in four figures - each counted from lib/catalyst.ts, none typed in. */
+const STATS = [
+  { value: CLIENT_MODULES.length, label: "Modules in the client" },
+  { value: SKY_SHADERS.length, label: "Animated skies" },
+  { value: THEME_PRESETS.length, label: "Colour schemes" },
+  { value: SEASON.levels, label: "Battle pass levels" },
+];
+
+/**
+ * What is switched on in the comparison's Catalyst shot. Both shots were taken by the client's own
+ * screenshot harness (DebugShots) from the same spot at the same time of day: every module off for the
+ * Minecraft one; for the Catalyst one these, the rest as a new player has them.
+ */
+const COMPARE_ON = ["Sky Shaders: Aurora", "Minimap", "Ping", "CPS", "Coordinates", "Playtime", "Armour Status", "Saturation"];
+
 /**
  * The home page: what Catalyst is, what it looks like, what it does and how to start - in that order,
  * because that's the order a new player asks. Every fact comes from the launcher and client
@@ -146,6 +171,13 @@ export default function HomePage() {
         <div className={`wide ${styles.heroGrid}`}>
           <div className={styles.heroCopy}>
             <Reveal>
+              <a className={styles.newsPill} href="#sign-in">
+                <b>New</b>
+                Approved for Minecraft sign-in
+                <ArrowIcon size={16} />
+              </a>
+            </Reveal>
+            <Reveal delay={0.03}>
               <span className="kicker">Launcher + client · Minecraft {GAME_VERSION}</span>
             </Reveal>
             <Reveal delay={0.06}>
@@ -239,6 +271,14 @@ export default function HomePage() {
               </Tilt>
             </StaggerItem>
           </Stagger>
+          <Stagger className={styles.stats}>
+            {STATS.map((stat) => (
+              <StaggerItem key={stat.label} className={styles.stat}>
+                <Counter to={stat.value} className={`shine-text ${styles.statValue}`} />
+                <span className={styles.statLabel}>{stat.label}</span>
+              </StaggerItem>
+            ))}
+          </Stagger>
         </div>
       </section>
 
@@ -273,8 +313,8 @@ export default function HomePage() {
                 </span>
                 <h3>Mods, one click away</h3>
                 <p>
-                  Search Modrinth without leaving the launcher. Every install is checked against your profile, brings the
-                  mods it needs and verifies each file. CurseForge joins once it&apos;s switched on.
+                  Search Modrinth and CurseForge without leaving the launcher. Every install is checked against your
+                  profile, brings the mods it needs and verifies each file. Installing from CurseForge comes next.
                 </p>
                 <ul className={styles.modsPoints}>
                   <li>Checked against your version and loader first</li>
@@ -332,13 +372,52 @@ export default function HomePage() {
         <ModuleMarquee />
       </section>
 
+      {/* ------------------------------------------------------------------ side by side */}
+      <section className="band" id="compare" aria-labelledby="compare-title">
+        <div className="wide">
+          <Reveal className="band-head center">
+            <span className="kicker">Side by side</span>
+            <h2 className="headline" id="compare-title">
+              Same world. More to see.
+            </h2>
+            <p className="lede">
+              Two shots of the same moment in the same world. Drag the line: Catalyst on the left, Minecraft as it
+              comes on the right.
+            </p>
+          </Reveal>
+          <Reveal from="scale" className={styles.compareWrap}>
+            <Compare
+              left={{
+                image: compareCatalyst,
+                label: "With Catalyst",
+                accent: true,
+                alt: "A snowy valley with Catalyst: an aurora and stars from Sky Shaders fill the sky, ping, CPS, coordinates, playtime and armour durability run down the left, and a minimap sits top right",
+              }}
+              right={{
+                image: compareMinecraft,
+                label: "Minecraft",
+                alt: "The same moment in Minecraft without Catalyst: a blue sky with blocky clouds, and only the hotbar, health and hunger on screen",
+              }}
+            />
+            <div className={styles.compareFoot}>
+              <div className={styles.chips} aria-label="Switched on in the Catalyst shot">
+                {COMPARE_ON.map((name) => (
+                  <span key={name}>{name}</span>
+                ))}
+              </div>
+              <span className={styles.compareHint}>Real in-game screenshots · drag the line</span>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
       {/* ------------------------------------------------------------------ how it works */}
       <section className="band" aria-labelledby="how-title">
         <div className="wide">
           <Reveal className="band-head center">
             <span className="kicker">How it works</span>
             <h2 className="headline" id="how-title">
-              Three steps to playing.
+              Four steps to playing.
             </h2>
           </Reveal>
           <Stagger as="ol" className={styles.steps}>
@@ -349,6 +428,14 @@ export default function HomePage() {
             </StaggerItem>
             <StaggerItem as="li" className={`panel ${styles.step}`}>
               <span className={styles.stepNo}>02</span>
+              <h3>Sign in with Microsoft</h3>
+              <p>
+                On Microsoft&apos;s own page, with the account that owns Minecraft. Catalyst is{" "}
+                <a href="#sign-in">approved for Minecraft sign-in</a>.
+              </p>
+            </StaggerItem>
+            <StaggerItem as="li" className={`panel ${styles.step}`}>
+              <span className={styles.stepNo}>03</span>
               <h3>Pick your profile and mods</h3>
               <p>
                 Catalyst {GAME_VERSION} {LOADER} is ready from the start, with {PREINSTALLED_MODS.join(", ")}. Add more from
@@ -356,11 +443,113 @@ export default function HomePage() {
               </p>
             </StaggerItem>
             <StaggerItem as="li" className={`panel ${styles.step}`}>
-              <span className={styles.stepNo}>03</span>
+              <span className={styles.stepNo}>04</span>
               <h3>Press Launch</h3>
-              <p>Your mods load, your modules are waiting behind Right Shift, and your cosmetics come with you.</p>
+              <p>You play as yourself, online too. Your mods load, your modules wait behind Right Shift, and your cosmetics come with you.</p>
             </StaggerItem>
           </Stagger>
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------------------ sign-in */}
+      <section className="band" id="sign-in" aria-labelledby="signin-title">
+        <div className={`wide ${styles.signIn}`}>
+          <Reveal className={styles.signInCopy}>
+            <span className="kicker" style={{ color: "var(--green)" }}>
+              Microsoft sign-in
+            </span>
+            <h2 className="headline" id="signin-title">
+              Approved for <span className="shine-text">Minecraft sign-in.</span>
+            </h2>
+            <p className="lede">
+              Mojang reviewed Catalyst and approved it to sign players in on {SIGN_IN.approvedOn}. Sign in once with
+              Microsoft, and the game starts as you.
+            </p>
+            <ul className={styles.signInPoints}>
+              <li>
+                <LockIcon size={22} />
+                <div>
+                  <b>Your password stays with Microsoft</b>
+                  <span>You sign in on Microsoft&apos;s own page, in your browser. Catalyst never sees your email or password.</span>
+                </div>
+              </li>
+              <li>
+                <UserIcon size={22} />
+                <div>
+                  <b>Play as yourself</b>
+                  <span>
+                    Your name and your skin in game - and online servers let you in, because they check your account with
+                    Mojang when you join.
+                  </span>
+                </div>
+              </li>
+              <li>
+                <CheckIcon size={22} />
+                <div>
+                  <b>Signed in, and still yours</b>
+                  <span>
+                    The launcher renews your sign-in by itself. Take its access back any time on{" "}
+                    <a href={SIGN_IN.manageUrl} rel="noreferrer">
+                      Microsoft&apos;s account page
+                    </a>
+                    .
+                  </span>
+                </div>
+              </li>
+            </ul>
+            <p className={styles.signInFine}>
+              Catalyst is not an official Minecraft product and is not endorsed by or associated with Mojang or Microsoft.
+              The approval lets the launcher sign you in - nothing more.
+            </p>
+          </Reveal>
+          <Reveal from="scale" delay={0.1} className={styles.chainWrap}>
+            <ol className={styles.chain} aria-label="What happens when you sign in">
+              <li className={styles.chainStep}>
+                <span className={styles.chainNode} style={{ color: "#8cc8f2" }}>
+                  <LockIcon size={20} />
+                </span>
+                <div>
+                  <h3>
+                    Microsoft <span className={styles.chainWhere}>In your browser</span>
+                  </h3>
+                  <p>You sign in on Microsoft&apos;s own page, and pick the account that owns Minecraft.</p>
+                </div>
+              </li>
+              <li className={styles.chainStep}>
+                <span className={styles.chainNode} style={{ color: "#4fa8e8" }}>
+                  <UserIcon size={20} />
+                </span>
+                <div>
+                  <h3>Xbox Live</h3>
+                  <p>Your Microsoft account vouches for your Xbox profile - the one Minecraft knows you by.</p>
+                </div>
+              </li>
+              <li className={styles.chainStep}>
+                <span className={styles.chainNode} style={{ color: "#37d3c4" }}>
+                  <ShieldCheckIcon size={20} />
+                </span>
+                <div>
+                  <h3>
+                    Minecraft
+                    <span className="tag" style={{ color: "var(--green)" }}>
+                      Approved
+                    </span>
+                  </h3>
+                  <p>Mojang checks that Catalyst is on its sign-in allow list, then hands back your Minecraft profile.</p>
+                </div>
+              </li>
+              <li className={styles.chainStep}>
+                <span className={styles.chainNode} style={{ color: "#5fbf87" }}>
+                  <PlayIcon size={20} />
+                </span>
+                <div>
+                  <h3>Catalyst</h3>
+                  <p>Press Play, and the game starts as you - your name, your skin, your servers.</p>
+                </div>
+              </li>
+            </ol>
+            <i className={styles.chainLight} aria-hidden="true" />
+          </Reveal>
         </div>
       </section>
 
