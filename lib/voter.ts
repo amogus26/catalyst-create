@@ -16,6 +16,9 @@ import { cookieOptions } from "./admin-session";
 
 export const VOTER_COOKIE = "catalyst_voter";
 
+/** A readable "this browser has voted" flag, so the cached designs page only asks /api/votes when it must. */
+export const VOTED_HINT = "catalyst_voted";
+
 const VOTER_COOKIE_SECONDS = 365 * 24 * 60 * 60;
 
 /** The voter id on this request, or null if this browser has never voted. */

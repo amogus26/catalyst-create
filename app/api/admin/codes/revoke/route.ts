@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
-import { isAdmin } from "@/lib/admin-session";
+import { isOwner } from "@/lib/admin-session";
 import { fingerprint, looksLikeCode } from "@/lib/codes";
 import { getStore } from "@/lib/store";
 
 /**
- * Cancels codes: a whole batch (`{batchId}`) or one code typed in (`{code}`). Reviewers only. A
+ * Cancels codes: a whole batch (`{batchId}`) or one code typed in (`{code}`). The owner only (CODES_PASSWORD). A
  * cancelled code answers "revoked" from then on, including to anyone who has it but hasn't used it.
  */
 export async function POST(request: Request) {
-  if (!(await isAdmin())) {
+  if (!(await isOwner())) {
     return NextResponse.json({ error: "Not signed in." }, { status: 401 });
   }
 

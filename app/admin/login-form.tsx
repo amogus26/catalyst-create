@@ -3,7 +3,16 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export function LoginForm() {
+/** A password form for one gate (lib/admin-session.ts): the reviewers' by default, or the owner's for codes. */
+export function LoginForm({
+  gate = "reviewer",
+  title = "Reviewers",
+  blurb = "For whoever reviews designs.",
+}: {
+  gate?: "reviewer" | "owner";
+  title?: string;
+  blurb?: string;
+}) {
   const router = useRouter();
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -17,7 +26,7 @@ export function LoginForm() {
       const response = await fetch("/api/admin/login", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ password, gate }),
       });
       if (!response.ok) {
         setError("That password is not right.");
@@ -35,8 +44,8 @@ export function LoginForm() {
   return (
     <div className="shell">
       <div className="login">
-        <h1>Reviewers</h1>
-        <p className="muted">For whoever reviews designs and makes redeem codes.</p>
+        <h1>{title}</h1>
+        <p className="muted">{blurb}</p>
         <form className="form-card stack" onSubmit={submit}>
           {error && (
             <div className="notice error" role="alert">

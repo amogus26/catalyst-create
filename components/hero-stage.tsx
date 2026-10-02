@@ -1,13 +1,13 @@
 import { designType } from "@/lib/design-types";
 import { View3DButton } from "./designs/cape-preview";
-import type { Submission } from "@/lib/store";
+import type { PublicDesign } from "@/lib/designs";
 
 /**
  * The top of the page shows the site's point before a word is read: the design that is winning (or
  * the most-voted one, between rounds), big, on a pool of light. A real submission on the public image
  * route, never artwork. With nothing approved yet it shows the empty 64x32 frame waiting for one.
  */
-export function HeroStage({ leader, leading }: { leader: Submission | null; leading: boolean }) {
+export function HeroStage({ leader, leading }: { leader: PublicDesign | null; leading: boolean }) {
   if (!leader) {
     return (
       <figure className="stage" style={{ margin: 0 }}>
@@ -17,7 +17,7 @@ export function HeroStage({ leader, leading }: { leader: Submission | null; lead
   }
   return (
     <figure className="stage" style={{ margin: 0 }}>
-      <img src={`/api/images/${leader.id}`} alt={`${designType(leader.designType).label} by ${leader.displayName}`} />
+      <img src={leader.image} alt={`${designType(leader.designType).label} by ${leader.displayName}`} />
       {leader.designType === "cape" && <View3DButton id={leader.id} label={`Cape by ${leader.displayName}`} />}
       <figcaption>
         <span>

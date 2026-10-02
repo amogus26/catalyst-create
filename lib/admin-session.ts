@@ -2,8 +2,8 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
 
 /**
- * The admin gate: one shared password in an environment variable, and a signed cookie for the
- * session it opens.
+ * The admin gates: a password in an environment variable each, and a signed cookie for the session it
+ * opens.
  *
  * This is not a user-account system and is not pretending to be one - it is the smallest gate that
  * keeps the review queue away from the public, which is all this version needs. What it does get
@@ -22,30 +22,54 @@ import { cookies } from "next/headers";
 
 export const ADMIN_COOKIE = "catalyst_admin";
 
+/**
+ * Two gates, each its own password and its own signed cookie:
+ *
+ * - **reviewer** (`ADMIN_PASSWORD`): the review queue on /admin - whoever helps check designs.
+ * - **owner** (`CODES_PASSWORD`): making and cancelling redeem codes on /admin/codes - the owner alone.
+ *   A code is worth coins and items, so a reviewer's password must not make them. It must differ from
+ *   the reviewer password, or the gate stays shut (two equal passwords would be one gate).
+ *
+ * Each cookie is signed with its own gate's password and names its gate, so neither can stand in for
+ * the other, and changing a password signs that gate's sessions out.
+ */
+export type Gate = "reviewer" | "owner";
+
+const GATES: Record<Gate, { env: "ADMIN_PASSWORD" | "CODES_PASSWORD"; cookie: string; label: string }> = {
+  reviewer: { env: "ADMIN_PASSWORD", cookie: ADMIN_COOKIE, label: "admin" },
+  owner: { env: "CODES_PASSWORD", cookie: "catalyst_owner", label: "owner" },
+};
+
 const SESSION_SECONDS = 12 * 60 * 60;
 
-function adminPassword(): string {
-  const value = process.env.ADMIN_PASSWORD;
+function gatePassword(gate: Gate): string {
+  const value = process.env[GATES[gate].env];
   if (!value || value.trim().length < 8) {
-    throw new Error(
-      "ADMIN_PASSWORD is missing or too short (8 characters minimum). The admin page cannot open without it.",
-    );
+    throw new Error(`${GATES[gate].env} is missing or too short (8 characters minimum). That page cannot open without it.`);
+  }
+  if (gate === "owner" && value === process.env.ADMIN_PASSWORD) {
+    throw new Error("CODES_PASSWORD is the same as ADMIN_PASSWORD - it must be the owner's own.");
   }
   return value;
 }
 
-/** Is the admin password configured at all? Lets the page say so instead of throwing at a visitor. */
-export function adminPasswordConfigured(): boolean {
+/** Is the gate's password configured (and, for the owner, different from the reviewers')? */
+export function passwordConfigured(gate: Gate): boolean {
   try {
-    adminPassword();
+    gatePassword(gate);
     return true;
   } catch {
     return false;
   }
 }
 
-export function passwordMatches(candidate: string): boolean {
-  const expected = Buffer.from(adminPassword(), "utf8");
+/** The reviewer gate's password is configured - kept for the review pages. */
+export function adminPasswordConfigured(): boolean {
+  return passwordConfigured("reviewer");
+}
+
+export function passwordMatches(gate: Gate, candidate: string): boolean {
+  const expected = Buffer.from(gatePassword(gate), "utf8");
   const given = Buffer.from(candidate ?? "", "utf8");
   if (expected.length !== given.length) {
     // timingSafeEqual throws on a length mismatch, so do an equal-length comparison anyway and
@@ -56,20 +80,20 @@ export function passwordMatches(candidate: string): boolean {
   return timingSafeEqual(expected, given);
 }
 
-function sign(expiresAt: number): string {
-  return createHmac("sha256", adminPassword()).update(`admin:${expiresAt}`).digest("hex");
+function sign(gate: Gate, expiresAt: number): string {
+  return createHmac("sha256", gatePassword(gate)).update(`${GATES[gate].label}:${expiresAt}`).digest("hex");
 }
 
-export function issueSession(): { name: string; value: string; maxAge: number } {
+export function issueSession(gate: Gate): { name: string; value: string; maxAge: number } {
   const expiresAt = Math.floor(Date.now() / 1000) + SESSION_SECONDS;
   return {
-    name: ADMIN_COOKIE,
-    value: `${expiresAt}.${sign(expiresAt)}`,
+    name: GATES[gate].cookie,
+    value: `${expiresAt}.${sign(gate, expiresAt)}`,
     maxAge: SESSION_SECONDS,
   };
 }
 
-export function sessionIsValid(token: string | undefined): boolean {
+export function sessionIsValid(gate: Gate, token: string | undefined): boolean {
   if (!token) return false;
   const [rawExpiry, signature] = token.split(".");
   const expiresAt = Number(rawExpiry);
@@ -78,20 +102,29 @@ export function sessionIsValid(token: string | undefined): boolean {
 
   let expected: string;
   try {
-    expected = sign(expiresAt);
+    expected = sign(gate, expiresAt);
   } catch {
-    return false; // no password configured: nobody is an admin
+    return false; // no password configured: nobody is through this gate
   }
   const a = Buffer.from(signature, "utf8");
   const b = Buffer.from(expected, "utf8");
   return a.length === b.length && timingSafeEqual(a, b);
 }
 
-/** Whether the current request carries a valid admin session. */
+/** Whether the current request carries a valid reviewer session. */
 export async function isAdmin(): Promise<boolean> {
   const jar = await cookies();
-  return sessionIsValid(jar.get(ADMIN_COOKIE)?.value);
+  return sessionIsValid("reviewer", jar.get(ADMIN_COOKIE)?.value);
 }
+
+/** Whether the current request carries a valid owner session - the only one that may make codes. */
+export async function isOwner(): Promise<boolean> {
+  const jar = await cookies();
+  return sessionIsValid("owner", jar.get(GATES.owner.cookie)?.value);
+}
+
+/** Every gate's cookie name, for signing out of all of them. */
+export const SESSION_COOKIES = Object.values(GATES).map((g) => g.cookie);
 
 export const cookieOptions = {
   httpOnly: true,

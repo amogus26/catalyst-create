@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { isAdmin } from "@/lib/admin-session";
 import { getStore } from "@/lib/store";
@@ -49,6 +50,7 @@ export async function POST(request: Request) {
     if (!updated) {
       return NextResponse.json({ error: "There is no submission with that id." }, { status: 404 });
     }
+    revalidatePath("/designs");
     return NextResponse.json({ ok: true, id: updated.id, featured: updated.featured });
   } catch (error) {
     console.error("[catalyst-create] featuring failed:", error);

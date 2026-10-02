@@ -1,5 +1,5 @@
 import { designType } from "@/lib/design-types";
-import type { Submission } from "@/lib/store";
+import type { PublicDesign } from "@/lib/designs";
 import { View3DButton } from "./designs/cape-preview";
 import { TypeIcon } from "./type-icon";
 import { VoteButton } from "./vote-button";
@@ -11,13 +11,11 @@ import { VoteButton } from "./vote-button";
  */
 export function DesignCard({
   submission,
-  voted,
   size = "normal",
   rank,
   leading = false,
 }: {
-  submission: Submission;
-  voted: boolean;
+  submission: PublicDesign;
   size?: "normal" | "large";
   rank?: number;
   leading?: boolean;
@@ -29,7 +27,7 @@ export function DesignCard({
       <div className="art-frame">
         <img
           className="art"
-          src={`/api/images/${submission.id}`}
+          src={submission.image}
           alt={`${type.label} design by ${submission.displayName}`}
           loading="lazy"
         />
@@ -49,7 +47,7 @@ export function DesignCard({
             {type.label}
           </span>
         </div>
-        <VoteButton id={submission.id} initialCount={submission.voteCount} initiallyVoted={voted} size={size} />
+        <VoteButton id={submission.id} initialCount={submission.voteCount} size={size} />
       </div>
     </article>
   );

@@ -244,7 +244,8 @@ That verifies the tables, the function, that the bucket exists and is private, a
 
 | Name | Needed | What it is |
 | --- | --- | --- |
-| `ADMIN_PASSWORD` | always | The shared password for `/admin`. Long and random; changing it signs out every admin session. |
+| `ADMIN_PASSWORD` | always | The reviewers' shared password for `/admin` (the design queue). Long and random; changing it signs out every reviewer session. |
+| `CODES_PASSWORD` | for codes | The owner's own password for `/admin/codes` - only the owner makes and cancels redeem codes. Must differ from `ADMIN_PASSWORD`, or nobody can make codes. Its own cookie; changing it signs the owner out. |
 | `SUPABASE_URL` | production | Project URL from Data API settings. |
 | `SUPABASE_SERVICE_ROLE_KEY` | production | The service-role/secret key. **Server only.** |
 | `SUPABASE_BUCKET` | optional | Defaults to `submissions`. |
@@ -276,7 +277,7 @@ a devDependency and is declared in `netlify.toml`. Leave both in place.
 
 ## Redeem codes
 
-Codes for the launcher - gift cards, giveaways, stream codes - are made on **`/admin/codes`**
+Codes for the launcher - gift cards, giveaways, stream codes - are made by the owner alone (`CODES_PASSWORD`) on **`/admin/codes`**
 (same reviewer password) and work in every launcher the moment they are made.
 
 - **Making:** pick the reward (coins, a sale on wings, a free shop item or a code-only exclusive),

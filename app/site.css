@@ -455,17 +455,21 @@ h4,
   overflow: hidden;
   pointer-events: none;
   z-index: 0;
+  /* Off screen, the browser skips drawing it - and its drifting light and souls stop costing frames. */
+  content-visibility: auto;
 }
 .hall.fade {
   mask-image: linear-gradient(transparent, #000 25%, #000 75%, transparent);
   -webkit-mask-image: linear-gradient(transparent, #000 25%, #000 75%, transparent);
 }
+/* No blur filter: a radial gradient fading to nothing is already soft, and a 40px blur over a pool half the
+   page wide, redone on every frame of its drift, was the hall's whole cost on slower graphics. */
 .hall .pool {
   position: absolute;
   border-radius: 50%;
-  filter: blur(2.5rem);
   opacity: 0.9;
   animation: pool-drift 22s ease-in-out infinite alternate;
+  will-change: transform;
 }
 .hall .ribbon {
   position: absolute;

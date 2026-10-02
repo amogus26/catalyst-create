@@ -7,11 +7,17 @@ import { Hall } from "@/components/site/hall";
 import { SectionHeader } from "@/components/section-header";
 import { SubmitForm } from "@/components/submit-form";
 import { FEATURED_LIMIT } from "@/lib/config";
+import { VotedProvider } from "@/components/designs/voted";
+import { withImages } from "@/lib/designs";
 import { getStore } from "@/lib/store";
-import { currentVoterId } from "@/lib/voter";
 
-// Approvals and votes change under this page constantly; never serve it from the build.
-export const dynamic = "force-dynamic";
+/**
+ * Cached and shared by every visitor, so opening it is instant: built at most once a minute, and again
+ * straight away when a vote is cast or a reviewer approves, takes down or features a design
+ * (revalidatePath in those routes). Nothing per-visitor is read here - which designs this browser has
+ * voted on is asked for after the page shows (components/designs/voted.tsx).
+ */
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Designs",
@@ -26,14 +32,16 @@ export const metadata: Metadata = {
  */
 export default async function HomePage() {
   const store = getStore();
-  const [featured, approved] = await Promise.all([
+  const [featuredRows, approvedRows] = await Promise.all([
     store.listFeatured(FEATURED_LIMIT),
     store.listByStatus("approved"),
   ]);
+  // The pictures ride in the page itself (lib/designs.ts) - no request per design.
+  const all = await withImages(store, [...featuredRows, ...approvedRows]);
+  const featured = all.slice(0, featuredRows.length);
+  const approved = all.slice(featuredRows.length);
 
-  const voterId = await currentVoterId();
-  const ids = [...new Set([...featured, ...approved].map((submission) => submission.id))];
-  const voted = voterId ? await store.votedIds(voterId, ids) : new Set<string>();
+  const ids = [...new Set(all.map((submission) => submission.id))];
   const votes = approved.reduce((sum, submission) => sum + submission.voteCount, 0);
   const leader = featured[0] ?? approved[0] ?? null;
 
@@ -111,9 +119,11 @@ export default async function HomePage() {
         </li>
       </ol>
 
-      <FeaturedRound items={featured} voted={voted} />
+      <VotedProvider ids={ids}>
+        <FeaturedRound items={featured} />
 
-      <Gallery items={approved} voted={[...voted]} />
+        <Gallery items={approved} />
+      </VotedProvider>
 
       <section className="section" id="submit">
         <SectionHeader kicker="Submit" title="Send in your design">

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { isAdmin } from "@/lib/admin-session";
+import { isOwner } from "@/lib/admin-session";
 import { fingerprint, generateCodes } from "@/lib/codes";
 import { parseReward, rewardSpec } from "@/lib/rewards";
 import { getStore } from "@/lib/store";
@@ -8,14 +8,14 @@ import { getStore } from "@/lib/store";
 const MAX_BATCH = 1000;
 
 /**
- * Makes a batch of codes: `{reward, count, maxUses, expiresOn, note}`. Reviewers only.
+ * Makes a batch of codes: `{reward, count, maxUses, expiresOn, note}`. The owner only (CODES_PASSWORD).
  *
  * The codes are generated here, stored by fingerprint only, and handed back in readable form in this
  * one response - the only time they exist readably. Lose the response and the batch is unusable (it
  * can be cancelled from the codes page and made again).
  */
 export async function POST(request: Request) {
-  if (!(await isAdmin())) {
+  if (!(await isOwner())) {
     return NextResponse.json({ error: "Not signed in." }, { status: 401 });
   }
 

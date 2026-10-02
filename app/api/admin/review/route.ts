@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { isAdmin } from "@/lib/admin-session";
 import { getStore, type SubmissionStatus } from "@/lib/store";
@@ -36,6 +37,8 @@ export async function POST(request: Request) {
     if (!updated) {
       return NextResponse.json({ error: "There is no submission with that id." }, { status: 404 });
     }
+    // The public designs page is cached: rebuild it now, so an approval shows - and a take-down goes - at once.
+    revalidatePath("/designs");
     return NextResponse.json({ ok: true, id: updated.id, status: updated.status });
   } catch (error) {
     console.error("[catalyst-create] review failed:", error);

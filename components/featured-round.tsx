@@ -1,4 +1,4 @@
-import type { Submission } from "@/lib/store";
+import type { PublicDesign } from "@/lib/designs";
 import { DesignCard } from "./design-card";
 import { SectionHeader } from "./section-header";
 
@@ -6,7 +6,7 @@ import { SectionHeader } from "./section-header";
  * The current round: the designs a reviewer picked, up to five, big enough to choose between.
  * "Leading" is only claimed when one design is really ahead - a gold badge on a tie at zero would lie.
  */
-export function FeaturedRound({ items, voted }: { items: Submission[]; voted: Set<string> }) {
+export function FeaturedRound({ items }: { items: PublicDesign[] }) {
   const leaderIsClear =
     items.length > 0 && items[0].voteCount > 0 && (items.length === 1 || items[0].voteCount > items[1].voteCount);
 
@@ -27,7 +27,6 @@ export function FeaturedRound({ items, voted }: { items: Submission[]; voted: Se
             <DesignCard
               key={submission.id}
               submission={submission}
-              voted={voted.has(submission.id)}
               size="large"
               rank={index + 1}
               leading={index === 0 && leaderIsClear}

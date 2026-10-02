@@ -1,4 +1,4 @@
-import { adminPasswordConfigured, isAdmin } from "@/lib/admin-session";
+import { isOwner, passwordConfigured } from "@/lib/admin-session";
 import { describeReward } from "@/lib/rewards";
 import { getStore } from "@/lib/store";
 import { SectionHeader } from "@/components/section-header";
@@ -14,21 +14,23 @@ export const dynamic = "force-dynamic";
 /**
  * Making redeem codes for the launcher - gift cards, giveaways, stream codes. A code made here works
  * in every launcher straight away: the launcher asks this site (/api/codes/redeem), and the site
- * marks it used for everyone. Behind the same reviewer password as the review queue.
+ * marks it used for everyone. Behind the owner's own password (CODES_PASSWORD), not the reviewers': codes
+ * are worth coins and items, so only the owner makes them.
  */
 export default async function CodesPage() {
-  if (!adminPasswordConfigured()) {
+  if (!passwordConfigured("owner")) {
     return (
       <div className="shell prose">
         <h1>Redeem codes</h1>
         <div className="notice info" style={{ marginTop: 20 }}>
-          <strong>ADMIN_PASSWORD is not set</strong>, so nobody can open this page.
+          <strong>CODES_PASSWORD is not set</strong> (or is the same as the reviewers&apos; password), so nobody can make
+          codes. Set your own in Netlify&apos;s environment variables and deploy again.
         </div>
       </div>
     );
   }
-  if (!(await isAdmin())) {
-    return <LoginForm />;
+  if (!(await isOwner())) {
+    return <LoginForm gate="owner" title="Redeem codes" blurb="Only the owner makes codes. This is not the reviewers' password." />;
   }
 
   // Before supabase/migrations/0004_redeem_codes.sql has run there are no tables to read - say so

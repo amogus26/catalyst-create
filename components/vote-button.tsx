@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useVoted } from "./designs/voted";
 
 /**
  * One vote per design per browser. The button goes spent as soon as the server says the vote
@@ -10,16 +11,16 @@ import { useState } from "react";
 export function VoteButton({
   id,
   initialCount,
-  initiallyVoted,
   size = "normal",
 }: {
   id: string;
   initialCount: number;
-  initiallyVoted: boolean;
   size?: "normal" | "large";
 }) {
   const [count, setCount] = useState(initialCount);
-  const [voted, setVoted] = useState(initiallyVoted);
+  const shared = useVoted();
+  const voted = shared.has(id);
+  const setVoted = (value: boolean) => value && shared.mark(id);
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
 
