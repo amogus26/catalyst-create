@@ -305,6 +305,11 @@
   display: flex;
   gap: 2px;
 }
+.choice img {
+  width: 2.5rem;
+  height: 2.5rem;
+  object-fit: contain;
+}
 .choice svg {
   width: 2.125rem;
   height: 2.125rem;
@@ -340,6 +345,12 @@
 .pickArt span:hover {
   transform: translateY(-0.375rem) rotate(-2deg);
 }
+.pickArt img {
+  width: 11rem;
+  height: 11rem;
+  object-fit: contain;
+  filter: drop-shadow(0 1rem 1.5rem rgba(255, 106, 26, 0.25));
+}
 .pickArt em {
   font-style: normal;
   font-family: var(--font-label), monospace;
@@ -355,9 +366,10 @@
   .pickArt span {
     padding: 0.75rem;
   }
-  .pickArt svg {
-    width: 5.25rem;
-    height: 5.25rem;
+  .pickArt svg,
+  .pickArt img {
+    width: 7.5rem;
+    height: 7.5rem;
   }
   .pickArt b {
     font-size: 0.875rem;

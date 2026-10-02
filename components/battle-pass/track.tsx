@@ -6,7 +6,7 @@ import { CapeArt, WingsArt } from "@/components/site/cosmetic-art";
 import { CoinMark } from "@/components/site/coin-mark";
 import { PixelSprite } from "@/components/site/pixel-sprite";
 import { ArrowIcon } from "@/components/site/icons";
-import { PASS_TIERS, levelCost, type PassReward } from "@/lib/catalyst";
+import { PASS_TIERS, PIECE_PICTURES, levelCost, type PassReward } from "@/lib/catalyst";
 
 function Reward({ reward, level }: { reward: PassReward | null; level: number }) {
   if (!reward) {
@@ -27,7 +27,7 @@ function Reward({ reward, level }: { reward: PassReward | null; level: number })
     case "cape":
       return (
         <span className={styles.item} title={reward.name}>
-          <CapeArt colors={reward.colors} id={`tier-${level}`} />
+          <CapeArt colors={reward.colors} id={`tier-${level}`} texture={reward.front} />
           <em>{reward.name}</em>
         </span>
       );
@@ -47,9 +47,14 @@ function Reward({ reward, level }: { reward: PassReward | null; level: number })
       return (
         <span className={styles.item} title={`${reward.name}: ${reward.options.join(" or ")}`}>
           <span className={styles.choice}>
-            {reward.options.map((option) => (
-              <PixelSprite key={option} name={option} size={34} />
-            ))}
+            {reward.options.map((option) =>
+              PIECE_PICTURES[option] ? (
+                // eslint-disable-next-line @next/next/no-img-element -- the piece's own render
+                <img key={option} src={PIECE_PICTURES[option]} alt="" width={560} height={560} loading="lazy" decoding="async" />
+              ) : (
+                <PixelSprite key={option} name={option} size={34} />
+              ),
+            )}
           </span>
           <em>{reward.options.join(" or ")}</em>
         </span>

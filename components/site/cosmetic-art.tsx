@@ -15,7 +15,8 @@ function safeId(id: string): string {
 const RIM = "rgba(255,255,255,0.16)";
 
 /** A cape on a player seen from behind: a plain silhouette wearing the cape in the item's colours. */
-export function CapeArt({ colors, id, className }: { colors: string[]; id: string; className?: string }) {
+/** [texture]: a painted cape's outside face (40x64, from art/capes) - drawn crisp in place of the gradient. */
+export function CapeArt({ colors, id, className, texture }: { colors: string[]; id: string; className?: string; texture?: string }) {
   const stops = ramp(colors);
   const px = 3.6;
   const cx = 50;
@@ -45,20 +46,26 @@ export function CapeArt({ colors, id, className }: { colors: string[]; id: strin
       {part(cx + 4 * px, shoulders, 4 * px, 12 * px, "arm-l")}
       {part(cx - 4 * px, hips, 4 * px, 12 * px, "leg-r")}
       {part(cx, hips, 4 * px, 12 * px, "leg-l")}
-      <rect x={capeX} y={shoulders} width={capeW} height={capeH} fill={`url(#${gid})`} />
-      <rect
-        x={capeX + px * 0.6}
-        y={shoulders + px * 0.6}
-        width={capeW - px * 1.2}
-        height={capeH - px * 1.2}
-        fill="none"
-        stroke={SHADE}
-        strokeWidth={px * 0.8}
-      />
-      <path
-        d={`M${cx} ${shoulders + 3 * px} L${cx + 1.6 * px} ${shoulders + 4.6 * px} L${cx} ${shoulders + 6.2 * px} L${cx - 1.6 * px} ${shoulders + 4.6 * px}Z`}
-        fill="rgba(255,255,255,0.35)"
-      />
+      {texture ? (
+        <image href={texture} x={capeX} y={shoulders} width={capeW} height={capeH} preserveAspectRatio="none" style={{ imageRendering: "pixelated" }} />
+      ) : (
+        <>
+          <rect x={capeX} y={shoulders} width={capeW} height={capeH} fill={`url(#${gid})`} />
+          <rect
+            x={capeX + px * 0.6}
+            y={shoulders + px * 0.6}
+            width={capeW - px * 1.2}
+            height={capeH - px * 1.2}
+            fill="none"
+            stroke={SHADE}
+            strokeWidth={px * 0.8}
+          />
+          <path
+            d={`M${cx} ${shoulders + 3 * px} L${cx + 1.6 * px} ${shoulders + 4.6 * px} L${cx} ${shoulders + 6.2 * px} L${cx - 1.6 * px} ${shoulders + 4.6 * px}Z`}
+            fill="rgba(255,255,255,0.35)"
+          />
+        </>
+      )}
       <rect x={capeX} y={shoulders} width={capeW} height={capeH} fill="none" stroke={RIM} strokeWidth={1.2} />
     </svg>
   );

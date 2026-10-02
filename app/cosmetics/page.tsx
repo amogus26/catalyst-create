@@ -6,7 +6,7 @@ import { Hall } from "@/components/site/hall";
 import { LockIcon } from "@/components/site/icons";
 import { Reveal, Stagger, StaggerItem, Tilt } from "@/components/site/motion";
 import { PixelSprite } from "@/components/site/pixel-sprite";
-import { CATALYST_PLUS, PASS_TIERS, SEASON, SHOP_ITEMS } from "@/lib/catalyst";
+import { CATALYST_PLUS, PASS_TIERS, PIECE_PICTURES, SEASON, SHOP_ITEMS } from "@/lib/catalyst";
 import styles from "./cosmetics.module.css";
 
 export const metadata: Metadata = {
@@ -14,7 +14,11 @@ export const metadata: Metadata = {
   description: `Wings, gauntlets and capes for Catalyst Client, in 3D: ${SHOP_ITEMS.map((i) => i.name).join(", ")}. In the launcher's Store.`,
 };
 
-type Earned = { name: string; from: string; art: { kind: "wings" | "cape"; colors: string[]; picture?: string } | { kind: "sprite" } };
+type Earned = {
+  name: string;
+  from: string;
+  art: { kind: "wings" | "cape"; colors: string[]; picture?: string; front?: string } | { kind: "sprite"; picture?: string };
+};
 
 /**
  * What the battle pass and Catalyst Plus give - never sold in the shop. The daily calendar's cosmetics
@@ -24,8 +28,15 @@ function earned(): Earned[] {
   const pass: Earned[] = PASS_TIERS.flatMap<Earned>((tier) => {
     const r = tier.premium;
     if (!r || r.kind === "coins") return [];
-    if (r.kind === "choice") return r.options.map((option) => ({ name: option, from: `Battle pass · level ${tier.level} pick`, art: { kind: "sprite" as const } }));
-    return [{ name: r.name, from: `Battle pass · level ${tier.level}`, art: { kind: r.kind, colors: r.colors, picture: r.kind === "wings" ? r.picture : undefined } }];
+    if (r.kind === "choice")
+      return r.options.map((option) => ({ name: option, from: `Battle pass · level ${tier.level} pick`, art: { kind: "sprite" as const, picture: PIECE_PICTURES[option] } }));
+    return [
+      {
+        name: r.name,
+        from: `Battle pass · level ${tier.level}`,
+        art: { kind: r.kind, colors: r.colors, picture: r.kind === "wings" ? r.picture : undefined, front: r.kind === "cape" ? r.front : undefined },
+      },
+    ];
   });
   const plus: Earned[] = ["Plus hat", "Plus gauntlet", "Plus name tag badge"].map((name) => ({ name, from: CATALYST_PLUS.name, art: { kind: "sprite" } }));
   return [...pass, ...plus];
@@ -77,15 +88,15 @@ export default function CosmeticsPage() {
               <StaggerItem key={r.name}>
                 <Tilt className={`panel ${styles.earnCard}`} max={6}>
                   <span className={styles.earnArt}>
-                    {r.art.kind === "sprite" ? (
-                      <PixelSprite name={r.name} size={56} />
-                    ) : r.art.kind === "wings" && r.art.picture ? (
-                      // eslint-disable-next-line @next/next/no-img-element -- the wings' own render
+                    {r.art.picture ? (
+                      // eslint-disable-next-line @next/next/no-img-element -- the piece's own render
                       <img src={r.art.picture} alt="" width={560} height={560} loading="lazy" decoding="async" />
+                    ) : r.art.kind === "sprite" ? (
+                      <PixelSprite name={r.name} size={56} />
                     ) : r.art.kind === "wings" ? (
                       <WingsArt colors={r.art.colors} id={`earn-${r.name}`} />
                     ) : (
-                      <CapeArt colors={r.art.colors} id={`earn-${r.name}`} />
+                      <CapeArt colors={r.art.colors} id={`earn-${r.name}`} texture={r.art.front} />
                     )}
                   </span>
                   <b>{r.name}</b>

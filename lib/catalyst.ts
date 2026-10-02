@@ -335,21 +335,37 @@ export const QUEST_XP_PER_DAY = QUESTS.reduce((sum, q) => sum + q.xp, 0);
 
 export type PassReward =
   | { kind: "coins"; amount: number }
-  | { kind: "cape"; name: string; colors: string[] }
+  | { kind: "cape"; name: string; colors: string[]; texture?: string; front?: string }
   | { kind: "wings"; name: string; colors: string[]; picture?: string }
   | { kind: "choice"; name: string; options: string[] };
 
+/**
+ * The pass capes are painted by hand (the client's art/capes/design_capes.py writes them into
+ * public/cosmetics/capes, and the same files into the client and the launcher): `texture` is the whole HD
+ * cape texture for 3D, `front` its outside face for pictures. "Kindle Cape" is kindle_cape.png.
+ */
+function paintedCape(name: string) {
+  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "_");
+  return { texture: `/cosmetics/capes/${slug}.png`, front: `/cosmetics/capes/${slug}-front.png` };
+}
+
+/** Renders of the box-model pieces (scripts/render-cosmetics.py), by name - the level-25 pick's. */
+export const PIECE_PICTURES: Record<string, string> = {
+  "Ember hat": "/cosmetics/ember-hat.webp",
+  "Ember gauntlet": "/cosmetics/ember-gauntlet.webp",
+};
+
 /** The premium lane's cosmetics by level (BattlePassPage.kt `passCosmetics`). */
 const PASS_COSMETICS: Record<number, PassReward> = {
-  5: { kind: "cape", name: "Kindle Cape", colors: [lighten(P.busy, 0.3), darken(P.busy, 0.3)] },
-  10: { kind: "cape", name: "Spark Cape", colors: [lighten(P.busy, 0.55), P.busy] },
-  15: { kind: "cape", name: "Ashen Cape", colors: [P.launchActive, darken(P.launchActive, 0.55)] },
-  20: { kind: "cape", name: "Ash Mantle", colors: [lighten(P.launchActive, 0.3), darken(P.launchActive, 0.5)] },
+  5: { kind: "cape", name: "Kindle Cape", colors: [lighten(P.busy, 0.3), darken(P.busy, 0.3)], ...paintedCape("Kindle Cape") },
+  10: { kind: "cape", name: "Spark Cape", colors: [lighten(P.busy, 0.55), P.busy], ...paintedCape("Spark Cape") },
+  15: { kind: "cape", name: "Ashen Cape", colors: [P.launchActive, darken(P.launchActive, 0.55)], ...paintedCape("Ashen Cape") },
+  20: { kind: "cape", name: "Ash Mantle", colors: [lighten(P.launchActive, 0.3), darken(P.launchActive, 0.5)], ...paintedCape("Ash Mantle") },
   25: { kind: "choice", name: "Pick one", options: ["Ember hat", "Ember gauntlet"] },
-  30: { kind: "cape", name: "Flare Cape", colors: [lighten(P.danger, 0.3), lighten(P.busy, 0.3)] },
-  35: { kind: "cape", name: "Smoulder Cape", colors: [darken(P.busy, 0.2), darken(P.danger, 0.6)] },
-  40: { kind: "cape", name: "Cinder Veil", colors: [P.danger, darken(P.danger, 0.5)] },
-  45: { kind: "cape", name: "Blaze Cape", colors: [lighten(P.busy, 0.5), P.busy, P.danger] },
+  30: { kind: "cape", name: "Flare Cape", colors: [lighten(P.danger, 0.3), lighten(P.busy, 0.3)], ...paintedCape("Flare Cape") },
+  35: { kind: "cape", name: "Smoulder Cape", colors: [darken(P.busy, 0.2), darken(P.danger, 0.6)], ...paintedCape("Smoulder Cape") },
+  40: { kind: "cape", name: "Cinder Veil", colors: [P.danger, darken(P.danger, 0.5)], ...paintedCape("Cinder Veil") },
+  45: { kind: "cape", name: "Blaze Cape", colors: [lighten(P.busy, 0.5), P.busy, P.danger], ...paintedCape("Blaze Cape") },
   50: { kind: "wings", name: SEASON.headline, colors: [...SEASON.headlineColors], picture: SEASON.headlinePicture },
 };
 

@@ -6,7 +6,8 @@ The site's still pictures of Catalyst's cosmetics and pixel icons, rendered in B
 Jobs:
     sprite:<NAME>          a 16x16 icon from lib/sprites.ts, built from voxels (CROWN, PICKAXE, CHEST...)
     box:<model>[:<pose>]   a box model the client draws (its assets/visuals/cosmetics/<model>.json):
-                           gauntlet, arcane_gauntlet or stoneheart_wings; pose "fist" raises a gauntlet
+                           a gauntlet (gauntlet, arcane_gauntlet, ember_gauntlet; pose "fist" raises it),
+                           a hat (ember_hat, on a plain head) or stoneheart_wings
     glb:<model>            a Blender-made wing model the client ships (<model>.glb), seen from behind
 
 Models are read from the client repository next to this one (../client), sprites from lib/sprites.ts -
@@ -280,7 +281,7 @@ def parts_of(list_, stone=None, mirror=False):
     return out
 
 
-def add_boxes(name, parts, matrix, parent, stone=(1, 1, 1, 1)):
+def add_boxes(name, parts, matrix, parent, stone=(1, 1, 1, 1), metallic=0.3, roughness=0.38):
     """Boxes in model pixels, placed by [matrix] (model space, blocks), split into lit and glowing."""
     solid, glow = ([], []), ([], [])
     for (x1, y1, z1, x2, y2, z2), spec, glows in parts:
@@ -291,7 +292,7 @@ def add_boxes(name, parts, matrix, parent, stone=(1, 1, 1, 1)):
             target[1].append(colour)
     made = []
     if solid[0]:
-        made.append(mesh_object(name, solid[0], solid[1], vertex_colour_material("Gold", roughness=0.38, metallic=0.3), parent))
+        made.append(mesh_object(name, solid[0], solid[1], vertex_colour_material("Solid", roughness=roughness, metallic=metallic), parent))
     if glow[0]:
         made.append(mesh_object(name + "Glow", glow[0], glow[1], vertex_colour_material("Glow", roughness=0.25, emission=2.2), parent))
     return made
@@ -325,6 +326,30 @@ def build_gauntlet(model, fist=False):
             faces.append(quad)
             colours.append(hex_rgba(spec))
     objects.append(mesh_object("Arm", faces, colours, vertex_colour_material("Skin", roughness=0.8), space))
+    return space, objects
+
+
+def build_hat(model):
+    """A hat (Hat.java) on a plain head - our classic skin's colours - in the head's model space."""
+    data = json.load(open(os.path.join(CLIENT, model + ".json"), encoding="utf-8"))
+    space = model_space()
+    # Leather, not metal: matte.
+    objects = add_boxes(model, parts_of(data["parts"]), Matrix.Identity(4), space, metallic=0.0, roughness=0.85)
+    head = [
+        ((-4, -8, -4, 4, 0, 4), CLASSIC_SKIN),
+        ((-4.05, -8.05, -4.05, 4.05, -6.6, 4.05), "#4A3222"),   # hair
+        ((-4.05, -6.6, 2.0, 4.05, -3.2, 4.05), "#4A3222"),      # hair at the back
+        ((-3.0, -4.6, -4.06, -1.0, -3.6, -4.0), "#F4F7FB"),     # eyes
+        ((1.0, -4.6, -4.06, 3.0, -3.6, -4.0), "#F4F7FB"),
+        ((-2.0, -4.6, -4.08, -1.0, -3.6, -4.06), "#4B6FB0"),
+        ((1.0, -4.6, -4.08, 2.0, -3.6, -4.06), "#4B6FB0"),
+    ]
+    faces, colours = [], []
+    for (x1, y1, z1, x2, y2, z2), spec in head:
+        for quad in box_faces(x1 / 16, y1 / 16, z1 / 16, x2 / 16, y2 / 16, z2 / 16):
+            faces.append(quad)
+            colours.append(hex_rgba(spec))
+    objects.append(mesh_object("Head", faces, colours, vertex_colour_material("Skin", roughness=0.8), space))
     return space, objects
 
 
@@ -395,6 +420,10 @@ def main():
         # Held the way Minecraft shows an item: tipped corner to corner, turned towards the light.
         pivot.rotation_euler = (math.radians(12), math.radians(-28), math.radians(-35))
         view, centre, radius = frame(objects, (0.35, -1.0, 0.25), lens=70, fill=0.92)
+    elif kind == "box" and name.endswith("hat"):
+        _, objects = build_hat(name)
+        # From the front and a little to the side and above, so the band's stone and the plume both show.
+        view, centre, radius = frame(objects, (0.55, -1.0, 0.45), lens=60, fill=0.9)
     elif kind == "box" and name.endswith("wings"):
         _, objects = build_stone_wings(name)
         view, centre, radius = frame(objects, (0.55, 1.0, 0.25), lens=60, fill=0.9)

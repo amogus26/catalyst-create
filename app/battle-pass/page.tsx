@@ -1,17 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Fragment } from "react";
 import { PassHero } from "@/components/battle-pass/pass-hero";
 import { PassTrack } from "@/components/battle-pass/track";
 import { CoinMark } from "@/components/site/coin-mark";
 import { Hall } from "@/components/site/hall";
 import { Counter, Reveal, Stagger, StaggerItem, Tilt } from "@/components/site/motion";
-import { PixelSprite } from "@/components/site/pixel-sprite";
 import {
   FREE_LANE_TOTAL,
   PASS_TIERS,
+  PIECE_PICTURES,
   PREMIUM_LANE_TOTAL,
-  QUESTS,
   QUEST_XP_PER_DAY,
+  QUESTS,
   SEASON,
   SEASON_MAX_XP,
   usd,
@@ -138,18 +139,23 @@ export default function BattlePassPage() {
                 <h2 className="headline" id="pick-title">
                   Your pick: hat or gauntlet.
                 </h2>
-                <p className="lede">Halfway through the season, pass holders choose one - the Ember hat or the Ember gauntlet.</p>
+                <p className="lede">
+                  Halfway through the season, pass holders choose one: the Ember hat - a charred top hat with a burning band
+                  and a plume of flame - or the Ember gauntlet - blackened iron split by molten cracks, an ember burning on
+                  the back of the hand. Both throw off embers in game.
+                </p>
               </div>
               <div className={styles.pickArt}>
-                <span>
-                  <PixelSprite name="Ember hat" size={120} />
-                  <b>Ember hat</b>
-                </span>
-                <em>or</em>
-                <span>
-                  <PixelSprite name="Ember gauntlet" size={120} />
-                  <b>Ember gauntlet</b>
-                </span>
+                {["Ember hat", "Ember gauntlet"].map((piece, i) => (
+                  <Fragment key={piece}>
+                    {i > 0 && <em>or</em>}
+                    <span>
+                      {/* eslint-disable-next-line @next/next/no-img-element -- rendered from the client's own model */}
+                      <img src={PIECE_PICTURES[piece]} alt={`The ${piece}`} width={560} height={560} loading="lazy" decoding="async" />
+                      <b>{piece}</b>
+                    </span>
+                  </Fragment>
+                ))}
               </div>
             </div>
           </Reveal>

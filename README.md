@@ -114,6 +114,11 @@ on `/cosmetics`, the coins on `/coins` and the cape preview on `/designs`. Scrol
   padded to a square in one pass and resized in another (sharp resizes before it extends) into
   `public/cosmetics/<item>.webp` (560px) and `public/features/<name>.webp`. The skies card is the client's
   own screenshot (`vz_shot=world` with `vz_look`, which hides the HUD).
+- **The battle pass capes are painted** - HD cape textures from the client's `art/capes/design_capes.py`,
+  run with `public/cosmetics/capes` as its folder (`paintedCape()` in `lib/catalyst.ts`; the `-front.png`
+  beside each is its outside face, cut with sharp, for `CapeArt`'s `texture`). The level-25 pick's Ember hat
+  and Ember gauntlet are the client's box models rendered here (`box:ember_hat`, `box:ember_gauntlet:fist`),
+  listed in `PIECE_PICTURES`.
 
 **Regenerating the pictures.** `public/stills/hero.webp` is the hero scene itself: open
 `/?still` (it holds a three-quarter pose and keeps the canvas readable), wait for it to draw, then
