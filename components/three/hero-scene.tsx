@@ -5,12 +5,9 @@ import { useFrame } from "@react-three/fiber";
 import { useReducedMotion } from "motion/react";
 import { useMemo, useRef, useState, type ReactNode } from "react";
 import * as THREE from "three";
-import { SEASON, SHOP_ITEMS } from "@/lib/catalyst";
 import { Player } from "./player";
 import { Stage, useWindowPointer } from "./stage";
 import { makeGlowTexture } from "./textures";
-
-const SCULK_CAPE = SHOP_ITEMS.find((item) => item.id === "sculk-cape")!.colors;
 
 /**
  * A soft pool of light on the ground, and a fainter one standing up behind the player - kept well
@@ -74,27 +71,27 @@ function HeroContent() {
   });
   return (
     <>
-      <Lights ember />
+      <Lights />
       <group ref={spin}>
-        <Player wearing={{ cape: { colors: SCULK_CAPE }, wings: SEASON.headlineModel }} look={pointer} still={!!reduced} />
+        <Player wearing={{ wings: { type: "glb", file: "void_butterfly_wings" } }} look={pointer} still={!!reduced} />
       </group>
       <FloorGlow />
       {!reduced && (
         <>
           <Sparkles count={70} scale={[5.5, 3.6, 4]} position={[0, 1.5, 0]} size={2.6} speed={0.35} color="#6ff5e6" opacity={0.85} />
-          <Sparkles count={24} scale={[2.4, 2, 1.6]} position={[0, 1.5, -0.8]} size={3.2} speed={0.5} color="#ffb27a" opacity={0.9} />
+          <Sparkles count={24} scale={[2.4, 2, 1.6]} position={[0, 1.5, -0.8]} size={3.2} speed={0.5} color="#b98cff" opacity={0.9} />
         </>
       )}
     </>
   );
 }
 
-/** The home page's hero: our player in the Sculk Cape and Emberfall Wings, turning slowly. */
+/** The home page's hero: our player in the Void Butterfly Wings, turning slowly. */
 export default function HeroScene({ className, fallback }: { className?: string; fallback: ReactNode }) {
   return (
     <Stage
       className={className}
-      label="A Catalyst player wearing the Sculk Cape and the Emberfall Wings, turning slowly"
+      label="A Catalyst player wearing the Void Butterfly Wings, turning slowly"
       camera={{ position: [0, 1.3, 6.2], fov: 30 }}
       fallback={fallback}
     >

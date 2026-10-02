@@ -22,13 +22,9 @@ export function HeroStage() {
       <DeferredScene poster={<Poster />}>
         <HeroScene className={styles.scene} fallback={<Poster />} />
       </DeferredScene>
-      <span className={`${styles.floatTag} ${styles.tagCape}`}>
-        <b>Sculk Cape</b>
-        <em>It hums when no one is near.</em>
-      </span>
       <span className={`${styles.floatTag} ${styles.tagWings}`}>
-        <b>Emberfall Wings</b>
-        <em>Battle pass · level 50</em>
+        <b>Void Butterfly Wings</b>
+        <em>Hatched where the End begins.</em>
       </span>
     </div>
   );

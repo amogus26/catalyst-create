@@ -177,7 +177,7 @@ const STATS = [
  * screenshot harness (DebugShots) from the same spot at the same time of day: every module off for the
  * Minecraft one; for the Catalyst one these, the rest as a new player has them.
  */
-const COMPARE_ON = ["Sky Shaders: Aurora", "Minimap", "Ping", "CPS", "Coordinates", "Playtime", "Armour Status", "Saturation"];
+const COMPARE_ON = ["Stoneheart Gauntlet", "Sky Shaders: Aurora", "Minimap", "Ping", "CPS", "Coordinates", "Playtime", "Saturation"];
 
 /**
  * The home page: what Catalyst is, what it looks like, what it does and how to start - in that order,
@@ -358,7 +358,9 @@ export default function HomePage() {
                   <h3>{card.title}</h3>
                   <p>{card.text}</p>
                   {/* eslint-disable-next-line @next/next/no-img-element -- a small transparent render, served as it is */}
-                  <img className={styles.cardImage} src={card.image} alt="" loading="lazy" decoding="async" draggable={false} />
+                  {/* Sized and loaded at once: a lazy picture with no size of its own is 0x0 until it loads, and some
+                      browsers never count a 0x0 picture as on screen - so it never loaded at all. */}
+                  <img className={styles.cardImage} src={card.image} alt="" width={520} height={520} decoding="async" draggable={false} />
                 </>
               );
               const className = [
@@ -419,22 +421,23 @@ export default function HomePage() {
               Same world. More to see.
             </h2>
             <p className="lede">
-              Two shots of the same moment in the same world. Drag the line: Catalyst on the left, Minecraft as it
-              comes on the right.
+              Two shots of the same moment in the same world. Drag the line: Minecraft as it comes on the left,
+              Catalyst on the right.
             </p>
           </Reveal>
           <Reveal from="scale" className={styles.compareWrap}>
+            {/* Catalyst on the right: the gauntlet on the hand is in that corner, so it shows from the start. */}
             <Compare
               left={{
+                image: compareMinecraft,
+                label: "Minecraft",
+                alt: "A snowy valley in Minecraft without Catalyst: a bare hand, a blue sky with blocky clouds, and only the hotbar, health and hunger on screen",
+              }}
+              right={{
                 image: compareCatalyst,
                 label: "With Catalyst",
                 accent: true,
-                alt: "A snowy valley with Catalyst: an aurora and stars from Sky Shaders fill the sky, ping, CPS, coordinates, playtime and armour durability run down the left, and a minimap sits top right",
-              }}
-              right={{
-                image: compareMinecraft,
-                label: "Minecraft",
-                alt: "The same moment in Minecraft without Catalyst: a blue sky with blocky clouds, and only the hotbar, health and hunger on screen",
+                alt: "The same moment with Catalyst: the Stoneheart Gauntlet on the hand, an aurora and stars from Sky Shaders fill the sky, ping, CPS, coordinates and playtime run down the left, and a minimap sits top right",
               }}
             />
             <div className={styles.compareFoot}>

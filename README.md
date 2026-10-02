@@ -57,8 +57,9 @@ the same spot at the same time: run `runClient` with `--width 1440 --height 810`
 2880x1620) and its own `--gameDir` (an init script adding both to the run's args, so no saves or settings of
 the team's are touched), `-Dvz_world=<a copied save> -Dvz_config=<an empty folder> -Dvz_skin=steve
 -Dvz_command_tick=20 -Dvz_panorama_tick=220` and `-Dvz_commands="time set 1000;weather clear;item replace entity
-@s weapon.mainhand with diamond_sword;tp @s -940.67 79 241.5 0 -8"` (that save's snowy valley), the game's chat
-hidden and GUI scale 4 in that folder's options.txt. Minecraft: `-Dvz_disable=` every module that starts on.
+@s weapon.mainhand with air;tp @s -940.67 79 241.5 0 -8"` (that save's snowy valley, an empty hand), the game's chat
+hidden and GUI scale 4 in that folder's options.txt, and `-Dvz_cosmetics=<file>`: `{}` for Minecraft,
+`{"gauntlet": {"name": "Stoneheart Gauntlet", "colors": ["#E0A83A"]}}` for Catalyst, so the hand wears it. Minecraft: `-Dvz_disable=` every module that starts on.
 Catalyst: `-Dvz_enable=sky_shaders,minimap -Dvz_disable=fps` - the FPS readout is off because a dev run at that size,
 without the Sodium a real launch brings, says nothing true about speed. The chips under it list what is on. Then
 `vz_menu.png` from that folder's `screenshots/`, resized to 2560x1440 WebP (quality 90). The mods panel's icons come straight from

@@ -110,11 +110,6 @@
   color: var(--muted);
   font-size: 0.75rem;
 }
-.tagCape {
-  left: 0;
-  top: 58%;
-  border-left: 0.1875rem solid #1e9aa1;
-}
 .tagWings {
   right: 0;
   top: 20%;
@@ -173,7 +168,6 @@
     order: -1;
     margin-bottom: -2.5rem;
   }
-  .tagCape,
   .tagWings {
     display: none;
   }
@@ -1494,6 +1488,13 @@
 a.featureCard:hover {
   text-decoration: none;
 }
+/* The words over the picture by an ordinary stacking order - no negative z-index: Safari drops a rotated,
+   filtered picture placed under its card's own background. */
+.featureCard h3,
+.featureCard p {
+  position: relative;
+  z-index: 2;
+}
 .featureCard h3 {
   max-width: 16rem;
   font-size: 1.25rem;
@@ -1510,9 +1511,9 @@ a.featureCard:hover {
   position: absolute;
   right: -1.25rem;
   bottom: -2.25rem;
-  z-index: -1;
+  z-index: 1;
   width: 56%;
-  max-height: 70%;
+  height: 70%;
   object-fit: contain;
   object-position: right bottom;
   filter: grayscale(1) brightness(0.7) contrast(1.05);
@@ -1526,7 +1527,7 @@ a.featureCard:hover {
   position: absolute;
   right: -18%;
   bottom: -32%;
-  z-index: -2;
+  z-index: 0;
   width: 80%;
   height: 80%;
   border-radius: 50%;
@@ -1557,7 +1558,6 @@ a.featureCard:hover {
   bottom: 0;
   width: 100%;
   height: 62%;
-  max-height: none;
   object-fit: cover;
   object-position: center 35%;
   transform: none;
@@ -1600,7 +1600,7 @@ a.featureCard:hover {
   right: -0.75rem;
   bottom: -1.25rem;
   width: 84%;
-  max-height: 62%;
+  height: 62%;
 }
 @media (max-width: 620px) {
   .cards {
@@ -1612,7 +1612,7 @@ a.featureCard:hover {
   /* Narrow cards: a smaller picture, so it stays under the words rather than over them. */
   .cardImage {
     width: 44%;
-    max-height: 54%;
+    height: 54%;
   }
   .featureCardWide .cardImage {
     width: 70%;
