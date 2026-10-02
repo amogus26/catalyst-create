@@ -153,7 +153,7 @@ export default function RedeemPage() {
                   <SparkIcon />
                 </span>
                 <h3>A shop item, free</h3>
-                <p>One of the shop&apos;s wings or capes, yours to wear.</p>
+                <p>One of the shop&apos;s wings, gauntlets or capes, yours to wear.</p>
               </Tilt>
             </StaggerItem>
             <StaggerItem>

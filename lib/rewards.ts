@@ -1,6 +1,6 @@
 /**
  * What a redeem code gives, in the launcher's own grammar (its `CodeGrant` in codes/Codes.kt):
- * `coins:500`, `sale:20:7`, `item:Moth Wings`, `special:Creator Cape`. The launcher applies the
+ * `coins:500`, `sale:20:7`, `item:Raven Wings`, `special:Creator Cape`. The launcher applies the
  * reward; the site only stores it and hands it over. Pure, so the admin form can use it too.
  */
 
@@ -9,12 +9,17 @@
  * CosmeticsPage.kt). An `item:` code must name one of these or it grants nothing the player can see.
  */
 export const SHOP_ITEMS = [
-  "Prism Wings",
-  "Molten Wings",
-  "Frost Wings",
-  "Moth Wings",
+  "Stoneheart Gauntlet",
+  "Stoneheart Wings",
+  "Arcane Iron Gauntlet",
+  "Raven Wings",
+  "Wyvern Wings",
+  "Seraph Wings",
+  "Void Butterfly Wings",
   "Emberfall Cape",
   "Sculk Cape",
+  "Shattered Wings",
+  "Crow Wings",
   "Aurora Cape",
   "Nightfall Cape",
   "Verdant Cape",

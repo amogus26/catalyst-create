@@ -73,11 +73,16 @@ function paintRegion(ctx: CanvasRenderingContext2D, [rx, ry, rw, rh]: readonly n
   }
 }
 
+/** Which skin a player wears: our own hooded one, or a plain everyday one. */
+export type SkinStyle = "catalyst" | "classic";
+
 /**
  * Our player: dark hair, teal eyes, a navy hoodie with a teal zip and trim, charcoal trousers and dark
- * shoes. Painted pixel by pixel with a little noise, the way skins are.
+ * shoes - or, "classic", an everyday player in a T-shirt and jeans. Painted pixel by pixel with a little
+ * noise, the way skins are.
  */
-export function makeSkinTexture(): THREE.CanvasTexture {
+export function makeSkinTexture(style: SkinStyle = "catalyst"): THREE.CanvasTexture {
+  if (style === "classic") return makeClassicSkin();
   const { el, ctx } = canvas(64, 64);
   const r = rng(7);
   const hair = () => speckle(HAIR.base, r, 0.1);
@@ -146,6 +151,88 @@ export function makeSkinTexture(): THREE.CanvasTexture {
     paintRegion(ctx, l.top, () => speckle(PANTS.base, r));
     paintRegion(ctx, l.bottom, () => SHOE.sole);
     for (const face of [l.front, l.back, l.right, l.left]) paintRegion(ctx, face, trousers);
+  };
+  leg(0, 16);
+  leg(16, 48);
+
+  return pixelTexture(el);
+}
+
+const CLASSIC = {
+  hair: "#4A3222",
+  hairLight: "#5E412D",
+  eye: "#4B6FB0",
+  shirt: "#2E9FC0",
+  shirtShade: "#23809B",
+  shirtLight: "#3BB3D3",
+  jeans: "#34477A",
+  jeansShade: "#2A3A66",
+  shoe: "#4A4E57",
+  sole: "#2E3138",
+} as const;
+
+/**
+ * An everyday player, our own pixels: brown hair, a teal T-shirt with short sleeves, blue jeans and grey
+ * shoes. The "normal skin" the home page's last picture wears (and scripts/render-cosmetics.py's arm).
+ */
+function makeClassicSkin(): THREE.CanvasTexture {
+  const { el, ctx } = canvas(64, 64);
+  const r = rng(11);
+  const hair = () => speckle(r() < 0.25 ? CLASSIC.hairLight : CLASSIC.hair, r, 0.08);
+  const shirt = (y: number, h: number) => speckle(y < 1 ? CLASSIC.shirtLight : y > h - 2 ? CLASSIC.shirtShade : CLASSIC.shirt, r, 0.05);
+  const skin = () => speckle(SKIN.tone, r, 0.05);
+
+  const head = boxRegions(0, 0, 8, 8, 8);
+  paintRegion(ctx, head.top, () => hair());
+  paintRegion(ctx, head.bottom, () => speckle(SKIN.shade, r));
+  paintRegion(ctx, head.back, (x, y) => (y < 6 ? hair() : speckle(SKIN.shade, r)));
+  paintRegion(ctx, head.right, (x, y) => (y < 2 || x < 4 || (y < 4 && x < 6) ? hair() : skin()));
+  paintRegion(ctx, head.left, (x, y) => (y < 2 || x > 3 || (y < 4 && x > 1) ? hair() : skin()));
+  paintRegion(ctx, head.front, (x, y) => {
+    if (y < 2) return hair();
+    if (y === 2) return x === 0 || x === 7 ? hair() : speckle(SKIN.light, r, 0.04);
+    if (y === 4) {
+      if (x === 1 || x === 6) return "#F4F7FB"; // whites
+      if (x === 2 || x === 5) return CLASSIC.eye;
+    }
+    if (y === 3 && (x === 1 || x === 2 || x === 5 || x === 6)) return speckle(CLASSIC.hair, r, 0.05); // brows
+    if (y === 6 && x >= 3 && x <= 4) return SKIN.mouth;
+    if (y === 7) return speckle(SKIN.shade, r, 0.04);
+    return skin();
+  });
+
+  const body = boxRegions(16, 16, 8, 12, 4);
+  paintRegion(ctx, body.top, () => shirt(1, 4));
+  paintRegion(ctx, body.bottom, () => speckle(CLASSIC.jeans, r));
+  paintRegion(ctx, body.front, (x, y, w, h) => {
+    if (y === 0 && x >= 3 && x <= 4) return skin(); // the collar's dip
+    if (y >= h - 2) return speckle(y === h - 1 ? CLASSIC.jeansShade : CLASSIC.jeans, r, 0.05); // jeans at the waist
+    return shirt(y, h - 2);
+  });
+  for (const face of [body.back, body.right, body.left]) {
+    paintRegion(ctx, face, (x, y, w, h) => (y >= h - 2 ? speckle(CLASSIC.jeans, r, 0.05) : shirt(y, h - 2)));
+  }
+
+  // Arms: short sleeves, then bare arms.
+  const arm = (u: number, v: number) => {
+    const a = boxRegions(u, v, 4, 12, 4);
+    const painter: Painter = (x, y, w, h) => (y < 4 ? shirt(y, 4) : speckle(y === h - 1 ? SKIN.shade : SKIN.tone, r, 0.05));
+    paintRegion(ctx, a.top, () => shirt(1, 4));
+    paintRegion(ctx, a.bottom, () => speckle(SKIN.shade, r));
+    for (const face of [a.front, a.back, a.right, a.left]) paintRegion(ctx, face, painter);
+  };
+  arm(40, 16);
+  arm(32, 48);
+
+  const leg = (u: number, v: number) => {
+    const l = boxRegions(u, v, 4, 12, 4);
+    const painter: Painter = (x, y, w, h) => {
+      if (y >= h - 2) return y === h - 1 ? CLASSIC.sole : speckle(CLASSIC.shoe, r, 0.05);
+      return speckle(y > 7 ? CLASSIC.jeansShade : CLASSIC.jeans, r, 0.06);
+    };
+    paintRegion(ctx, l.top, () => speckle(CLASSIC.jeans, r));
+    paintRegion(ctx, l.bottom, () => CLASSIC.sole);
+    for (const face of [l.front, l.back, l.right, l.left]) paintRegion(ctx, face, painter);
   };
   leg(0, 16);
   leg(16, 48);

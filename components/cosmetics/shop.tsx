@@ -10,14 +10,22 @@ import { DeferredScene } from "@/components/site/deferred-scene";
 import { RARITY, SHOP_ITEMS, salePrice, type ShopItem } from "@/lib/catalyst";
 import { CoinMark } from "@/components/site/coin-mark";
 
-type Filter = "all" | "wings" | "cape";
+type Filter = "all" | "wings" | "gauntlet" | "cape";
 const FILTERS: { id: Filter; label: string }[] = [
   { id: "all", label: "All" },
   { id: "wings", label: "Wings" },
+  { id: "gauntlet", label: "Gauntlets" },
   { id: "cape", label: "Capes" },
 ];
 
+const KIND_LABEL: Record<ShopItem["kind"], string> = { wings: "wings", gauntlet: "gauntlet", cape: "cape" };
+
+/** An item's picture: its model's rendered still, or - for capes, drawn from their colours - the cape. */
 function Art({ item, id }: { item: ShopItem; id: string }) {
+  if (item.picture) {
+    // eslint-disable-next-line @next/next/no-img-element -- a small transparent still, served as it is
+    return <img src={item.picture} alt="" width={560} height={560} loading="lazy" decoding="async" draggable={false} />;
+  }
   return item.kind === "wings" ? <WingsArt colors={item.colors} id={id} /> : <CapeArt colors={item.colors} id={id} />;
 }
 
@@ -76,7 +84,7 @@ export function CosmeticsShop() {
           >
             <span className={styles.bannerTag} style={{ color: rarity.color }}>
               {picked.tag?.kind === "deal" ? `${picked.tag.percentOff}% off · ` : picked.tag?.kind === "new" ? "New · " : ""}
-              {rarity.label} {picked.kind === "wings" ? "wings" : "cape"}
+              {rarity.label} {KIND_LABEL[picked.kind]}
             </span>
             <h2>{picked.name}</h2>
             <p className={styles.lore}>&ldquo;{picked.lore}&rdquo;</p>
@@ -93,7 +101,7 @@ export function CosmeticsShop() {
           <DeferredScene poster={<ViewerPoster item={picked} />}>
             <ViewerScene
               className={styles.viewerCanvas}
-              item={{ id: picked.id, kind: picked.kind, colors: picked.colors, glow: rarity.color }}
+              item={{ id: picked.id, kind: picked.kind, colors: picked.colors, model: picked.model, glow: rarity.color }}
               fallback={<ViewerPoster item={picked} />}
             />
           </DeferredScene>

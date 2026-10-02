@@ -6,13 +6,15 @@ import { useReducedMotion } from "motion/react";
 import { useMemo, useRef, type ReactNode } from "react";
 import * as THREE from "three";
 import { FloorGlow, Lights } from "./hero-scene";
-import { Player, type Wearing } from "./player";
+import { Player, type Wearing, type WornModel } from "./player";
 import { Stage } from "./stage";
 
 export interface ViewerItem {
   id: string;
-  kind: "cape" | "wings";
+  kind: "cape" | "wings" | "gauntlet";
   colors: string[];
+  /** The model the client draws it with - the shop's wings and gauntlets have one, capes don't. */
+  model?: WornModel;
   /** The glow the item's rarity casts on the pedestal. */
   glow: string;
 }
@@ -49,14 +51,24 @@ function Equip({ children, id }: { children: ReactNode; id: string }) {
   return <group ref={group}>{children}</group>;
 }
 
+function wearingFor(item: ViewerItem): Wearing {
+  if (item.kind === "cape") return { cape: { colors: item.colors } };
+  if (item.kind === "gauntlet") return { gauntlet: item.model?.file ?? "gauntlet", skin: "classic" };
+  return { wings: item.model ?? { colors: item.colors, glow: 0.18 } };
+}
+
 function ViewerContent({ item }: { item: ViewerItem }) {
   const reduced = useReducedMotion();
-  const wearing: Wearing = item.kind === "cape" ? { cape: { colors: item.colors } } : { wings: { colors: item.colors, glow: 0.18 } };
+  const gauntlet = item.kind === "gauntlet";
   return (
     <>
-      <Lights ember={item.kind === "wings"} />
+      {/* The warm light behind wings keeps gold gold - the teal rim alone turns it green from behind. */}
+      <Lights ember={item.kind !== "cape"} />
       <Equip id={item.id}>
-        <Player wearing={wearing} still={!!reduced} />
+        {/* The camera starts behind the player, where wings and capes are; a gauntlet is seen from the front. */}
+        <group rotation={[0, gauntlet ? Math.PI * 0.85 : 0, 0]}>
+          <Player wearing={wearingFor(item)} still={!!reduced} pose={gauntlet ? "raise" : "idle"} />
+        </group>
       </Equip>
       <Pedestal glow={item.glow} />
       <FloorGlow color={item.glow} size={3} back={false} />
@@ -75,13 +87,13 @@ function ViewerContent({ item }: { item: ViewerItem }) {
   );
 }
 
-/** The cosmetics shop's viewer: the player wearing [item], seen from behind, dragged round by hand. */
+/** The cosmetics shop's viewer: the player wearing [item] - wings and capes from behind - dragged round by hand. */
 export default function ViewerScene({ item, className, fallback }: { item: ViewerItem; className?: string; fallback: ReactNode }) {
   return (
     <Stage
       className={className}
       interactive
-      label={`A player wearing ${item.kind === "cape" ? "the cape" : "the wings"} - drag to turn them round`}
+      label={`A player wearing the ${item.kind === "cape" ? "cape" : item.kind === "gauntlet" ? "gauntlet" : "wings"} - drag to turn them round`}
       camera={{ position: [2.5, 1.6, -5.4], fov: 30 }}
       fallback={fallback}
     >

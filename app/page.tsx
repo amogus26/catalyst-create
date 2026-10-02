@@ -9,25 +9,20 @@ import { ModuleMarquee, ModuleVideo } from "@/components/home/client-showcase";
 import { Compare } from "@/components/home/compare";
 import { HeroStage } from "@/components/home/hero-stage";
 import { Tour, type Chapter } from "@/components/home/tour";
-import { CapeArt, WingsArt } from "@/components/site/cosmetic-art";
+import { WingsArt } from "@/components/site/cosmetic-art";
 import { DownloadButton } from "@/components/site/download-button";
 import { Hall } from "@/components/site/hall";
 import { HashRedirect } from "@/components/site/hash-redirect";
+import { CtaStage } from "@/components/home/cta-stage";
 import { ModInstall } from "@/components/home/mod-install";
 import {
   ArrowIcon,
-  BoltIcon,
   BoxIcon,
-  ChatIcon,
   CheckIcon,
   GridIcon,
-  LayersIcon,
   LockIcon,
-  PaletteIcon,
   PlayIcon,
   ShieldCheckIcon,
-  SlidersIcon,
-  SoundIcon,
   UserIcon,
   WindowsIcon,
   AppleIcon,
@@ -99,44 +94,75 @@ const PROFILE_MODS = [
   { name: "Mod Menu", icon: "https://cdn.modrinth.com/data/mOgUt4GM/5a20ed1450a0e1e79a1fe04e61bb4e5878bf1d20.png" },
 ];
 
-/** The six features under the mods panel - what the launcher does besides mods, one line each. */
-const FEATURES = [
+/**
+ * The feature cards, after Pulse Visuals' grid: one thing each, with a picture of our own - a voxel icon
+ * from the launcher's reward art, or a cosmetic the client ships - rendered by scripts/render-cosmetics.py
+ * (the skies are the client's own screenshot). Grey until pointed at; the first is lit.
+ */
+const FEATURE_CARDS: { title: string; text: string; image: string; href?: string; sky?: boolean; wide?: boolean }[] = [
+  {
+    title: "Made to look good",
+    text: `A clean Right Shift menu, ${THEME_PRESETS.length} colour schemes or any colour you like, and a HUD you arrange by dragging.`,
+    image: "/features/crown.webp",
+  },
   {
     title: "Fast from the first launch",
-    text: `${PREINSTALLED_MODS.join(", ").replace(/, ([^,]*)$/, " and $1")} come installed, and stay on their newest build.`,
-    Icon: BoltIcon,
-    colour: "#f0b429",
+    text: `${PREINSTALLED_MODS.join(", ").replace(/, ([^,]*)$/, " and $1")} come installed and stay on their newest build - the speed mods, without hunting for them.`,
+    image: "/features/pickaxe.webp",
   },
   {
-    title: "Profiles that keep mods apart",
-    text: "Each profile has its own mods. A mod that doesn't fit says why - and offers to make a profile it does fit.",
-    Icon: LayersIcon,
-    colour: "#8cc8f2",
+    title: "Made for PvP",
+    text: "CPS, projectile prediction, hitbox outlines, totem pops, cooldowns and armour status - one Right Shift away.",
+    image: "/features/gauntlet.webp",
   },
   {
-    title: "Your colours",
-    text: `${THEME_PRESETS.length} colour schemes - or one built from any colour. The client's menu follows.`,
-    Icon: PaletteIcon,
-    colour: "#fa86b6",
+    title: "Mods in one click",
+    text: "Search Modrinth and CurseForge from the launcher. The mods a mod needs come with it, every file checked.",
+    image: "/features/chest.webp",
   },
   {
-    title: "Your sounds",
-    text: "Your own hit and block sounds, and a picture behind your inventory - set in the launcher, heard in game.",
-    Icon: SoundIcon,
-    colour: "#4fa8e8",
+    title: "Wings you can wear",
+    text: "3D wings and gauntlets that beat, glide and fold as you move - worn in game, on your own player.",
+    image: "/features/stoneheart-wings.webp",
+    href: "/cosmetics",
+    wide: true,
   },
   {
-    title: "Help, built in",
-    text: "Catalyst Bot answers the usual questions - mods, crashes, the menu, rewards - right on Home.",
-    Icon: ChatIcon,
-    colour: "#37d3c4",
+    title: `${SKY_SHADERS.length} animated skies`,
+    text: "An aurora, a nebula, a galaxy, End beams, caustics or a black hole - drawn by your graphics card, on your screen only.",
+    image: "/features/aurora.webp",
+    sky: true,
   },
   {
-    title: "Memory and Java, sorted",
-    text: "Give the game 2 to 16 GB, pick a Java or let Catalyst find one, and choose the game's window size.",
-    Icon: SlidersIcon,
-    colour: "#b9c0cc",
+    title: "Your real account",
+    text: "Sign in with Microsoft and play as yourself - your name, your skin, online servers.",
+    image: "/features/name-tag.webp",
+    href: "#sign-in",
   },
+  {
+    title: "Something every day",
+    text: `A daily reward card, a ${SEASON.levels}-level battle pass and redeem codes - coins and cosmetics for playing.`,
+    image: "/features/present.webp",
+    href: "/battle-pass",
+  },
+  {
+    title: "Always getting better",
+    text: "New modules, skies and cosmetics keep coming - every change is in the release notes.",
+    image: "/features/lantern.webp",
+    href: "/download#notes",
+  },
+];
+
+/** And the rest, one line each - real, just smaller. */
+const MORE_FEATURES = [
+  "Profiles that keep mods apart",
+  "Your own hit and block sounds",
+  "A picture behind your inventory",
+  "Catalyst Bot on Home",
+  "2 to 16 GB of memory",
+  "Java found for you",
+  "Your window size",
+  "Starts with your computer",
 ];
 
 /** Catalyst in four figures - each counted from lib/catalyst.ts, none typed in. */
@@ -173,7 +199,7 @@ export default function HomePage() {
             <Reveal>
               <a className={styles.newsPill} href="#sign-in">
                 <b>New</b>
-                Approved for Minecraft sign-in
+                Sign in with your Microsoft account
                 <ArrowIcon size={16} />
               </a>
             </Reveal>
@@ -326,31 +352,44 @@ export default function HomePage() {
               <ModInstall mods={PROFILE_MODS} source={`${GAME_VERSION} ${LOADER}`} />
             </div>
           </Reveal>
-          <Stagger className={styles.featureGrid}>
-            {FEATURES.map((feature) => (
-              <StaggerItem key={feature.title} className={`panel ${styles.feature}`}>
-                <span className={styles.tileIcon} style={{ color: feature.colour }}>
-                  <feature.Icon />
-                </span>
-                <h3>{feature.title}</h3>
-                <p>{feature.text}</p>
-                {feature.title === "Fast from the first launch" && (
-                  <div className={styles.chips}>
-                    {PREINSTALLED_MODS.map((mod) => (
-                      <span key={mod}>{mod}</span>
-                    ))}
-                  </div>
-                )}
-                {feature.title === "Your colours" && (
-                  <div className={styles.swatches} role="img" aria-label={`${THEME_PRESETS.length} colour schemes`}>
-                    {THEME_PRESETS.map((preset) => (
-                      <span key={preset.name} title={preset.name} style={{ background: preset.accent }} />
-                    ))}
-                  </div>
-                )}
-              </StaggerItem>
-            ))}
+          <Stagger className={styles.cards}>
+            {FEATURE_CARDS.map((card, i) => {
+              const body = (
+                <>
+                  <h3>{card.title}</h3>
+                  <p>{card.text}</p>
+                  {/* eslint-disable-next-line @next/next/no-img-element -- a small transparent render, served as it is */}
+                  <img className={styles.cardImage} src={card.image} alt="" loading="lazy" decoding="async" draggable={false} />
+                </>
+              );
+              const className = [
+                styles.featureCard,
+                i === 0 && styles.featureCardLit,
+                card.sky && styles.featureCardSky,
+                card.wide && styles.featureCardWide,
+              ]
+                .filter(Boolean)
+                .join(" ");
+              return (
+                <StaggerItem key={card.title}>
+                  {card.href ? (
+                    <Link href={card.href} className={className}>
+                      {body}
+                    </Link>
+                  ) : (
+                    <div className={className}>{body}</div>
+                  )}
+                </StaggerItem>
+              );
+            })}
           </Stagger>
+          <Reveal>
+            <ul className={styles.moreFeatures} aria-label="And more">
+              {MORE_FEATURES.map((feature) => (
+                <li key={feature}>{feature}</li>
+              ))}
+            </ul>
+          </Reveal>
         </div>
       </section>
 
@@ -430,8 +469,8 @@ export default function HomePage() {
               <span className={styles.stepNo}>02</span>
               <h3>Sign in with Microsoft</h3>
               <p>
-                On Microsoft&apos;s own page, with the account that owns Minecraft. Catalyst is{" "}
-                <a href="#sign-in">approved for Minecraft sign-in</a>.
+                On Microsoft&apos;s own page, with the account that owns Minecraft -{" "}
+                <a href="#sign-in">how sign-in works</a>.
               </p>
             </StaggerItem>
             <StaggerItem as="li" className={`panel ${styles.step}`}>
@@ -459,11 +498,11 @@ export default function HomePage() {
               Microsoft sign-in
             </span>
             <h2 className="headline" id="signin-title">
-              Approved for <span className="shine-text">Minecraft sign-in.</span>
+              Sign in with your <span className="shine-text">real account.</span>
             </h2>
             <p className="lede">
-              Mojang reviewed Catalyst and approved it to sign players in on {SIGN_IN.approvedOn}. Sign in once with
-              Microsoft, and the game starts as you.
+              Catalyst signs you in with Microsoft, the way Minecraft&apos;s own launcher does - Mojang reviewed the app
+              and allowed it to on {SIGN_IN.approvedOn}. Sign in once, and the game starts as you.
             </p>
             <ul className={styles.signInPoints}>
               <li>
@@ -498,8 +537,8 @@ export default function HomePage() {
               </li>
             </ul>
             <p className={styles.signInFine}>
-              Catalyst is not an official Minecraft product and is not endorsed by or associated with Mojang or Microsoft.
-              The approval lets the launcher sign you in - nothing more.
+              Catalyst is not an official Minecraft product, and is not approved by or associated with Mojang or
+              Microsoft. Being allowed to use Minecraft sign-in lets the launcher sign you in - nothing more.
             </p>
           </Reveal>
           <Reveal from="scale" delay={0.1} className={styles.chainWrap}>
@@ -529,12 +568,7 @@ export default function HomePage() {
                   <ShieldCheckIcon size={20} />
                 </span>
                 <div>
-                  <h3>
-                    Minecraft
-                    <span className="tag" style={{ color: "var(--green)" }}>
-                      Approved
-                    </span>
-                  </h3>
+                  <h3>Minecraft</h3>
                   <p>Mojang checks that Catalyst is on its sign-in allow list, then hands back your Minecraft profile.</p>
                 </div>
               </li>
@@ -568,13 +602,15 @@ export default function HomePage() {
               <Link href="/cosmetics" className={styles.storeCard}>
                 <Tilt className={`panel ${styles.storeInner}`}>
                   <div className={styles.storeArt}>
-                    <WingsArt colors={SHOP_ITEMS.find((i) => i.id === "frost-wings")!.colors} id="store-frost" />
+                    {/* eslint-disable-next-line @next/next/no-img-element -- the shop's own still of the model */}
+                    <img src={SHOP_ITEMS.find((i) => i.id === "stoneheart-wings")?.picture} alt="" width={560} height={560} loading="lazy" decoding="async" />
                   </div>
                   <span className="kicker blue">Cosmetics</span>
-                  <h3>Wings and capes</h3>
+                  <h3>Wings, gauntlets and capes</h3>
                   <p>
-                    {wings.length} wings from {Math.min(...wings.map((w) => w.price ?? Infinity)).toLocaleString("en-US")} coins, and{" "}
-                    {SHOP_ITEMS.length - wings.length} capes - in 3D.
+                    {wings.length} wings from {Math.min(...wings.map((w) => w.price ?? Infinity)).toLocaleString("en-US")} coins,{" "}
+                    {SHOP_ITEMS.filter((i) => i.kind === "gauntlet").length} gauntlets and {SHOP_ITEMS.filter((i) => i.kind === "cape").length} capes -
+                    in 3D.
                   </p>
                   <span className={styles.tileLink}>
                     Browse cosmetics <ArrowIcon size={16} />
@@ -698,15 +734,7 @@ export default function HomePage() {
             </p>
           </Reveal>
           <Reveal from="scale" className={styles.finalArt}>
-            {/* eslint-disable-next-line @next/next/no-img-element -- a still rendered from the site's own 3D player */}
-            <img
-              src="/stills/cta-wave.webp"
-              alt="A player in the Sculk Cape and Prism Wings, waving"
-              width={1184}
-              height={979}
-              loading="lazy"
-              decoding="async"
-            />
+            <CtaStage />
           </Reveal>
         </div>
       </section>

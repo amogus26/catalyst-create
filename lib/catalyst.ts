@@ -77,7 +77,7 @@ export const RARITY = {
 } as const;
 export type Rarity = keyof typeof RARITY;
 
-export type ShopKind = "wings" | "cape";
+export type ShopKind = "wings" | "cape" | "gauntlet";
 
 export interface ShopItem {
   id: string;
@@ -89,43 +89,79 @@ export interface ShopItem {
   colors: string[];
   lore: string;
   tag?: { kind: "new" } | { kind: "deal"; percentOff: number };
+  /**
+   * The model the client draws it with, worn by the 3D player here too: a box model (the gauntlets, the
+   * Stoneheart Wings) or a Blender model (the other wings). Capes have none - they are drawn from colours.
+   */
+  model?: { type: "box" | "glb"; file: string };
+  /** Its picture: a still of that model, rendered by scripts/render-cosmetics.py into public/cosmetics. */
+  picture?: string;
 }
 
 const P = PALETTE;
 
 /**
- * The launcher's shop, in its order (CosmeticsPage.kt `shopItems`). It sells wings and capes only;
- * only wings have prices so far (shop/Economy.kt WING_PRICES, 1,500-2,500 coins).
+ * The launcher's shop, in its order (CosmeticsPage.kt `shopItems`): wings, gauntlets and capes. Only
+ * wings have prices so far (shop/Economy.kt WING_PRICES, 1,500-2,500 coins); the rest say "Price not out
+ * yet", and while the store is a preview everything can be worn in game for free.
  */
 export const SHOP_ITEMS: ShopItem[] = [
   {
-    id: "prism-wings", name: "Prism Wings", kind: "wings", rarity: "legendary", price: 2500,
-    colors: [P.blue, P.success, P.busy, P.danger], lore: "Every colour, all at once.",
-    tag: { kind: "deal", percentOff: 25 },
+    id: "stoneheart-gauntlet", name: "Stoneheart Gauntlet", kind: "gauntlet", rarity: "legendary", price: null,
+    colors: ["#E0A83A"], lore: "Five stones round a golden heart.", tag: { kind: "new" },
+    model: { type: "box", file: "gauntlet" }, picture: "/cosmetics/stoneheart-gauntlet.webp",
+  },
+  {
+    id: "stoneheart-wings", name: "Stoneheart Wings", kind: "wings", rarity: "legendary", price: 2500,
+    colors: ["#F2C23A", "#B8841E"], lore: "A golden heart, flying.", tag: { kind: "new" },
+    model: { type: "box", file: "stoneheart_wings" }, picture: "/cosmetics/stoneheart-wings.webp",
+  },
+  {
+    id: "arcane-iron-gauntlet", name: "Arcane Iron Gauntlet", kind: "gauntlet", rarity: "legendary", price: null,
+    colors: ["#3B4048", "#46FF8C"], lore: "Cold iron, green fire.", tag: { kind: "new" },
+    model: { type: "box", file: "arcane_gauntlet" }, picture: "/cosmetics/arcane-iron-gauntlet.webp",
+  },
+  {
+    id: "raven-wings", name: "Raven Wings", kind: "wings", rarity: "legendary", price: 2200,
+    colors: [P.launchActive, darken(P.launchActive, 0.85)], lore: "Every feather a moonless night.", tag: { kind: "new" },
+    model: { type: "glb", file: "raven_wings" }, picture: "/cosmetics/raven-wings.webp",
+  },
+  {
+    id: "wyvern-wings", name: "Wyvern Wings", kind: "wings", rarity: "legendary", price: 2500,
+    colors: ["#2E2A34", "#121015"], lore: "Borrowed from something much bigger.", tag: { kind: "new" },
+    model: { type: "glb", file: "wyvern_wings" }, picture: "/cosmetics/wyvern-wings.webp",
+  },
+  {
+    id: "seraph-wings", name: "Seraph Wings", kind: "wings", rarity: "legendary", price: 2300,
+    colors: ["#F4F6FA", "#B9C0CC"], lore: "Light as the first snow.", tag: { kind: "new" },
+    model: { type: "glb", file: "seraph_wings" }, picture: "/cosmetics/seraph-wings.webp",
+  },
+  {
+    id: "void-butterfly-wings", name: "Void Butterfly Wings", kind: "wings", rarity: "legendary", price: 2200,
+    colors: ["#8A4AE0", "#1A1024"], lore: "Hatched where the End begins.", tag: { kind: "new" },
+    model: { type: "glb", file: "void_butterfly_wings" }, picture: "/cosmetics/void-butterfly-wings.webp",
   },
   {
     id: "emberfall-cape", name: "Emberfall Cape", kind: "cape", rarity: "rare", price: null,
     colors: [P.busy, darken(P.danger, 0.3)], lore: "Woven from the last light of autumn.",
   },
   {
-    id: "molten-wings", name: "Molten Wings", kind: "wings", rarity: "legendary", price: 2400,
-    colors: [lighten(P.busy, 0.3), P.busy, darken(P.danger, 0.2)], lore: "Still warm from the forge.",
-  },
-  {
     id: "sculk-cape", name: "Sculk Cape", kind: "cape", rarity: "rare", price: null,
     colors: [P.sculkFleck, P.sculkPatch], lore: "It hums when no one is near.", tag: { kind: "new" },
   },
   {
-    id: "frost-wings", name: "Frost Wings", kind: "wings", rarity: "epic", price: 2000,
-    colors: [lighten(P.launchActive, 0.5), P.blue], lore: "Leaves a trail of rime.",
+    id: "shattered-wings", name: "Shattered Wings", kind: "wings", rarity: "epic", price: 1900,
+    colors: ["#3A3A44", "#15151A"], lore: "Broken, and flying anyway.", tag: { kind: "new" },
+    model: { type: "glb", file: "shattered_wings" }, picture: "/cosmetics/shattered-wings.webp",
+  },
+  {
+    id: "crow-wings", name: "Crow Wings", kind: "wings", rarity: "epic", price: 1600,
+    colors: ["#2A2D38", "#101116"], lore: "Small, sharp, and always watching.", tag: { kind: "new" },
+    model: { type: "glb", file: "crow_wings" }, picture: "/cosmetics/crow-wings.webp",
   },
   {
     id: "aurora-cape", name: "Aurora Cape", kind: "cape", rarity: "rare", price: null,
     colors: [P.success, P.blue, darken(P.blue, 0.4)], lore: "Stitched from the northern sky.",
-  },
-  {
-    id: "moth-wings", name: "Moth Wings", kind: "wings", rarity: "epic", price: 1500,
-    colors: [P.launchActive, darken(P.launchActive, 0.5)], lore: "Drawn to every lantern.",
   },
   {
     id: "nightfall-cape", name: "Nightfall Cape", kind: "cape", rarity: "common", price: null,
@@ -437,9 +473,12 @@ export const SIGN_IN = {
 /** The mods every player starts with, kept up to date (launcher mods/PreinstalledMods.kt). */
 export const PREINSTALLED_MODS = ["Sodium", "Lithium", "Dynamic FPS"] as const;
 
-/** The launcher's colour schemes and their dark-mode accents (theme/ThemePresets.kt); any colour works too. */
+/**
+ * The launcher's colour schemes and their dark-mode accents (theme/ThemePresets.kt); any colour works too.
+ * Default has been sky blue in an indigo dark since 29 September 2026 (its DEFAULT_COLOUR).
+ */
 export const THEME_PRESETS = [
-  { name: "Default", accent: "#4FA8E8" },
+  { name: "Default", accent: "#2FABF5" },
   { name: "Deepslate", accent: "#BCC5D0" },
   { name: "Amethyst", accent: "#B888FA" },
   { name: "Cherry", accent: "#FA86B6" },
@@ -454,16 +493,65 @@ export const THEME_PRESETS = [
 /** The newest stories on the launcher's News page (ui/pages/NewsPage.kt `newsItems`), word for word. */
 export const RELEASE_NOTES: { title: string; date: string; tag: "Launcher" | "Client" | "Store"; excerpt: string; points: string[] }[] = [
   {
-    title: "Sign in with Microsoft - approved for Minecraft",
+    title: "Sign in with Microsoft",
     date: "1 October 2026",
     tag: "Launcher",
-    excerpt: "Mojang has approved Catalyst for Minecraft sign-in. Sign in once on Microsoft's own page, and Play starts the game as you.",
+    excerpt: "Catalyst now signs you in with your Microsoft account - Mojang has reviewed the app and allowed it. Sign in once on Microsoft's own page, and Play starts the game as you.",
     points: [
       "Add account opens Microsoft's sign-in page in your browser - Catalyst never sees your email or password.",
       "Microsoft asks which account to use, so you can pick the one that owns Minecraft.",
       "Play starts the game as your account: your name, your skin, and online servers.",
       "Your sign-in renews itself when it runs out, so you rarely have to sign in again.",
       "Switch account signs in with another account; Sign out forgets it on this computer.",
+    ],
+  },
+  {
+    title: "CurseForge is on",
+    date: "1 October 2026",
+    tag: "Launcher",
+    excerpt: "The Mods page searches CurseForge as well as Modrinth.",
+    points: [
+      "The CurseForge tab shows its mods for your profile's Minecraft version and loader, with categories and sorting.",
+      "All shows both platforms at once, each row saying where a mod is from.",
+      "Install on a CurseForge mod links to its CurseForge page for now - installing straight from CurseForge comes once CurseForge confirms it.",
+    ],
+  },
+  {
+    title: "A new colour picker",
+    date: "1 October 2026",
+    tag: "Client",
+    excerpt: "Picking a colour in the Right Shift menu is bigger and simpler - and it asks before throwing a change away.",
+    points: [
+      "A large colour field, hue and opacity sliders, and a before-and-after swatch - click its left half to go back.",
+      "Type a colour as HEX, or as R, G, B and A.",
+      "Sixteen preset colours, one click each.",
+      "Save keeps the colour. Leaving with a change unsaved asks: save, discard, or keep editing.",
+    ],
+  },
+  {
+    title: "Sky Shaders, and a box behind your HUD",
+    date: "30 September 2026",
+    tag: "Client",
+    excerpt: "Six animated skies, a background behind every HUD element, and an Edit HUD that is easier to arrange.",
+    points: [
+      "Sky Shaders: an aurora, a nebula, a galaxy, End beams, caustics or a black hole, drawn by your graphics card - your screen only.",
+      "Choose its colour, brightness, speed and stars, or keep it for the night.",
+      "Every HUD element can have a background box, in your colour, opacity, corners and padding.",
+      "Edit HUD: elements are easier to grab, snap to each other and to the screen's edges, and stick together when dropped close.",
+      "Shift and the arrow keys nudge an element; Ctrl+Z undoes a move.",
+    ],
+  },
+  {
+    title: "3D wings and gauntlets",
+    date: "28 September 2026",
+    tag: "Store",
+    excerpt: "Wings modelled in 3D, the Stoneheart set and the Arcane Iron Gauntlet - worn in game, on your own player.",
+    points: [
+      "Raven, Wyvern, Seraph, Void Butterfly, Shattered and Crow Wings: 3D wings that beat, glide and fold as you move.",
+      "The Stoneheart Wings and Stoneheart Gauntlet: gold, set with glowing stones that shed sparks.",
+      "The Arcane Iron Gauntlet: cold iron and green fire.",
+      "Wear in game, from the Store - a cape, wings and a gauntlet at once. For now only you see them.",
+      "Free to wear while the Store is a preview.",
     ],
   },
   {

@@ -48,8 +48,8 @@ export default function TermsPage() {
           <b>The short version</b>
           <ul>
             <li>
-              Catalyst is a fan-made client for Minecraft. It is not made or endorsed by Mojang or Microsoft - Mojang has
-              approved it only to use Minecraft sign-in.
+              Catalyst is a fan-made client for Minecraft. It is not an official Minecraft product, and is not approved
+              by or associated with Mojang or Microsoft.
             </li>
             <li>Play fair: follow the rules of every server you join.</li>
             <li>Coins and cosmetics are a licence to use them in Catalyst - they have no cash value.</li>
@@ -91,14 +91,14 @@ export default function TermsPage() {
 
         <h2 id="minecraft">3. Minecraft, Mojang and Microsoft</h2>
         <p>
-          Catalyst is <strong>not an official Minecraft product</strong> and is not endorsed by or
+          Catalyst is <strong>not an official Minecraft product</strong> and is not approved by or
           associated with Mojang or Microsoft. &quot;Minecraft&quot; is a trademark of Mojang Synergies AB.
         </p>
         <p>
-          Mojang has approved the Catalyst launcher for Minecraft sign-in: on {SIGN_IN.approvedOn} it added
-          Catalyst&apos;s app to the list of apps Minecraft&apos;s services will sign players in for. That lets
-          the launcher sign you in with your Microsoft account. It is not an endorsement of Catalyst, and it
-          changes nothing else in these terms.
+          The launcher signs you in through Minecraft&apos;s own sign-in, which Mojang allows only for apps it has
+          reviewed: on {SIGN_IN.approvedOn} it allowed Catalyst&apos;s. That lets the launcher sign you in with
+          your Microsoft account - it does not make Catalyst official or mean that Mojang or Microsoft approve of
+          it, and it changes nothing else in these terms.
         </p>
         <p>
           To play you need your own genuine Minecraft: Java Edition account, and you must follow the{" "}

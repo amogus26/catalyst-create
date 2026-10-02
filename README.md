@@ -10,8 +10,8 @@ launcher's mod browser. Next.js + Supabase, on Netlify.
 
 | Path | What it is |
 | --- | --- |
-| `/` | Home: a 3D hero, the figures, a tour of the real launcher, the features, the client's modules, Catalyst and Minecraft side by side, how to start, Microsoft sign-in, the store |
-| `/cosmetics` | The shop as the launcher has it - capes and wings in coins, a 3D viewer, rewards you earn |
+| `/` | Home: a 3D hero, the figures, a tour of the real launcher, the features (cards after Pulse Visuals' grid), the client's modules, Catalyst and Minecraft side by side, how to start, Microsoft sign-in, the store, and a live 3D player in the Stoneheart set |
+| `/cosmetics` | The shop as the launcher has it - wings, gauntlets and capes, worn in 3D on the client's own models, rewards you earn |
 | `/coins` | Coin packs, what coins buy, Catalyst+ and the daily rewards calendar |
 | `/battle-pass` | The season: 50 levels on a scrolling track, the quests and the XP they give |
 | `/redeem` | Where codes come from and how to redeem one in the launcher |
@@ -95,13 +95,29 @@ on `/cosmetics`, the coins on `/coins` and the cape preview on `/designs`. Scrol
   bloom where you click (`components/site/pointer-light.tsx`, the launcher's `HallBackdrop.kt`
   numbers). One canvas behind the page, drawn only while there is light to draw, off with reduced
   motion.
-- The character, capes and wings are drawn in code (`components/three/textures.ts`) - our own skin,
-  no Mojang assets.
+- The character, capes and the battle pass's flat wings are drawn in code (`components/three/textures.ts`)
+  - our own skins (the hooded Catalyst one, and a "classic" T-shirt-and-jeans one), no Mojang assets.
+- **The shop's cosmetics are the client's own models**, worn by the same player: the gauntlets and the
+  Stoneheart Wings are the client's box models (`components/three/box-model.tsx`, a port of its
+  `Gauntlet.java` and `StoneWings.java`, reading the same `assets/visuals/cosmetics/*.json`, copied into
+  `components/three/models/`), with their sparks; the other wings are the client's Blender `.glb` files
+  (`components/three/glb-wings.tsx`, served from `public/cosmetics/models/`, loaded only when picked).
+  When the client's models change, copy them over again.
+- **The pictures of them** - the shop's tiles and the feature cards' renders - are rendered in Blender by
+  `scripts/render-cosmetics.py` (run it from this folder; it reads the client next to this repo and
+  `lib/sprites.ts`): `blender -b --factory-startup --python scripts/render-cosmetics.py -- glb:raven_wings out.png 768`
+  (jobs `glb:<model>`, `box:<model>[:fist]`, `sprite:<NAME>`), in the launcher's own studio light, then trimmed,
+  padded to a square in one pass and resized in another (sharp resizes before it extends) into
+  `public/cosmetics/<item>.webp` (560px) and `public/features/<name>.webp`. The skies card is the client's
+  own screenshot (`vz_shot=world` with `vz_look`, which hides the HUD).
 
 **Regenerating the pictures.** `public/stills/hero.webp` is the hero scene itself: open
 `/?still` (it holds a three-quarter pose and keeps the canvas readable), wait for it to draw, then
 in the browser console run
 `Object.assign(document.createElement("a"), { href: document.querySelector("canvas").toDataURL("image/webp", 0.86), download: "hero.webp" }).click()`.
+`public/stills/cta-stoneheart.webp`, the last section's picture while its live 3D loads (or without WebGL),
+is the same: `/?still`, scroll to the bottom, and the canvas inside `[class*=ctaStage]` (taken at 2x and
+resized to 1000px).
 `public/og.png`, the picture shown when a link is shared, is a 1200x630 screenshot of the top of the
 home page.
 
@@ -269,7 +285,7 @@ Codes for the launcher - gift cards, giveaways, stream codes - are made on **`/a
   person. The `redeem_code` database function locks the code, checks cancelled / expired / already
   redeemed on this install / used up, records the redemption and hands back the reward, all in one
   step, so a code's last use can't go to two players at once.
-- **The launcher applies the reward** (`coins:500`, `sale:20:7`, `item:Moth Wings`,
+- **The launcher applies the reward** (`coins:500`, `sale:20:7`, `item:Raven Wings`,
   `special:Creator Cape` - `lib/rewards.ts`, the launcher's `CodeGrant`). What it gave is kept on
   the player's computer until accounts exist.
 - **Keeping the two sides in step:** the launcher and this site each hash a code themselves.
@@ -405,8 +421,10 @@ get pinned scroll sections (the launcher tour on the home page, the battle pass 
 same content as plain lists. Inter for text, Space Grotesk for headings and JetBrains Mono for small labels - no pixel font. Buttons have the launcher's stepped pixel corners. The logo is the launcher's own traced logo
 as an SVG, never the raster artwork. Every page says it is not affiliated with Mojang or Microsoft.
 
-**Microsoft sign-in is approved, and the site says exactly that much.** Mojang reviewed the launcher's Azure
-app and put it on the Minecraft sign-in allow list on 28 September 2026 (`SIGN_IN` in `lib/catalyst.ts`). The
-pages call it "approved for Minecraft sign-in" - never "official", "partner" or "endorsed" - and wherever it is
-claimed (the home page's sign-in section, the terms) they also say it is permission to sign players in, not
-an endorsement. No Microsoft, Xbox or Mojang logos.
+**Microsoft sign-in, and the line in the footer.** Mojang reviewed the launcher's Azure app and put it on
+the Minecraft sign-in allow list on 28 September 2026 (`SIGN_IN` in `lib/catalyst.ts`). That is permission to
+use Minecraft sign-in, nothing more - the pages say Mojang *allowed* the app to sign players in, never that
+Catalyst is "approved", "official", "partnered" or "endorsed", and never with a badge. Mojang's usage
+guidelines (minecraft.net/usage-guidelines) ask for exactly that, and for "NOT AN OFFICIAL MINECRAFT PRODUCT.
+NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT" prominently on the website - the footer's line, which
+stays. Breaking the guidelines is how an app comes off the allow list. No Microsoft, Xbox or Mojang logos.

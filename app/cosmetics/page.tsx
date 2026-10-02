@@ -11,7 +11,7 @@ import styles from "./cosmetics.module.css";
 
 export const metadata: Metadata = {
   title: "Cosmetics",
-  description: `Wings and capes for Catalyst Client, in 3D: ${SHOP_ITEMS.map((i) => i.name).join(", ")}. Bought with coins in the launcher.`,
+  description: `Wings, gauntlets and capes for Catalyst Client, in 3D: ${SHOP_ITEMS.map((i) => i.name).join(", ")}. In the launcher's Store.`,
 };
 
 type Earned = { name: string; from: string; art: { kind: "wings" | "cape"; colors: string[] } | { kind: "sprite" } };
@@ -44,8 +44,8 @@ export default function CosmeticsPage() {
               Wear something <span className="shine-text">rare.</span>
             </h1>
             <p className="lede">
-              Wings and capes, worn in the client and shown here in 3D. Pick one to try it on, drag to turn it round -
-              then find it in the launcher&apos;s Store.
+              Wings, gauntlets and capes - worn in the client, and shown here in 3D on the same models. Pick one to try
+              it on, drag to turn it round, then find it in the launcher&apos;s Store.
             </p>
           </Reveal>
         </div>
@@ -54,8 +54,9 @@ export default function CosmeticsPage() {
       <section className="wide" aria-label="The shop">
         <CosmeticsShop />
         <p className={`note ${styles.preview}`}>
-          <b>Store preview.</b>&nbsp;These are the items and prices in the launcher&apos;s Store today. Coins can&apos;t be bought
-          yet - when they can, it will be in the launcher, never on this site.
+          <b>Store preview.</b>&nbsp;These are the items and prices in the launcher&apos;s Store today, and while it is a preview
+          you can wear any of them in game for free - for now only you see them. Coins can&apos;t be bought yet; when they
+          can, it will be in the launcher, never on this site.
         </p>
       </section>
 

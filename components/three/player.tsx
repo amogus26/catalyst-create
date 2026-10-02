@@ -1,9 +1,11 @@
 "use client";
 
 import { useFrame } from "@react-three/fiber";
-import { useEffect, useMemo, useRef, type MutableRefObject } from "react";
+import { Suspense, useEffect, useMemo, useRef, type MutableRefObject } from "react";
 import * as THREE from "three";
-import { boxRegions, makeCapeTexture, makeSkinTexture, makeWingTexture, WING_END, WING_PATH, WING_START } from "./textures";
+import { GauntletModel, StoneWingsModel } from "./box-model";
+import { GlbWings } from "./glb-wings";
+import { boxRegions, makeCapeTexture, makeSkinTexture, makeWingTexture, WING_END, WING_PATH, WING_START, type SkinStyle } from "./textures";
 
 /*
  * A Minecraft-proportioned player, built in code: head 8x8x8, body 8x12x4, arms and legs 4x12x4 and a
@@ -68,10 +70,17 @@ function wingGeometry(): THREE.ExtrudeGeometry {
 /** How many skin pixels one unit of the wing's outline box is: 33 makes each wing about 13 pixels long. */
 const WING_SCALE = 33;
 
+/** A worn model, as the client draws it: a box model (./box-model) or a Blender model (./glb-wings). */
+export type WornModel = { type: "box" | "glb"; file: string };
+
 export interface Wearing {
   /** A shop cape in its colours, or a cape texture (an uploaded or drawn design). */
   cape?: { colors: string[] } | { texture: THREE.Texture };
-  wings?: { colors: string[]; glow?: number };
+  /** Flat wings in colours (the battle pass's), or a model the client ships. */
+  wings?: { colors: string[]; glow?: number } | WornModel;
+  /** A gauntlet's box model, on the right hand. */
+  gauntlet?: string;
+  skin?: SkinStyle;
 }
 
 /**
@@ -88,9 +97,10 @@ export function Player({
   wearing: Wearing;
   look?: MutableRefObject<{ x: number; y: number }>;
   still?: boolean;
-  pose?: "idle" | "wave";
+  pose?: "idle" | "wave" | "raise";
 }) {
-  const skin = useMemo(() => makeSkinTexture(), []);
+  const skinStyle = wearing.skin ?? "catalyst";
+  const skin = useMemo(() => makeSkinTexture(skinStyle), [skinStyle]);
   const geometry = useMemo(
     () => ({
       head: skinBox(8, 8, 8, 0, 0),
@@ -114,10 +124,12 @@ export function Player({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [capeKey]);
 
-  const wingKey = wearing.wings?.colors.join() ?? "";
+  const flatWings = wearing.wings && "colors" in wearing.wings ? wearing.wings : null;
+  const modelWings = wearing.wings && "type" in wearing.wings ? wearing.wings : null;
+  const wingKey = flatWings?.colors.join() ?? "";
   const wingMaterial = useMemo(() => {
-    if (!wearing.wings) return null;
-    const map = makeWingTexture(wearing.wings.colors);
+    if (!flatWings) return null;
+    const map = makeWingTexture(flatWings.colors);
     return new THREE.MeshStandardMaterial({
       map,
       alphaTest: 0.35,
@@ -126,7 +138,7 @@ export function Player({
       metalness: 0.08,
       emissive: new THREE.Color("#ffffff"),
       emissiveMap: map,
-      emissiveIntensity: wearing.wings.glow ?? 0.22,
+      emissiveIntensity: flatWings.glow ?? 0.22,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wingKey]);
@@ -171,6 +183,11 @@ export function Player({
       leftArm.current.rotation.x = -Math.sin(t * 0.9) * 0.08;
       if (pose === "wave") {
         rightArm.current.rotation.z = 2.6 + Math.sin(t * 7) * 0.25;
+      } else if (pose === "raise") {
+        // A fist held up and out to the side, clear of the head - to show off a gauntlet. (The right arm
+        // swings outwards about -z; +z would bring it in across the face.)
+        rightArm.current.rotation.z = -2.3 - Math.sin(t * 1.6) * 0.04;
+        rightArm.current.rotation.x = -0.2;
       }
     }
     if (head.current) {
@@ -198,7 +215,11 @@ export function Player({
           <mesh geometry={geometry.head} material={skinMaterial} position={[0, 4, 0]} />
         </group>
         <group ref={rightArm} position={[-6, 4, 0]}>
-          <mesh geometry={geometry.rightArm} material={skinMaterial} position={[0, -4, 0]} />
+          {/* A raised gauntlet turns a quarter round its arm, so its stones (on the back of the hand) face forward. */}
+          <group rotation={[0, wearing.gauntlet && pose !== "idle" ? Math.PI / 2 : 0, 0]}>
+            <mesh geometry={geometry.rightArm} material={skinMaterial} position={[0, -4, 0]} />
+            {wearing.gauntlet && <GauntletModel file={wearing.gauntlet} still={still} />}
+          </group>
         </group>
         <group ref={leftArm} position={[6, 4, 0]}>
           <mesh geometry={geometry.leftArm} material={skinMaterial} position={[0, -4, 0]} />
@@ -207,6 +228,12 @@ export function Player({
           <group ref={cape} position={[0, 6, -2]}>
             <mesh geometry={geometry.cape} material={capeMaterial} position={[0, -8, -0.5]} />
           </group>
+        )}
+        {modelWings?.type === "box" && <StoneWingsModel still={still} />}
+        {modelWings?.type === "glb" && (
+          <Suspense fallback={null}>
+            <GlbWings file={modelWings.file} still={still} />
+          </Suspense>
         )}
         {wingMaterial && (
           <>

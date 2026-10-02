@@ -64,8 +64,8 @@ export default function DownloadPage() {
             <StaggerItem className={`panel ${styles.need}`}>
               <b>Account</b>
               <span>
-                A Microsoft account that owns Minecraft: Java Edition. You sign in on Microsoft&apos;s own page - Catalyst
-                is <Link href="/#sign-in">approved for Minecraft sign-in</Link>.
+                A Microsoft account that owns Minecraft: Java Edition. You sign in on Microsoft&apos;s own page -{" "}
+                <Link href="/#sign-in">how sign-in works</Link>.
               </span>
             </StaggerItem>
             <StaggerItem className={`panel ${styles.need}`}>

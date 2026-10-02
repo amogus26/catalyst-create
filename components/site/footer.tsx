@@ -53,7 +53,8 @@ export function SiteFooter() {
           </nav>
         </div>
         <div className="legal">
-          <span>Not affiliated with Mojang or Microsoft. Not an official Minecraft product.</span>
+          {/* Mojang's usage guidelines ask for this line on the website, prominently - keep it. */}
+          <span>Not an official Minecraft product. Not approved by or associated with Mojang or Microsoft.</span>
           <span>Minecraft is a trademark of Mojang Synergies AB.</span>
         </div>
       </div>

@@ -25,7 +25,7 @@ assert.ok(!looksLikeCode("CATL-0000-1111-OOOO"), "look-alike characters are neve
 
 assert.deepEqual(parseReward("coins:500"), { kind: "coins", amount: 500 });
 assert.deepEqual(parseReward("sale:20:7"), { kind: "sale", percentOff: 20, days: 7 });
-assert.deepEqual(parseReward("item:Moth Wings"), { kind: "item", name: "Moth Wings" });
+assert.deepEqual(parseReward("item:Raven Wings"), { kind: "item", name: "Raven Wings" });
 assert.deepEqual(parseReward("special:Creator Cape"), { kind: "special", name: "Creator Cape" });
 for (const bad of ["coins:-5", "coins", "sale:95:7", "sale:20", "item:", "item:Nope Wings", "hat:1"]) {
   assert.equal(parseReward(bad), null, bad);

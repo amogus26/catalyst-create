@@ -6,18 +6,7 @@ import { CoinMark } from "@/components/site/coin-mark";
 import { Hall } from "@/components/site/hall";
 import { BannerIcon, CalendarIcon, CheckIcon, SparkIcon, TicketIcon } from "@/components/site/icons";
 import { Counter, Reveal, Stagger, StaggerItem, Tilt } from "@/components/site/motion";
-import {
-  BEST_VALUE_PACK,
-  CATALYST_PLUS,
-  COIN_PACKS,
-  ECONOMY,
-  FREE_LANE_TOTAL,
-  PREMIUM_LANE_TOTAL,
-  SEASON,
-  coinsPerDollar,
-  packBonus,
-  usd,
-} from "@/lib/catalyst";
+import { BEST_VALUE_PACK, CATALYST_PLUS, COIN_PACKS, coinsPerDollar, ECONOMY, FREE_LANE_TOTAL, packBonus, PREMIUM_LANE_TOTAL, SEASON, SHOP_ITEMS, usd } from "@/lib/catalyst";
 import styles from "./coins.module.css";
 
 export const metadata: Metadata = {
@@ -53,7 +42,7 @@ export default function CoinsPage() {
               </span>
               <span>
                 <b>
-                  <Counter to={ECONOMY.wingPrices[0]} />
+                  <Counter to={Math.min(...SHOP_ITEMS.filter((item) => item.kind === "wings" && item.price !== null).map((item) => item.price!))} />
                 </b>
                 coins for the cheapest wings
               </span>
