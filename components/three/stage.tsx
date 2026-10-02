@@ -80,7 +80,8 @@ export function Stage({
           <Canvas
             // No tone mapping: the launcher's colours (lib/catalyst.ts) come out as they are, not washed out.
             flat
-            dpr={[1, 2]}
+            // Never under 1.5: on a 1x screen the scene is drawn larger and scaled down, which smooths its edges.
+            dpr={[1.5, 2]}
             camera={camera}
             frameloop={!visible ? "never" : reduced ? "demand" : "always"}
             gl={{ antialias: true, alpha: true, powerPreference: "high-performance", preserveDrawingBuffer: keep }}

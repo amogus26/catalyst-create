@@ -2,14 +2,14 @@
 
 import dynamic from "next/dynamic";
 import { DeferredScene } from "@/components/site/deferred-scene";
-import { WingsArt } from "@/components/site/cosmetic-art";
 import { RARITY, SEASON } from "@/lib/catalyst";
 import styles from "@/app/battle-pass/pass.module.css";
 
 function Poster() {
   return (
     <div className={styles.poster} aria-hidden="true">
-      <WingsArt colors={[...SEASON.headlineColors]} id="pass-poster" />
+      {/* eslint-disable-next-line @next/next/no-img-element -- the wings' own render, served as it is */}
+      <img src={SEASON.headlinePicture} alt="" width={560} height={560} decoding="async" />
     </div>
   );
 }
@@ -23,7 +23,7 @@ export function PassHero() {
       <DeferredScene poster={<Poster />}>
         <ViewerScene
           className={styles.canvas}
-          item={{ id: "emberfall-wings", kind: "wings", colors: [...SEASON.headlineColors], glow: RARITY.legendary.color }}
+          item={{ id: "emberfall-wings", kind: "wings", colors: [...SEASON.headlineColors], model: SEASON.headlineModel, glow: RARITY.legendary.color }}
           fallback={<Poster />}
         />
       </DeferredScene>

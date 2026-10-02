@@ -303,6 +303,13 @@ export const SEASON = {
   priceCents: ECONOMY.passPriceCents,
   headline: "Emberfall Wings",
   headlineColors: [lighten(P.busy, 0.35), P.busy, P.danger],
+  /**
+   * The headline wings' 3D model - phoenix feathers in the season's ember colours, built like the store's
+   * wings (launcher art/wings/build_wings.py emberfall_wings) and worn by the client by that name - and its
+   * picture (scripts/render-cosmetics.py).
+   */
+  headlineModel: { type: "glb", file: "emberfall_wings" },
+  headlinePicture: "/cosmetics/emberfall-wings.webp",
   levels: 50,
   earlyLevels: 25,
   earlyLevelXp: 150,
@@ -329,7 +336,7 @@ export const QUEST_XP_PER_DAY = QUESTS.reduce((sum, q) => sum + q.xp, 0);
 export type PassReward =
   | { kind: "coins"; amount: number }
   | { kind: "cape"; name: string; colors: string[] }
-  | { kind: "wings"; name: string; colors: string[] }
+  | { kind: "wings"; name: string; colors: string[]; picture?: string }
   | { kind: "choice"; name: string; options: string[] };
 
 /** The premium lane's cosmetics by level (BattlePassPage.kt `passCosmetics`). */
@@ -343,7 +350,7 @@ const PASS_COSMETICS: Record<number, PassReward> = {
   35: { kind: "cape", name: "Smoulder Cape", colors: [darken(P.busy, 0.2), darken(P.danger, 0.6)] },
   40: { kind: "cape", name: "Cinder Veil", colors: [P.danger, darken(P.danger, 0.5)] },
   45: { kind: "cape", name: "Blaze Cape", colors: [lighten(P.busy, 0.5), P.busy, P.danger] },
-  50: { kind: "wings", name: SEASON.headline, colors: [...SEASON.headlineColors] },
+  50: { kind: "wings", name: SEASON.headline, colors: [...SEASON.headlineColors], picture: SEASON.headlinePicture },
 };
 
 /** Every level: everyone's reward and pass holders' (BattlePassPage.kt `passTiers`, Economy.kt lanes). */

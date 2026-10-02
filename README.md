@@ -95,8 +95,11 @@ on `/cosmetics`, the coins on `/coins` and the cape preview on `/designs`. Scrol
   bloom where you click (`components/site/pointer-light.tsx`, the launcher's `HallBackdrop.kt`
   numbers). One canvas behind the page, drawn only while there is light to draw, off with reduced
   motion.
-- The character, capes and the battle pass's flat wings are drawn in code (`components/three/textures.ts`)
-  - our own skins (the hooded Catalyst one, and a "classic" T-shirt-and-jeans one), no Mojang assets.
+- The character and capes are drawn in code (`components/three/textures.ts`) - our own skins (the hooded
+  Catalyst one, and a "classic" T-shirt-and-jeans one), no Mojang assets. No flat wings are shown any more:
+  every pair is a 3D model, the battle pass's Emberfall Wings too (`SEASON.headlineModel`, built in the
+  launcher's `art/wings/build_wings.py`). The flat-wing code stays only as a fallback for a wing with no
+  picture.
 - **The shop's cosmetics are the client's own models**, worn by the same player: the gauntlets and the
   Stoneheart Wings are the client's box models (`components/three/box-model.tsx`, a port of its
   `Gauntlet.java` and `StoneWings.java`, reading the same `assets/visuals/cosmetics/*.json`, copied into

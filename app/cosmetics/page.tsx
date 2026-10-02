@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   description: `Wings, gauntlets and capes for Catalyst Client, in 3D: ${SHOP_ITEMS.map((i) => i.name).join(", ")}. In the launcher's Store.`,
 };
 
-type Earned = { name: string; from: string; art: { kind: "wings" | "cape"; colors: string[] } | { kind: "sprite" } };
+type Earned = { name: string; from: string; art: { kind: "wings" | "cape"; colors: string[]; picture?: string } | { kind: "sprite" } };
 
 /**
  * What the battle pass and Catalyst Plus give - never sold in the shop. The daily calendar's cosmetics
@@ -25,7 +25,7 @@ function earned(): Earned[] {
     const r = tier.premium;
     if (!r || r.kind === "coins") return [];
     if (r.kind === "choice") return r.options.map((option) => ({ name: option, from: `Battle pass · level ${tier.level} pick`, art: { kind: "sprite" as const } }));
-    return [{ name: r.name, from: `Battle pass · level ${tier.level}`, art: { kind: r.kind, colors: r.colors } }];
+    return [{ name: r.name, from: `Battle pass · level ${tier.level}`, art: { kind: r.kind, colors: r.colors, picture: r.kind === "wings" ? r.picture : undefined } }];
   });
   const plus: Earned[] = ["Plus hat", "Plus gauntlet", "Plus name tag badge"].map((name) => ({ name, from: CATALYST_PLUS.name, art: { kind: "sprite" } }));
   return [...pass, ...plus];
@@ -79,6 +79,9 @@ export default function CosmeticsPage() {
                   <span className={styles.earnArt}>
                     {r.art.kind === "sprite" ? (
                       <PixelSprite name={r.name} size={56} />
+                    ) : r.art.kind === "wings" && r.art.picture ? (
+                      // eslint-disable-next-line @next/next/no-img-element -- the wings' own render
+                      <img src={r.art.picture} alt="" width={560} height={560} loading="lazy" decoding="async" />
                     ) : r.art.kind === "wings" ? (
                       <WingsArt colors={r.art.colors} id={`earn-${r.name}`} />
                     ) : (
@@ -111,7 +114,13 @@ export default function CosmeticsPage() {
               <StaggerItem key={i}>
                 <Link href="/redeem" className={styles.locked}>
                   <span className={styles.lockedArt} aria-hidden="true">
-                    {kind === "wings" ? <WingsArt colors={["#2B3547", "#161C27"]} id={`locked-${i}`} /> : <CapeArt colors={["#2B3547", "#161C27"]} id={`locked-${i}`} />}
+                    {kind === "wings" ? (
+                      // A pair of wings in shadow - what it is stays a secret until the code is redeemed.
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img className={styles.lockedWings} src="/cosmetics/seraph-wings.webp" alt="" width={560} height={560} loading="lazy" decoding="async" />
+                    ) : (
+                      <CapeArt colors={["#2B3547", "#161C27"]} id={`locked-${i}`} />
+                    )}
                     <span className={styles.lockBadge}>
                       <LockIcon size={20} />
                     </span>

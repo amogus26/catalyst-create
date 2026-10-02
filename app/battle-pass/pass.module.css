@@ -87,6 +87,13 @@
   width: 100%;
   height: 100%;
 }
+.poster img {
+  position: absolute;
+  inset: 16%;
+  width: 68%;
+  height: 68%;
+  object-fit: contain;
+}
 @media (max-width: 860px) {
   .topGrid {
     grid-template-columns: 1fr;
@@ -280,9 +287,11 @@
   gap: 0.25rem;
   width: 100%;
 }
-.item svg {
+.item svg,
+.item img {
   width: 4.75rem;
   height: 4.75rem;
+  object-fit: contain;
 }
 .item em {
   font-style: normal;

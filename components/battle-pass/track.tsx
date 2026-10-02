@@ -34,7 +34,12 @@ function Reward({ reward, level }: { reward: PassReward | null; level: number })
     case "wings":
       return (
         <span className={styles.item} title={reward.name}>
-          <WingsArt colors={reward.colors} id={`tier-${level}`} />
+          {reward.picture ? (
+            // eslint-disable-next-line @next/next/no-img-element -- the wings' own render
+            <img src={reward.picture} alt="" width={560} height={560} loading="lazy" decoding="async" />
+          ) : (
+            <WingsArt colors={reward.colors} id={`tier-${level}`} />
+          )}
           <em>{reward.name}</em>
         </span>
       );

@@ -76,7 +76,7 @@ function HeroContent() {
     <>
       <Lights ember />
       <group ref={spin}>
-        <Player wearing={{ cape: { colors: SCULK_CAPE }, wings: { colors: [...SEASON.headlineColors], glow: 0.16 } }} look={pointer} still={!!reduced} />
+        <Player wearing={{ cape: { colors: SCULK_CAPE }, wings: SEASON.headlineModel }} look={pointer} still={!!reduced} />
       </group>
       <FloorGlow />
       {!reduced && (

@@ -9,7 +9,6 @@ import { ModuleMarquee, ModuleVideo } from "@/components/home/client-showcase";
 import { Compare } from "@/components/home/compare";
 import { HeroStage } from "@/components/home/hero-stage";
 import { Tour, type Chapter } from "@/components/home/tour";
-import { WingsArt } from "@/components/site/cosmetic-art";
 import { DownloadButton } from "@/components/site/download-button";
 import { Hall } from "@/components/site/hall";
 import { HashRedirect } from "@/components/site/hash-redirect";
@@ -640,7 +639,8 @@ export default function HomePage() {
               <Link href="/battle-pass" className={styles.storeCard}>
                 <Tilt className={`panel ${styles.storeInner} ${styles.storeEmber}`}>
                   <div className={styles.storeArt}>
-                    <WingsArt colors={[...SEASON.headlineColors]} id="store-emberfall" />
+                    {/* eslint-disable-next-line @next/next/no-img-element -- the wings' own render */}
+                    <img src={SEASON.headlinePicture} alt="" width={560} height={560} loading="lazy" decoding="async" />
                   </div>
                   <span className="kicker" style={{ color: "#ffb27a" }}>
                     Season {SEASON.number}
