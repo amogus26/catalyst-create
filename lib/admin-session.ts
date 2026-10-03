@@ -13,7 +13,7 @@ import { cookies } from "next/headers";
  * - The cookie is not the password. It is `expiry.hmac(expiry)`, signed with the password as the
  *   key, so it cannot be forged without knowing the password - and **changing the password signs
  *   every existing session out**, which is what you want the moment it leaks.
- * - httpOnly, so no script can read it; sameSite=lax, so another site cannot post as you; secure
+ * - httpOnly, so no script can read it; sameSite=strict, so another site cannot post as you (nor link you in signed in); secure
  *   in production.
  *
  * What it does not do: rate-limit guesses. Pick a long random password and the arithmetic is on
@@ -40,7 +40,8 @@ const GATES: Record<Gate, { env: "ADMIN_PASSWORD" | "CODES_PASSWORD"; cookie: st
   owner: { env: "CODES_PASSWORD", cookie: "catalyst_owner", label: "owner" },
 };
 
-const SESSION_SECONDS = 60 * 60;
+/** How long a sign-in lasts: long enough to make a batch of codes, short enough that a left-open page locks itself. */
+const SESSION_SECONDS = 10 * 60;
 
 function gatePassword(gate: Gate): string {
   const value = process.env[GATES[gate].env];
@@ -93,7 +94,7 @@ export function gateCodeKey(gate: Gate): string | null {
 function sign(gate: Gate, expiresAt: number): string {
   // The code key is part of the signature too, so setting or changing it signs everyone out.
   const key = gatePassword(gate) + (gateCodeKey(gate) ?? "");
-  return createHmac("sha256", key).update(`${GATES[gate].label}:${expiresAt}`).digest("hex");
+  return createHmac("sha256", key).update(`${GATES[gate].label}:v2:${expiresAt}`).digest("hex");
 }
 
 export function issueSession(gate: Gate): { name: string; value: string; maxAge: number } {
@@ -140,7 +141,7 @@ export const SESSION_COOKIES = Object.values(GATES).map((g) => g.cookie);
 
 export const cookieOptions = {
   httpOnly: true,
-  sameSite: "lax",
+  sameSite: "strict",
   secure: process.env.NODE_ENV === "production",
   path: "/",
 } as const;

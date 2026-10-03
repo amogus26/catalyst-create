@@ -31,7 +31,8 @@ export async function POST(request: Request) {
 
   const session = issueSession(which);
   const response = NextResponse.json({ ok: true });
-  response.cookies.set(session.name, session.value, { ...cookieOptions, maxAge: session.maxAge });
+  // No maxAge: the browser forgets the sign-in when it closes, and the token itself runs out after 10 minutes.
+  response.cookies.set(session.name, session.value, cookieOptions);
   return response;
 }
 
