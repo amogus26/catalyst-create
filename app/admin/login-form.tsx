@@ -8,8 +8,11 @@ export function LoginForm({
   gate = "reviewer",
   title = "Reviewers",
   blurb = "For whoever reviews designs.",
+  needsCode = false,
 }: {
   gate?: "reviewer" | "owner";
+  /** The gate's code key is set: ask for the six-digit code too. */
+  needsCode?: boolean;
   title?: string;
   blurb?: string;
 }) {
@@ -30,7 +33,7 @@ export function LoginForm({
         body: JSON.stringify({ password, gate, code }),
       });
       if (!response.ok) {
-        setError(gate === "owner" ? "That password or code is not right." : "That password is not right.");
+        setError("That password or code is not right.");
         return;
       }
       setPassword("");
@@ -74,7 +77,7 @@ export function LoginForm({
               onChange={(event) => setPassword(event.target.value)}
             />
           </div>
-          {gate === "owner" && (
+          {needsCode && (
             <div>
               {/* one-time-code: Safari offers the code from the Passwords app's entry for this site. */}
               <label htmlFor="code">6-digit code</label>

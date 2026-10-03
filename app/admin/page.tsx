@@ -2,7 +2,7 @@ import { FeatureToggle } from "@/components/feature-toggle";
 import { SectionHeader } from "@/components/section-header";
 import { TypeIcon } from "@/components/type-icon";
 import { designType } from "@/lib/design-types";
-import { adminPasswordConfigured, isAdmin } from "@/lib/admin-session";
+import { adminPasswordConfigured, gateCodeKey, isAdmin } from "@/lib/admin-session";
 import { FEATURED_LIMIT } from "@/lib/config";
 import { getStore, type Submission } from "@/lib/store";
 import { AdminBar } from "./admin-bar";
@@ -35,7 +35,7 @@ export default async function AdminPage() {
   }
 
   if (!(await isAdmin())) {
-    return <LoginForm />;
+    return <LoginForm needsCode={gateCodeKey("reviewer") !== null} />;
   }
 
   const store = getStore();

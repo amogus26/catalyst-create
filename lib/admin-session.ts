@@ -80,17 +80,19 @@ export function passwordMatches(gate: Gate, candidate: string): boolean {
   return timingSafeEqual(expected, given);
 }
 
-/**
- * The owner's sign-in code key (CODES_TOTP_SECRET, base32): when set, the codes page also asks for the
- * six-digit code the owner's Passwords app makes from it.
- */
-export function ownerCodeKey(): string | null {
-  return process.env.CODES_TOTP_SECRET?.trim() || null;
+/** Each gate's sign-in code key (base32): when set, that page also asks for the six-digit code made from it. */
+const CODE_KEYS: Record<Gate, "ADMIN_TOTP_SECRET" | "CODES_TOTP_SECRET"> = {
+  reviewer: "ADMIN_TOTP_SECRET",
+  owner: "CODES_TOTP_SECRET",
+};
+
+export function gateCodeKey(gate: Gate): string | null {
+  return process.env[CODE_KEYS[gate]]?.trim() || null;
 }
 
 function sign(gate: Gate, expiresAt: number): string {
-  // The owner's key is part of the signature too, so setting or changing it signs everyone out.
-  const key = gatePassword(gate) + (gate === "owner" ? (ownerCodeKey() ?? "") : "");
+  // The code key is part of the signature too, so setting or changing it signs everyone out.
+  const key = gatePassword(gate) + (gateCodeKey(gate) ?? "");
   return createHmac("sha256", key).update(`${GATES[gate].label}:${expiresAt}`).digest("hex");
 }
 

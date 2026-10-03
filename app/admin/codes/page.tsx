@@ -1,4 +1,4 @@
-import { isOwner, passwordConfigured } from "@/lib/admin-session";
+import { gateCodeKey, isOwner, passwordConfigured } from "@/lib/admin-session";
 import { describeReward } from "@/lib/rewards";
 import { getStore } from "@/lib/store";
 import { SectionHeader } from "@/components/section-header";
@@ -30,7 +30,14 @@ export default async function CodesPage() {
     );
   }
   if (!(await isOwner())) {
-    return <LoginForm gate="owner" title="Redeem codes" blurb="Only the owner makes codes. This is not the reviewers' password." />;
+    return (
+      <LoginForm
+        gate="owner"
+        title="Redeem codes"
+        blurb="Only the owner makes codes. This is not the reviewers' password."
+        needsCode={gateCodeKey("owner") !== null}
+      />
+    );
   }
 
   // Before supabase/migrations/0004_redeem_codes.sql has run there are no tables to read - say so
