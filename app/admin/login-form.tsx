@@ -52,6 +52,16 @@ export function LoginForm({
               {error}
             </div>
           )}
+          {/* Which login this is, for the browser's password manager: without it both of this site's saved
+              passwords look alike, and the browser fills - or "updates" - the wrong one. */}
+          <input
+            type="text"
+            name="username"
+            autoComplete="username"
+            value={gate === "owner" ? "codespassword" : "admin"}
+            readOnly
+            hidden
+          />
           <div>
             <label htmlFor="password">Password</label>
             <input
