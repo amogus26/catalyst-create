@@ -413,8 +413,13 @@ const chat: Record<string, Handler> = {
     const after = Number(ctx.url.searchParams.get("after") ?? 0) || 0;
     const clan = await clanOf(ctx.db, id);
     const filter = [`recipient.eq.${id}`, `and(sender.eq.${id},clan.is.null)`, ...(clan ? [`clan.eq.${clan}`] : [])].join(",");
-    const { data, error } = await ctx.db.from("messages").select("*").or(filter).gt("id", after).order("id", { ascending: true }).limit(200);
+    // From the start, the newest hundred; after that, everything newer than what the caller has.
+    const { data, error } =
+      after > 0
+        ? await ctx.db.from("messages").select("*").or(filter).gt("id", after).order("id", { ascending: true }).limit(200)
+        : await ctx.db.from("messages").select("*").or(filter).order("id", { ascending: false }).limit(100);
     if (error) throw new Error(error.message);
+    if (after === 0) data?.reverse();
     const rows = data as { id: number; sender: string; recipient: string | null; clan: string | null; body: string; created_at: string }[];
     const names = await players(ctx.db, [...new Set(rows.flatMap((r) => [r.sender, ...(r.recipient ? [r.recipient] : [])]))]);
     return json({

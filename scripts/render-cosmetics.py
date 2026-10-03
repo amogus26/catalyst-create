@@ -9,7 +9,8 @@ Jobs:
     head                   a player's head in our classic skin
     box:<model>[:<pose>]   a box model the client draws (its assets/visuals/cosmetics/<model>.json):
                            a gauntlet (gauntlet, arcane_gauntlet, ember_gauntlet; pose "fist" raises it),
-                           a hat (ember_hat, on a plain head) or stoneheart_wings
+                           a hat (any model whose JSON says "kind": "hat", on a plain head), a pet ("kind":
+                           "pet", on its own) or stoneheart_wings
     glb:<model>            a Blender-made wing model the client ships (<model>.glb), seen from behind
 
 Models are read from the client repository next to this one (../client), sprites from lib/sprites.ts -
@@ -408,7 +409,8 @@ def build_hat(model):
     data = json.load(open(os.path.join(CLIENT, model + ".json"), encoding="utf-8"))
     space = model_space()
     # Leather, not metal: matte.
-    objects = add_boxes(model, parts_of(data["parts"]), Matrix.Identity(4), space, metallic=0.0, roughness=0.85)
+    # The spinning parts (a propeller) stand still in a picture.
+    objects = add_boxes(model, parts_of(data["parts"] + data.get("spin", [])), Matrix.Identity(4), space, metallic=0.0, roughness=0.85)
     head = [
         ((-4, -8, -4, 4, 0, 4), CLASSIC_SKIN),
         ((-4.05, -8.05, -4.05, 4.05, -6.6, 4.05), "#4A3222"),   # hair
@@ -425,6 +427,22 @@ def build_hat(model):
             colours.append(hex_rgba(spec))
     objects.append(mesh_object("Head", faces, colours, vertex_colour_material("Skin", roughness=0.8), space))
     return space, objects
+
+
+def build_pet(model):
+    """A pet (Pet.java) on its own, in its own space - its feet at the origin, facing -Z."""
+    data = json.load(open(os.path.join(CLIENT, model + ".json"), encoding="utf-8"))
+    space = model_space()
+    objects = add_boxes(model, parts_of(data["parts"]), Matrix.Identity(4), space, metallic=0.0, roughness=0.8)
+    return space, objects
+
+
+def kind_of(model):
+    """What a box model is, from its own JSON ("hat", "pet") - or None for the older ones that don't say."""
+    try:
+        return json.load(open(os.path.join(CLIENT, model + ".json"), encoding="utf-8")).get("kind")
+    except OSError:
+        return None
 
 
 def build_head():
@@ -544,7 +562,11 @@ def main():
         pivot.rotation_euler = (math.radians(8), math.radians(-14), math.radians(-12)) if name in ART \
             else (math.radians(12), math.radians(-28), math.radians(-35))
         view, centre, radius = frame(objects, (0.35, -1.0, 0.25), lens=70, fill=0.92)
-    elif kind == "box" and name.endswith("hat"):
+    elif kind == "box" and kind_of(name) == "pet":
+        _, objects = build_pet(name)
+        # Three-quarters from the front and a little above: the face, and the tail or flippers beside it.
+        view, centre, radius = frame(objects, (0.75, -1.0, 0.4), lens=60, fill=0.9)
+    elif kind == "box" and (name.endswith("hat") or kind_of(name) == "hat"):
         _, objects = build_hat(name)
         # From the front and a little to the side and above, so the band's stone and the plume both show.
         view, centre, radius = frame(objects, (0.55, -1.0, 0.45), lens=60, fill=0.9)
