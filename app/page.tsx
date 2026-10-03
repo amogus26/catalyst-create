@@ -79,7 +79,7 @@ const LAUNCHER_CHAPTERS: Chapter[] = [
     text: "Daily quests fill the bar - play an hour, play two sessions, open your daily card - and every level has something on the free lane or the pass.",
     points: [`Season ${SEASON.number}: ${SEASON.name}, ${SEASON.levels} levels`, "Up to 275 XP a day from quests", `The ${SEASON.headline} at level ${SEASON.levels}`],
     image: launcherPass,
-    alt: "The launcher's Battle Pass page: the Season 4 Emberfall bar, the free and premium reward lanes, and three daily quests",
+    alt: "The launcher's Battle Pass page: the Season 1 Emberfall bar, the free and premium reward lanes, and three daily quests",
   },
 ];
 
@@ -95,15 +95,16 @@ const PROFILE_MODS = [
 
 /**
  * The feature cards, after Pulse Visuals' grid: one thing each, with a picture of our own - pixel art drawn
- * for them (a palette in the launcher's theme colours, a bolt, an install arrow), a player's head, or a
+ * for them (a bolt, an install arrow), a player's head, the client's real Right Shift menu, or a
  * cosmetic the client ships - rendered by scripts/render-cosmetics.py
  * (the skies are the client's own screenshot). Grey until pointed at; the first is lit.
  */
-const FEATURE_CARDS: { title: string; text: string; image: string; href?: string; sky?: boolean; wide?: boolean }[] = [
+const FEATURE_CARDS: { title: string; text: string; image: string; href?: string; sky?: boolean; wide?: boolean; shot?: boolean }[] = [
   {
     title: "Made to look good",
     text: `A clean Right Shift menu, ${THEME_PRESETS.length} colour schemes or any colour you like, and a HUD you arrange by dragging.`,
-    image: "/features/palette.webp",
+    image: "/features/menu.webp",
+    shot: true,
   },
   {
     title: "Fast from the first launch",
@@ -369,6 +370,7 @@ export default function HomePage() {
                 i === 0 && styles.featureCardLit,
                 card.sky && styles.featureCardSky,
                 card.wide && styles.featureCardWide,
+                card.shot && styles.featureCardShot,
               ]
                 .filter(Boolean)
                 .join(" ");
