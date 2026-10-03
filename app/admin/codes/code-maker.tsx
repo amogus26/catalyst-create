@@ -12,6 +12,7 @@ const KINDS: { id: Kind; label: string }[] = [
   { id: "sale", label: "Sale" },
   { id: "item", label: "Free item" },
   { id: "special", label: "Exclusive" },
+  { id: "plus", label: "Plus" },
 ];
 
 interface Made {
@@ -35,6 +36,7 @@ export function CodeMaker() {
   const [days, setDays] = useState("7");
   const [item, setItem] = useState<string>(SHOP_ITEMS[0]);
   const [special, setSpecial] = useState("");
+  const [plusDays, setPlusDays] = useState("30");
   const [count, setCount] = useState("10");
   // Random codes, or one the owner types ("SUMMER2026").
   const [own, setOwn] = useState(false);
@@ -54,7 +56,9 @@ export function CodeMaker() {
         ? { kind, percentOff: Number(percent), days: Number(days) }
         : kind === "item"
           ? { kind, name: item }
-          : { kind, name: special.trim() };
+          : kind === "plus"
+            ? { kind, days: Number(plusDays) }
+            : { kind, name: special.trim() };
 
   async function make(event: React.FormEvent) {
     event.preventDefault();
@@ -200,6 +204,19 @@ export function CodeMaker() {
               <option key={name}>{name}</option>
             ))}
           </select>
+        </div>
+      )}
+      {kind === "plus" && (
+        <div>
+          <label htmlFor="plusDays">Days of Catalyst Plus</label>
+          <input id="plusDays" type="number" min={1} max={366} value={plusDays} onChange={(e) => setPlusDays(e.target.value)} />
+          <div className="chips" style={{ marginTop: 10 }}>
+            {[7, 30, 90, 365].map((days) => (
+              <button key={days} type="button" className="chip small" aria-pressed={Number(plusDays) === days} onClick={() => setPlusDays(String(days))}>
+                {days} days
+              </button>
+            ))}
+          </div>
         </div>
       )}
       {kind === "special" && (

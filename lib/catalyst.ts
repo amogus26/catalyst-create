@@ -309,6 +309,9 @@ export const SEASON = {
    */
   headlineModel: { type: "glb", file: "emberfall_wings" },
   headlinePicture: "/cosmetics/emberfall-wings.webp",
+  /** When it runs (ISO dates, inclusive): the account server pays a level's coins only once it could have been reached. */
+  startsOn: "2026-09-26",
+  endsOn: "2026-12-01",
   levels: 50,
   earlyLevels: 25,
   earlyLevelXp: 150,

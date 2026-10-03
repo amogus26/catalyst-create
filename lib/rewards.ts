@@ -1,3 +1,4 @@
+import { CATALOG, NOT_SOLD } from "./catalog.ts";
 /**
  * What a redeem code gives, in the launcher's own grammar (its `CodeGrant` in codes/Codes.kt):
  * `coins:500`, `sale:20:7`, `item:Raven Wings`, `special:Creator Cape`. The launcher applies the
@@ -5,28 +6,14 @@
  */
 
 /**
- * The launcher's shop items, by the exact names its Cosmetics page uses (`shopItems` in
- * CosmeticsPage.kt). An `item:` code must name one of these or it grants nothing the player can see.
+ * What an `item:` code may give: anything in the shop (lib/catalog.ts) and the few things never sold. An
+ * `item:` code must name one of these or it grants nothing the player can see.
  */
-export const SHOP_ITEMS = [
-  "Stoneheart Gauntlet",
-  "Stoneheart Wings",
-  "Arcane Iron Gauntlet",
-  "Raven Wings",
-  "Wyvern Wings",
-  "Seraph Wings",
-  "Void Butterfly Wings",
-  "Emberfall Cape",
-  "Sculk Cape",
-  "Shattered Wings",
-  "Crow Wings",
-  "Aurora Cape",
-  "Nightfall Cape",
-  "Verdant Cape",
-] as const;
+export const SHOP_ITEMS: readonly string[] = [...CATALOG.map((entry) => entry.name), ...NOT_SOLD];
 
 export type Reward =
   | { kind: "coins"; amount: number }
+  | { kind: "plus"; days: number }
   | { kind: "sale"; percentOff: number; days: number }
   | { kind: "item"; name: string }
   | { kind: "special"; name: string };
@@ -42,6 +29,8 @@ export function rewardSpec(reward: Reward): string {
       return `item:${reward.name}`;
     case "special":
       return `special:${reward.name}`;
+    case "plus":
+      return `plus:${reward.days}`;
   }
 }
 
@@ -62,7 +51,11 @@ export function parseReward(spec: string): Reward | null {
         : null;
     }
     case "item":
-      return a && (SHOP_ITEMS as readonly string[]).includes(a) ? { kind, name: a } : null;
+      return a && SHOP_ITEMS.includes(a) ? { kind, name: a } : null;
+    case "plus": {
+      const days = whole(a);
+      return days >= 1 && days <= 366 && b === undefined ? { kind, days } : null;
+    }
     case "special": {
       const name = spec.slice("special:".length).trim();
       return name.length >= 2 && name.length <= 40 ? { kind, name } : null;
@@ -85,5 +78,7 @@ export function describeReward(spec: string): string {
       return `${reward.name}, free`;
     case "special":
       return `${reward.name} (exclusive)`;
+    case "plus":
+      return `${reward.days} days of Catalyst Plus`;
   }
 }

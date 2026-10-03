@@ -1,3 +1,4 @@
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { createLocalStore } from "./local";
@@ -38,7 +39,7 @@ export function usingDevStore(): boolean {
  * database, so when - and only when - the variable is such a mask, the real key comes from .env.local on
  * the machine doing the build (git-ignored, never deployed). On Netlify's servers it is the real key.
  */
-function serviceRoleKey(): string | undefined {
+export function serviceRoleKey(): string | undefined {
   const value = process.env.SUPABASE_SERVICE_ROLE_KEY;
   // The mask is a run of asterisks, then the key's last four characters.
   if (!value || !/^\*{8,}/.test(value)) return value;
@@ -51,6 +52,22 @@ function serviceRoleKey(): string | undefined {
   } catch {
     return value;
   }
+}
+
+let db: SupabaseClient | null = null;
+
+/**
+ * The database itself, for the account server (lib/account.ts and app/api/v1): accounts, coins and the
+ * social side live only in Supabase - there is no local stand-in, so without it they answer 503.
+ */
+export function getDb(): SupabaseClient | null {
+  if (typeof window !== "undefined") throw new Error("The database is server-only.");
+  if (db) return db;
+  const url = process.env.SUPABASE_URL;
+  const key = serviceRoleKey();
+  if (!url || !key) return null;
+  db = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
+  return db;
 }
 
 export function getStore(): Store {

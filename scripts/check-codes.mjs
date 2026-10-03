@@ -11,6 +11,9 @@ import assert from "node:assert/strict";
 import { fingerprint, generateCodes, looksLikeCode, looksLikeCustomCode, normalize } from "../lib/codes.ts";
 import { parseReward } from "../lib/rewards.ts";
 import { totp, totpMatches } from "../lib/totp.ts";
+import { dailyReward, luckyDays, monthMaxCoins } from "../lib/daily.ts";
+import { CATALOG, priceFor } from "../lib/catalog.ts";
+import { FLAGS, LEFT_OUT } from "../lib/flags.ts";
 
 assert.equal(normalize("catl 2345 6789 abcd"), "CATL-2345-6789-ABCD");
 assert.equal(
@@ -47,5 +50,23 @@ assert.equal(totp(rfcKey, 20000000000, 8), "65353130");
 assert.ok(totpMatches(rfcKey, totp(rfcKey, 1000), 1000 + 25), "a code from the last 30 seconds still works");
 assert.ok(!totpMatches(rfcKey, totp(rfcKey, 1000), 1000 + 95), "a code from 90 seconds ago does not");
 assert.ok(!totpMatches(rfcKey, "", 1000));
+
+// Daily rewards, pinned to the launcher's DailyRewardsTest: the same vectors on both sides.
+assert.deepEqual([...luckyDays("2026-10")], [6, 18, 26]);
+assert.deepEqual([...luckyDays("2027-02")], [8, 12, 25]);
+assert.deepEqual(dailyReward("2026-10", 7), { day: 7, coins: 20, item: "Straw Hat", kind: "hat", lucky: false });
+assert.deepEqual(dailyReward("2026-10", 26), { day: 26, coins: 70, item: null, kind: "coins", lucky: true });
+assert.deepEqual(dailyReward("2026-10", 31), { day: 31, coins: 90, item: "Golden Hamster", kind: "pet", lucky: false });
+assert.deepEqual(dailyReward("2027-02", 28), { day: 28, coins: 90, item: "Snowball Hamster", kind: "pet", lucky: false });
+assert.equal(dailyReward("2026-11", 21).item, "Baseball Cap");
+// A perfect month stays under 1,000 coins - Economy.DAILY_MONTH_MAX - however the lucky days fall.
+for (let year = 2026; year < 2030; year++)
+  for (let month = 1; month <= 12; month++) assert.ok(monthMaxCoins(`${year}-${String(month).padStart(2, "0")}`) <= 1000);
+
+// The price list: every name once, flags for every country but the ones left out, sales only on wings.
+assert.equal(new Set(CATALOG.map((i) => i.name)).size, CATALOG.length);
+assert.equal(FLAGS.length + Object.keys(LEFT_OUT).length, 193, "every UN member is either sold or left out with a reason");
+assert.equal(priceFor("Raven Wings", 20), 1760);
+assert.equal(priceFor("Party Hat", 20), 300);
 
 console.log("codes: fingerprints match the launcher, rewards read the launcher's way");
