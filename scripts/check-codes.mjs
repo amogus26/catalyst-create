@@ -8,7 +8,7 @@
  */
 
 import assert from "node:assert/strict";
-import { fingerprint, generateCodes, looksLikeCode, normalize } from "../lib/codes.ts";
+import { fingerprint, generateCodes, looksLikeCode, looksLikeCustomCode, normalize } from "../lib/codes.ts";
 import { parseReward } from "../lib/rewards.ts";
 
 assert.equal(normalize("catl 2345 6789 abcd"), "CATL-2345-6789-ABCD");
@@ -22,6 +22,13 @@ assert.equal(new Set(codes).size, 500);
 for (const code of codes) assert.ok(looksLikeCode(code), code);
 assert.ok(looksLikeCode(codes[0].toLowerCase().replaceAll("-", " ")));
 assert.ok(!looksLikeCode("CATL-0000-1111-OOOO"), "look-alike characters are never in a code");
+assert.equal(normalize("2345 6789 abcd"), "CATL-2345-6789-ABCD", "a generated code typed without its prefix");
+
+// Custom codes the owner types: kept as typed, in capitals. The launcher's CodesTest pins the same.
+assert.equal(normalize("summer 2026!"), "SUMMER2026");
+assert.equal(fingerprint("summer-2026"), "33ef49129b05f8a905f5aa34fdce8585feec9f2b4ef45dfe35f31ad4adb35dfa");
+assert.ok(looksLikeCode("Summer2026") && looksLikeCustomCode("Summer2026"));
+for (const bad of ["short", "CATLWINGS", "x".repeat(25), "!!!"]) assert.ok(!looksLikeCustomCode(bad), bad);
 
 assert.deepEqual(parseReward("coins:500"), { kind: "coins", amount: 500 });
 assert.deepEqual(parseReward("sale:20:7"), { kind: "sale", percentOff: 20, days: 7 });

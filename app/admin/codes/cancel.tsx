@@ -75,7 +75,7 @@ export function CancelOne() {
         <input
           id="leaked"
           type="text"
-          placeholder="CATL-XXXX-XXXX-XXXX"
+          placeholder="CATL-XXXX-XXXX-XXXX or SUMMER2026"
           value={code}
           autoComplete="off"
           spellCheck={false}

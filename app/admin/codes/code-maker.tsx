@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { looksLikeCustomCode, normalize } from "@/lib/code-format";
 import { describeReward, rewardSpec, SHOP_ITEMS, type Reward } from "@/lib/rewards";
 
 type Kind = Reward["kind"];
@@ -22,7 +23,7 @@ interface Made {
 }
 
 /**
- * Pick a reward, how many codes and how long they last, and make them. The readable codes come back
+ * Pick a reward, how many codes (or type your own) and how long they last, and make them. The readable codes come back
  * once, from the server, and are shown here to copy or download - the site keeps only their
  * fingerprints, so they cannot be shown again later.
  */
@@ -35,6 +36,9 @@ export function CodeMaker() {
   const [item, setItem] = useState<string>(SHOP_ITEMS[0]);
   const [special, setSpecial] = useState("");
   const [count, setCount] = useState("10");
+  // Random codes, or one the owner types ("SUMMER2026").
+  const [own, setOwn] = useState(false);
+  const [custom, setCustom] = useState("");
   const [uses, setUses] = useState("1");
   const [lastDay, setLastDay] = useState("");
   const [note, setNote] = useState("");
@@ -62,7 +66,8 @@ export function CodeMaker() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           reward: rewardSpec(reward),
-          count: Number(count),
+          count: own ? 1 : Number(count),
+          custom: own ? custom : null,
           maxUses: Number(uses),
           expiresOn: lastDay || null,
           note: note || null,
@@ -95,8 +100,10 @@ export function CodeMaker() {
     return (
       <div className="stack" style={{ gap: 16 }}>
         <div className="notice ok">
-          <b>{made.codes.length} codes for {describeReward(made.reward)}</b> - they work now. Copy them
-          before leaving: they are shown this once.
+          <b>
+            {made.codes.length} code{made.codes.length === 1 ? "" : "s"} for {describeReward(made.reward)}
+          </b>{" "}
+          - {made.codes.length === 1 ? "it works" : "they work"} now. Copy before leaving: random codes are shown this once.
         </div>
         <ol className="code-list">
           {made.codes.map((code) => (
@@ -209,11 +216,46 @@ export function CodeMaker() {
         </div>
       )}
 
-      <div className="pair">
-        <div>
-          <label htmlFor="count">How many codes</label>
-          <input id="count" type="number" min={1} max={1000} value={count} onChange={(e) => setCount(e.target.value)} />
+      <div>
+        <span className="label">Code</span>
+        <div className="segmented" role="group" aria-label="Code">
+          <button type="button" aria-pressed={!own} onClick={() => setOwn(false)}>
+            Random
+          </button>
+          <button type="button" aria-pressed={own} onClick={() => setOwn(true)}>
+            Type my own
+          </button>
         </div>
+      </div>
+
+      <div className="pair">
+        {own ? (
+          <div>
+            <label htmlFor="custom">Your code</label>
+            <input
+              id="custom"
+              type="text"
+              maxLength={40}
+              placeholder="SUMMER2026"
+              autoComplete="off"
+              spellCheck={false}
+              value={custom}
+              onChange={(e) => setCustom(e.target.value)}
+            />
+            <span className="tiny muted">
+              {custom.trim() === ""
+                ? "6 to 24 letters and numbers. A word is easy to guess - give it few players or a last day."
+                : looksLikeCustomCode(custom)
+                  ? `Players type ${normalize(custom)} (any case, spaces ignored).`
+                  : "6 to 24 letters and numbers, not starting with CATL."}
+            </span>
+          </div>
+        ) : (
+          <div>
+            <label htmlFor="count">How many codes</label>
+            <input id="count" type="number" min={1} max={1000} value={count} onChange={(e) => setCount(e.target.value)} />
+          </div>
+        )}
         <div>
           <label htmlFor="uses">Players per code</label>
           <input id="uses" type="number" min={1} max={100000} value={uses} onChange={(e) => setUses(e.target.value)} />
@@ -232,8 +274,12 @@ export function CodeMaker() {
       </div>
 
       <div className="row">
-        <button className="gold" type="submit" disabled={busy}>
-          {busy ? "Making..." : `Make ${Number(count) || 0} code${Number(count) === 1 ? "" : "s"}`}
+        <button className="gold" type="submit" disabled={busy || (own && !looksLikeCustomCode(custom))}>
+          {busy
+            ? "Making..."
+            : own
+              ? `Make ${looksLikeCustomCode(custom) ? normalize(custom) : "my code"}`
+              : `Make ${Number(count) || 0} code${Number(count) === 1 ? "" : "s"}`}
         </button>
         <span className="tiny muted">
           {describeReward(rewardSpec(reward))}

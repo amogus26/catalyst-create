@@ -101,13 +101,12 @@ export interface ShopItem {
 const P = PALETTE;
 
 /**
- * The launcher's shop, in its order (CosmeticsPage.kt `shopItems`): wings, gauntlets and capes. Only
- * wings have prices so far (shop/Economy.kt WING_PRICES, 1,500-2,500 coins); the rest say "Price not out
- * yet", and while the store is a preview everything can be worn in game for free.
+ * The launcher's shop, in its order (CosmeticsPage.kt `shopItems`): wings, gauntlets and capes, each with
+ * its price in shop/Economy.kt's ranges. Nothing is free: an item is worn in game only once it is bought.
  */
 export const SHOP_ITEMS: ShopItem[] = [
   {
-    id: "stoneheart-gauntlet", name: "Stoneheart Gauntlet", kind: "gauntlet", rarity: "legendary", price: null,
+    id: "stoneheart-gauntlet", name: "Stoneheart Gauntlet", kind: "gauntlet", rarity: "legendary", price: 2800,
     colors: ["#E0A83A"], lore: "Five stones round a golden heart.", tag: { kind: "new" },
     model: { type: "box", file: "gauntlet" }, picture: "/cosmetics/stoneheart-gauntlet.webp",
   },
@@ -117,7 +116,7 @@ export const SHOP_ITEMS: ShopItem[] = [
     model: { type: "box", file: "stoneheart_wings" }, picture: "/cosmetics/stoneheart-wings.webp",
   },
   {
-    id: "arcane-iron-gauntlet", name: "Arcane Iron Gauntlet", kind: "gauntlet", rarity: "legendary", price: null,
+    id: "arcane-iron-gauntlet", name: "Arcane Iron Gauntlet", kind: "gauntlet", rarity: "legendary", price: 2400,
     colors: ["#3B4048", "#46FF8C"], lore: "Cold iron, green fire.", tag: { kind: "new" },
     model: { type: "box", file: "arcane_gauntlet" }, picture: "/cosmetics/arcane-iron-gauntlet.webp",
   },
@@ -142,11 +141,11 @@ export const SHOP_ITEMS: ShopItem[] = [
     model: { type: "glb", file: "void_butterfly_wings" }, picture: "/cosmetics/void-butterfly-wings.webp",
   },
   {
-    id: "emberfall-cape", name: "Emberfall Cape", kind: "cape", rarity: "rare", price: null,
+    id: "emberfall-cape", name: "Emberfall Cape", kind: "cape", rarity: "rare", price: 800,
     colors: [P.busy, darken(P.danger, 0.3)], lore: "Woven from the last light of autumn.",
   },
   {
-    id: "sculk-cape", name: "Sculk Cape", kind: "cape", rarity: "rare", price: null,
+    id: "sculk-cape", name: "Sculk Cape", kind: "cape", rarity: "rare", price: 800,
     colors: [P.sculkFleck, P.sculkPatch], lore: "It hums when no one is near.", tag: { kind: "new" },
   },
   {
@@ -160,15 +159,15 @@ export const SHOP_ITEMS: ShopItem[] = [
     model: { type: "glb", file: "crow_wings" }, picture: "/cosmetics/crow-wings.webp",
   },
   {
-    id: "aurora-cape", name: "Aurora Cape", kind: "cape", rarity: "rare", price: null,
+    id: "aurora-cape", name: "Aurora Cape", kind: "cape", rarity: "rare", price: 900,
     colors: [P.success, P.blue, darken(P.blue, 0.4)], lore: "Stitched from the northern sky.",
   },
   {
-    id: "nightfall-cape", name: "Nightfall Cape", kind: "cape", rarity: "common", price: null,
+    id: "nightfall-cape", name: "Nightfall Cape", kind: "cape", rarity: "common", price: 500,
     colors: [darken(P.blue, 0.2), darken(P.blue, 0.7)], lore: "Pulls the dusk in close.",
   },
   {
-    id: "verdant-cape", name: "Verdant Cape", kind: "cape", rarity: "common", price: null,
+    id: "verdant-cape", name: "Verdant Cape", kind: "cape", rarity: "common", price: 400,
     colors: [P.launchReady, darken(P.success, 0.5)], lore: "Smells faintly of rain.",
   },
 ];
@@ -298,7 +297,7 @@ export const YEAR_GIFT = {
 
 /** The season (ui/pages/BattlePassPage.kt `Season`) and its levels (launch/BattlePass.kt). */
 export const SEASON = {
-  number: 4,
+  number: 1,
   name: "Emberfall",
   priceCents: ECONOMY.passPriceCents,
   headline: "Emberfall Wings",
@@ -413,7 +412,7 @@ export const EARNED_COSMETICS: { name: string; from: string }[] = [
 /** Codes (launcher codes/Codes.kt, this site's lib/codes.ts). */
 export const CODE_FORMAT = {
   example: "CATL-7KQ4-M9XH-3TRE",
-  alphabetNote: "Twelve letters and digits, with no 0, O, 1, I or L - so nothing is misread.",
+  alphabetNote: "Twelve letters and digits, with no 0, O, 1, I or L - so nothing is misread. Giveaway codes can be a word too, like SUMMER2026.",
   where: "Launcher → Store → Coins → Redeem code",
 } as const;
 
@@ -574,7 +573,6 @@ export const RELEASE_NOTES: { title: string; date: string; tag: "Launcher" | "Cl
       "The Stoneheart Wings and Stoneheart Gauntlet: gold, set with glowing stones that shed sparks.",
       "The Arcane Iron Gauntlet: cold iron and green fire.",
       "Wear in game, from the Store - a cape, wings and a gauntlet at once. For now only you see them.",
-      "Free to wear while the Store is a preview.",
     ],
   },
   {

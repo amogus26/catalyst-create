@@ -166,6 +166,8 @@ export function createLocalStore(): Store {
 
     async createCodes({ batchId, hashes, reward, note, maxUses, expiresOn }) {
       const book = await readCodes();
+      // The database refuses a repeat by its primary key; this file does the same.
+      if (book.codes.some((code) => hashes.includes(code.hash))) throw new Error("duplicate code");
       const createdAt = new Date().toISOString();
       for (const hash of hashes) {
         book.codes.push({ hash, batchId, reward, note, maxUses, uses: 0, expiresOn, revoked: false, createdAt });

@@ -65,9 +65,9 @@ export default function CosmeticsPage() {
       <section className="wide" aria-label="The shop">
         <CosmeticsShop />
         <p className={`note ${styles.preview}`}>
-          <b>Store preview.</b>&nbsp;These are the items and prices in the launcher&apos;s Store today, and while it is a preview
-          you can wear any of them in game for free - for now only you see them. Coins can&apos;t be bought yet; when they
-          can, it will be in the launcher, never on this site.
+          <b>Nothing is free to wear.</b>&nbsp;These are the items and prices in the launcher&apos;s Store today: buy one with
+          coins and wear it in game - for now only you see it. Coins come from redeem codes for now; when coins can be bought,
+          it will be in the launcher, never on this site.
         </p>
       </section>
 

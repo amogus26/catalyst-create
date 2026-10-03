@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { isOwner } from "@/lib/admin-session";
-import { fingerprint, generateCodes } from "@/lib/codes";
+import { fingerprint, generateCodes, looksLikeCustomCode, normalize } from "@/lib/codes";
 import { parseReward, rewardSpec } from "@/lib/rewards";
 import { getStore } from "@/lib/store";
 
@@ -8,7 +8,8 @@ import { getStore } from "@/lib/store";
 const MAX_BATCH = 1000;
 
 /**
- * Makes a batch of codes: `{reward, count, maxUses, expiresOn, note}`. The owner only (CODES_PASSWORD).
+ * Makes a batch of codes: `{reward, count, maxUses, expiresOn, note}`, or one code the owner typed with
+ * `{custom: "SUMMER2026", ...}` in place of count. The owner only (CODES_PASSWORD).
  *
  * The codes are generated here, stored by fingerprint only, and handed back in readable form in this
  * one response - the only time they exist readably. Lose the response and the batch is unusable (it
@@ -30,7 +31,14 @@ export async function POST(request: Request) {
   if (!reward) {
     return NextResponse.json({ error: "That reward is not one the launcher understands." }, { status: 400 });
   }
-  const count = Number(body.count);
+  const custom = typeof body.custom === "string" && body.custom.trim() !== "" ? body.custom : null;
+  if (custom !== null && !looksLikeCustomCode(custom)) {
+    return NextResponse.json(
+      { error: "A custom code is 6 to 24 letters and numbers, and can't start with CATL." },
+      { status: 400 },
+    );
+  }
+  const count = custom !== null ? 1 : Number(body.count);
   if (!Number.isInteger(count) || count < 1 || count > MAX_BATCH) {
     return NextResponse.json({ error: `Make between 1 and ${MAX_BATCH} codes at a time.` }, { status: 400 });
   }
@@ -51,7 +59,7 @@ export async function POST(request: Request) {
   }
   const note = typeof body.note === "string" && body.note.trim() !== "" ? body.note.trim().slice(0, 120) : null;
 
-  const codes = generateCodes(count);
+  const codes = custom !== null ? [normalize(custom)] : generateCodes(count);
   const batchId = crypto.randomUUID();
   try {
     await getStore().createCodes({
@@ -63,6 +71,9 @@ export async function POST(request: Request) {
       expiresOn,
     });
   } catch (error) {
+    if (custom !== null && String(error).toLowerCase().includes("duplicate")) {
+      return NextResponse.json({ error: `${codes[0]} already exists - pick another word.` }, { status: 409 });
+    }
     console.error("[catalyst-create] making codes failed:", error);
     return NextResponse.json({ error: "The codes could not be saved - none were made." }, { status: 500 });
   }

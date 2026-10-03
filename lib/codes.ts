@@ -2,29 +2,16 @@ import { createHash, randomInt } from "node:crypto";
 
 /**
  * Redeem codes, the same way the launcher reads them (its `codes/Codes.kt`): `CATL-XXXX-XXXX-XXXX`,
- * twelve characters from an alphabet with no 0/O or 1/I/L, stored only as the SHA-256 of that tidy
- * form. If [normalize] or [fingerprint] ever drift from the launcher's, codes made here stop
- * redeeming - `scripts/check-codes.ts` pins both to the launcher's own test vector.
+ * twelve characters from an alphabet with no 0/O or 1/I/L - or a custom word the owner typed (see
+ * code-format.ts) - stored only as the SHA-256 of the tidy form. If [normalize] or [fingerprint] ever drift from the launcher's, codes made here stop
+ * redeeming - `scripts/check-codes.mjs` pins both to the launcher's own test vector.
  *
  * No `@/` imports here, so the check script can run this file with plain `node`.
  */
 
-export const PREFIX = "CATL";
-export const ALPHABET = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
+import { ALPHABET, normalize, PREFIX } from "./code-format.ts";
 
-/** What a player typed, as it was generated: capitals, no spaces, dashes put back. */
-export function normalize(typed: string): string {
-  const raw = typed
-    .toUpperCase()
-    .replace(/[^A-Z0-9]/g, "")
-    .replace(/^CATL/, "");
-  return `${PREFIX}-${raw.match(/.{1,4}/g)?.join("-") ?? ""}`;
-}
-
-/** Whether [typed] could be a code at all - checked before the database is asked anything. */
-export function looksLikeCode(typed: string): boolean {
-  return new RegExp(`^${PREFIX}(-[${ALPHABET}]{4}){3}$`).test(normalize(typed));
-}
+export * from "./code-format.ts";
 
 /** The only form a code is ever stored in. */
 export function fingerprint(code: string): string {
