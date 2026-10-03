@@ -21,6 +21,8 @@ export const metadata: Metadata = {
   },
   description:
     `Catalyst is a Minecraft launcher and client in one: it installs your mods and keeps them updated, adds ${CLIENT_MODULES.length} modules, and brings cosmetics, a battle pass and daily rewards.`,
+  applicationName: "Catalyst Client",
+  keywords: ["Catalyst Client", "Catalyst", "Minecraft client", "Minecraft launcher", "Fabric", "Minecraft mods", "cosmetics"],
   openGraph: {
     type: "website",
     siteName: "Catalyst Client",
@@ -57,6 +59,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             Local dev store - data lives in <code>.localstore/</code> on this machine only.
           </div>
         )}
+        {/* Tells search engines what Catalyst Client is, so a search for its name can show it as an app. */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "SoftwareApplication",
+              name: "Catalyst Client",
+              alternateName: "Catalyst",
+              url: "https://catalystclient.net",
+              applicationCategory: "GameApplication",
+              operatingSystem: "Windows, macOS",
+              description: metadata.description,
+              offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+            }),
+          }}
+        />
         <SiteHeader />
         <main id="main">{children}</main>
         <SiteFooter />
