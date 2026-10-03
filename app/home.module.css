@@ -1509,11 +1509,11 @@ a.featureCard:hover {
 }
 .cardImage {
   position: absolute;
-  right: -1.25rem;
-  bottom: -2.25rem;
+  right: 0.25rem;
+  bottom: -0.5rem;
   z-index: 1;
-  width: 56%;
-  height: 70%;
+  width: 52%;
+  height: 60%;
   object-fit: contain;
   object-position: right bottom;
   filter: grayscale(1) brightness(0.7) contrast(1.05);

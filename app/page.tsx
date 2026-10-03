@@ -94,20 +94,21 @@ const PROFILE_MODS = [
 ];
 
 /**
- * The feature cards, after Pulse Visuals' grid: one thing each, with a picture of our own - a voxel icon
- * from the launcher's reward art, or a cosmetic the client ships - rendered by scripts/render-cosmetics.py
+ * The feature cards, after Pulse Visuals' grid: one thing each, with a picture of our own - pixel art drawn
+ * for them (a palette in the launcher's theme colours, a bolt, an install arrow), a player's head, or a
+ * cosmetic the client ships - rendered by scripts/render-cosmetics.py
  * (the skies are the client's own screenshot). Grey until pointed at; the first is lit.
  */
 const FEATURE_CARDS: { title: string; text: string; image: string; href?: string; sky?: boolean; wide?: boolean }[] = [
   {
     title: "Made to look good",
     text: `A clean Right Shift menu, ${THEME_PRESETS.length} colour schemes or any colour you like, and a HUD you arrange by dragging.`,
-    image: "/features/crown.webp",
+    image: "/features/palette.webp",
   },
   {
     title: "Fast from the first launch",
     text: `${PREINSTALLED_MODS.join(", ").replace(/, ([^,]*)$/, " and $1")} come installed and stay on their newest build - the speed mods, without hunting for them.`,
-    image: "/features/pickaxe.webp",
+    image: "/features/bolt.webp",
   },
   {
     title: "Made for PvP",
@@ -117,7 +118,7 @@ const FEATURE_CARDS: { title: string; text: string; image: string; href?: string
   {
     title: "Mods in one click",
     text: "Search Modrinth and CurseForge from the launcher. The mods a mod needs come with it, every file checked.",
-    image: "/features/chest.webp",
+    image: "/features/install.webp",
   },
   {
     title: "Wings you can wear",
@@ -135,13 +136,13 @@ const FEATURE_CARDS: { title: string; text: string; image: string; href?: string
   {
     title: "Your real account",
     text: "Sign in with Microsoft and play as yourself - your name, your skin, online servers.",
-    image: "/features/name-tag.webp",
+    image: "/features/head.webp",
     href: "#sign-in",
   },
   {
     title: "Something every day",
     text: `A daily reward card, a ${SEASON.levels}-level battle pass and redeem codes - coins and cosmetics for playing.`,
-    image: "/features/present.webp",
+    image: "/features/ember-gauntlet.webp",
     href: "/battle-pass",
   },
   {

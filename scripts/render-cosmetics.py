@@ -4,7 +4,9 @@ The site's still pictures of Catalyst's cosmetics and pixel icons, rendered in B
     blender -b --factory-startup --python scripts/render-cosmetics.py -- <job> <out.png> [size]
 
 Jobs:
-    sprite:<NAME>          a 16x16 icon from lib/sprites.ts, built from voxels (CROWN, PICKAXE, CHEST...)
+    sprite:<NAME>          a 16x16 icon from lib/sprites.ts, built from voxels (CROWN, PICKAXE, CHEST...), or
+                           one of this script's own ART (BOLT, INSTALL, PALETTE)
+    head                   a player's head in our classic skin
     box:<model>[:<pose>]   a box model the client draws (its assets/visuals/cosmetics/<model>.json):
                            a gauntlet (gauntlet, arcane_gauntlet, ember_gauntlet; pose "fist" raises it),
                            a hat (ember_hat, on a plain head) or stoneheart_wings
@@ -223,17 +225,85 @@ def read_sprites():
     return palette, sprites
 
 
+# Pixel art for the home page's feature cards, our own: drawn here, extruded like the reward icons. A pixel
+# whose letter is in GLOW is lit from within.
+ART = {
+    "BOLT": ({"k": "#3A2A08", "W": "#FFF6D8", "Y": "#FFD24A", "O": "#FF9A2E"}, "WYO", [
+        "..........kkkk..",
+        ".........kWYYk..",
+        "........kWYYk...",
+        ".......kWYYk....",
+        "......kWYYk.....",
+        ".....kWYYk......",
+        "....kWYYYkkkkk..",
+        "...kWYYYYYYYYk..",
+        "..kkkkkkYYYYk...",
+        ".......kYYOk....",
+        "......kYYOk.....",
+        ".....kYYOk......",
+        "....kYOOk.......",
+        "...kYOk.........",
+        "..kOk...........",
+        "..kk............",
+    ]),
+    # Mods in one click: a download arrow dropping into a tray.
+    "INSTALL": ({"k": "#0C2A2A", "L": "#9BF0E6", "T": "#37D3C4", "D": "#1E9AA1"}, "", [
+        "................",
+        "......kkkk......",
+        "......kLTk......",
+        "......kLTk......",
+        "......kLTk......",
+        "...kkkkLTkkkk...",
+        "...kLLLTTTTDk...",
+        "....kLTTTTDk....",
+        ".....kLTTDk.....",
+        "......kLDk......",
+        ".......kk.......",
+        "..kk........kk..",
+        "..kTk......kTk..",
+        "..kTTkkkkkkTTk..",
+        "..kDDDDDDDDDDk..",
+        "..kkkkkkkkkkkk..",
+    ]),
+    # The paint is the launcher's colour schemes: Default's sky blue, Amethyst, Cherry, Redstone, Emerald, Copper.
+    "PALETTE": ({"k": "#3A240E", "B": "#C8925A", "b": "#9A6A3A", "1": "#2FABF5", "2": "#B888FA", "3": "#FA86B6",
+                 "4": "#F65754", "5": "#3BD68E", "6": "#F18E4C"}, "", [
+        "................",
+        "....kkkkkkk.....",
+        "..kkBBBBBBBkk...",
+        ".kB11BBB22BBBk..",
+        "kBB11BBB22BB33k.",
+        "kBBBBBBBBBBB33k.",
+        "kBkkBBBBBBBBBBk.",
+        "kk..kBB66BB44k..",
+        "kk..kBB66BB44k..",
+        "kBkkBBBBBBBBk...",
+        "kBBBBB55BBBk....",
+        ".kBBBB55BBk.....",
+        "..kkbbbbbk......",
+        "....kkkkk.......",
+        "................",
+        "................",
+    ]),
+}
+
+
 def build_sprite(name, depth=1.0):
     """The icon as voxels, one per pixel, a pixel deep: only the faces that show are built."""
-    palette, sprites = read_sprites()
-    rows = sprites[name]
+    glow_letters = ""
+    if name in ART:
+        palette, glow_letters, rows = ART[name]
+    else:
+        palette, sprites = read_sprites()
+        rows = sprites[name]
     filled = {(x, y) for y, row in enumerate(rows) for x, ch in enumerate(row) if ch != "."}
-    faces, colours = [], []
+    plain, glow = ([], []), ([], [])
     for y, row in enumerate(rows):
         for x, ch in enumerate(row):
             if ch == ".":
                 continue
             colour = hex_rgba(palette[ch])
+            target = glow if ch in glow_letters else plain
             X, Z = x, 15 - y  # up is +Z
             sides = box_faces(X, 0, Z, X + 1, depth, Z + 1)
             show = [
@@ -246,17 +316,21 @@ def build_sprite(name, depth=1.0):
             ]
             for quad, visible in zip(sides, show):
                 if visible:
-                    faces.append(quad)
+                    target[0].append(quad)
                     # The back and the bevelled sides a touch darker, as an extruded sprite is.
                     k = 1.0 if quad is sides[2] else 0.86
-                    colours.append((colour[0] * k, colour[1] * k, colour[2] * k, 1.0))
-    mat = vertex_colour_material("Sprite", roughness=0.42)
-    obj = mesh_object(name, faces, colours, mat, bevel=0.06)
-    obj.location = (-8, -depth / 2, -8)
+                    target[1].append((colour[0] * k, colour[1] * k, colour[2] * k, 1.0))
     pivot = bpy.data.objects.new("Pivot", None)
     bpy.context.scene.collection.objects.link(pivot)
-    obj.parent = pivot
-    return pivot, [obj]
+    made = []
+    for (faces, colours), mat in ((plain, vertex_colour_material("Sprite", roughness=0.42)),
+                                  (glow, vertex_colour_material("SpriteGlow", roughness=0.3, emission=1.6))):
+        if faces:
+            obj = mesh_object(name, faces, colours, mat, bevel=0.06)
+            obj.location = (-8, -depth / 2, -8)
+            obj.parent = pivot
+            made.append(obj)
+    return pivot, made
 
 
 # --- box models (the client's gauntlets and Stoneheart Wings) ------------------------------------------------
@@ -353,6 +427,50 @@ def build_hat(model):
     return space, objects
 
 
+def build_head():
+    """A player's head, 8 voxels a side, in our classic skin (components/three/textures.ts makeClassicSkin):
+    brown hair, blue eyes. Blender space: Z up, the face towards -Y."""
+    hair, hair_light, skin, shade, light = "#4A3222", "#5E412D", "#C99670", "#B27F5A", "#D9A983"
+    face = [
+        "HHHHHHHH",
+        "HHHHHHHH",
+        "HLLLLLLH",
+        "SBBSSBBS",
+        "SWESSEWS",
+        "SSSSSSSS",
+        "SSSMMSSS",
+        "DDDDDDDD",
+    ]
+    colours_of = {"H": hair, "L": light, "S": skin, "B": hair, "W": "#F4F7FB", "E": "#4B6FB0", "M": "#8E5B41", "D": shade}
+    faces, colours = [], []
+
+    def quad(points, colour):
+        faces.append(points)
+        colours.append(hex_rgba(colour))
+
+    for i in range(8):
+        for j in range(8):
+            # front (-Y): row j from the top
+            quad([(i, 0, 7 - j), (i + 1, 0, 7 - j), (i + 1, 0, 8 - j), (i, 0, 8 - j)], colours_of[face[j][i]])
+            # top (+Z): hair, a little lighter
+            quad([(i, j, 8), (i + 1, j, 8), (i + 1, j + 1, 8), (i, j + 1, 8)], hair_light if (i * 7 + j * 3) % 5 == 0 else hair)
+            # back (+Y): hair down to the neck
+            quad([(i, 8, 7 - j), (i, 8, 8 - j), (i + 1, 8, 8 - j), (i + 1, 8, 7 - j)], hair if j < 6 else shade)
+            # sides: hair over the top and the back, skin at the front below the temple
+            side = hair if (j < 2 or i > 4 or (j < 4 and i > 2)) else skin
+            quad([(0, i, 7 - j), (0, i, 8 - j), (0, i + 1, 8 - j), (0, i + 1, 7 - j)], side)
+            quad([(8, i, 7 - j), (8, i + 1, 7 - j), (8, i + 1, 8 - j), (8, i, 8 - j)], side)
+    for i in range(8):
+        for j in range(8):
+            quad([(i, j, 0), (i, j + 1, 0), (i + 1, j + 1, 0), (i + 1, j, 0)], shade)
+    obj = mesh_object("Head", faces, colours, vertex_colour_material("Skin", roughness=0.8))
+    obj.location = (-4, -4, -4)
+    pivot = bpy.data.objects.new("Pivot", None)
+    bpy.context.scene.collection.objects.link(pivot)
+    obj.parent = pivot
+    return pivot, [obj]
+
+
 def build_stone_wings(model="stoneheart_wings"):
     """StoneWings.java at rest, standing still: each side swung back by its idle, blades at their angles."""
     data = json.load(open(os.path.join(CLIENT, model + ".json"), encoding="utf-8"))
@@ -415,10 +533,16 @@ def main():
     kind, _, rest = job.partition(":")
     name, _, pose = rest.partition(":")
 
-    if kind == "sprite":
+    if kind == "head":
+        pivot, objects = build_head()
+        pivot.rotation_euler = (0, 0, math.radians(-28))
+        view, centre, radius = frame(objects, (0.25, -1.0, 0.45), lens=60, fill=0.9)
+    elif kind == "sprite":
         pivot, objects = build_sprite(name)
-        # Held the way Minecraft shows an item: tipped corner to corner, turned towards the light.
-        pivot.rotation_euler = (math.radians(12), math.radians(-28), math.radians(-35))
+        # Held the way Minecraft shows an item: tipped corner to corner, turned towards the light. The cards'
+        # own art turns less, so its shape reads.
+        pivot.rotation_euler = (math.radians(8), math.radians(-14), math.radians(-12)) if name in ART \
+            else (math.radians(12), math.radians(-28), math.radians(-35))
         view, centre, radius = frame(objects, (0.35, -1.0, 0.25), lens=70, fill=0.92)
     elif kind == "box" and name.endswith("hat"):
         _, objects = build_hat(name)
