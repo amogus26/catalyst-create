@@ -15,6 +15,7 @@ export function LoginForm({
 }) {
   const router = useRouter();
   const [password, setPassword] = useState("");
+  const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -26,13 +27,14 @@ export function LoginForm({
       const response = await fetch("/api/admin/login", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ password, gate }),
+        body: JSON.stringify({ password, gate, code }),
       });
       if (!response.ok) {
-        setError("That password is not right.");
+        setError(gate === "owner" ? "That password or code is not right." : "That password is not right.");
         return;
       }
       setPassword("");
+      setCode("");
       router.refresh();
     } catch {
       setError("Could not reach the server.");
@@ -72,6 +74,21 @@ export function LoginForm({
               onChange={(event) => setPassword(event.target.value)}
             />
           </div>
+          {gate === "owner" && (
+            <div>
+              {/* one-time-code: Safari offers the code from the Passwords app's entry for this site. */}
+              <label htmlFor="code">6-digit code</label>
+              <input
+                id="code"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                maxLength={6}
+                placeholder="From the Passwords app"
+                value={code}
+                onChange={(event) => setCode(event.target.value.replace(/\D/g, ""))}
+              />
+            </div>
+          )}
           <div>
             <button className="primary" type="submit" disabled={busy || password.length === 0}>
               {busy ? "Checking..." : "Sign in"}

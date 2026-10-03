@@ -10,6 +10,7 @@
 import assert from "node:assert/strict";
 import { fingerprint, generateCodes, looksLikeCode, looksLikeCustomCode, normalize } from "../lib/codes.ts";
 import { parseReward } from "../lib/rewards.ts";
+import { totp, totpMatches } from "../lib/totp.ts";
 
 assert.equal(normalize("catl 2345 6789 abcd"), "CATL-2345-6789-ABCD");
 assert.equal(
@@ -37,5 +38,14 @@ assert.deepEqual(parseReward("special:Creator Cape"), { kind: "special", name: "
 for (const bad of ["coins:-5", "coins", "sale:95:7", "sale:20", "item:", "item:Nope Wings", "hat:1"]) {
   assert.equal(parseReward(bad), null, bad);
 }
+
+// The codes page's six-digit sign-in codes: RFC 6238's own SHA-1 vectors ("12345678901234567890" in base32).
+const rfcKey = "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ";
+assert.equal(totp(rfcKey, 59, 8), "94287082");
+assert.equal(totp(rfcKey, 1111111109, 8), "07081804");
+assert.equal(totp(rfcKey, 20000000000, 8), "65353130");
+assert.ok(totpMatches(rfcKey, totp(rfcKey, 1000), 1000 + 25), "a code from the last 30 seconds still works");
+assert.ok(!totpMatches(rfcKey, totp(rfcKey, 1000), 1000 + 95), "a code from 90 seconds ago does not");
+assert.ok(!totpMatches(rfcKey, "", 1000));
 
 console.log("codes: fingerprints match the launcher, rewards read the launcher's way");

@@ -1,12 +1,17 @@
 import { NextResponse } from "next/server";
-import { cookieOptions, issueSession, passwordConfigured, passwordMatches, SESSION_COOKIES, type Gate } from "@/lib/admin-session";
+import { cookieOptions, issueSession, ownerCodeKey, passwordConfigured, passwordMatches, SESSION_COOKIES, type Gate } from "@/lib/admin-session";
+import { totpMatches } from "@/lib/totp";
 
-/** Signing in: `{password, gate}` - "reviewer" (the default) for the review queue, "owner" for redeem codes. */
+/**
+ * Signing in: `{password, gate, code}` - "reviewer" (the default) for the review queue, "owner" for redeem
+ * codes. The owner also gives the six-digit `code` once CODES_TOTP_SECRET is set.
+ */
 export async function POST(request: Request) {
   let password: unknown;
   let gate: unknown;
+  let code: unknown;
   try {
-    ({ password, gate } = (await request.json()) as { password?: unknown; gate?: unknown });
+    ({ password, gate, code } = (await request.json()) as { password?: unknown; gate?: unknown; code?: unknown });
   } catch {
     return NextResponse.json({ error: "That request could not be read." }, { status: 400 });
   }
@@ -16,8 +21,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "No password is configured for that on this server." }, { status: 503 });
   }
 
-  if (typeof password !== "string" || !passwordMatches(which, password)) {
-    // Deliberately vague, and the same answer for a missing password as a wrong one.
+  const codeKey = which === "owner" ? ownerCodeKey() : null;
+  const passwordRight = typeof password === "string" && passwordMatches(which, password);
+  const codeRight = codeKey === null || (typeof code === "string" && totpMatches(codeKey, code));
+  if (!passwordRight || !codeRight) {
+    // Deliberately vague: the same answer whichever of the two was wrong, or missing.
     return NextResponse.json({ error: "Not right." }, { status: 401 });
   }
 
