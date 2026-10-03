@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { createLocalStore } from "./local";
 import { createSupabaseStore } from "./supabase";
 import type { Store } from "./types";
@@ -30,6 +32,27 @@ export function usingDevStore(): boolean {
   return !configured && process.env.NODE_ENV !== "production";
 }
 
+/**
+ * The service role key. It is a secret variable in Netlify, and Netlify never hands secret values to its
+ * CLI: a `netlify deploy` built on a laptop gets "****************abcd" in their place. Building /designs reads the
+ * database, so when - and only when - the variable is such a mask, the real key comes from .env.local on
+ * the machine doing the build (git-ignored, never deployed). On Netlify's servers it is the real key.
+ */
+function serviceRoleKey(): string | undefined {
+  const value = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  // The mask is a run of asterisks, then the key's last four characters.
+  if (!value || !/^\*{8,}/.test(value)) return value;
+  try {
+    const line = readFileSync(join(process.cwd(), ".env.local"), "utf8")
+      .split(/\r?\n/)
+      .find((l) => l.startsWith("SUPABASE_SERVICE_ROLE_KEY="));
+    const local = line?.slice("SUPABASE_SERVICE_ROLE_KEY=".length).trim().replace(/^["']|["']$/g, "");
+    return local || value;
+  } catch {
+    return value;
+  }
+}
+
 export function getStore(): Store {
   if (typeof window !== "undefined") {
     // The service role key lives in this module's neighbourhood. Nothing here may be bundled into
@@ -39,7 +62,7 @@ export function getStore(): Store {
   if (cached) return cached;
 
   const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const key = serviceRoleKey();
   const bucket = process.env.SUPABASE_BUCKET ?? "submissions";
 
   if (url && key) {
