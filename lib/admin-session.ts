@@ -40,7 +40,7 @@ const GATES: Record<Gate, { env: "ADMIN_PASSWORD" | "CODES_PASSWORD"; cookie: st
   owner: { env: "CODES_PASSWORD", cookie: "catalyst_owner", label: "owner" },
 };
 
-const SESSION_SECONDS = 12 * 60 * 60;
+const SESSION_SECONDS = 60 * 60;
 
 function gatePassword(gate: Gate): string {
   const value = process.env[GATES[gate].env];
